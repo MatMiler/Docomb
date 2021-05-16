@@ -1,7 +1,7 @@
-﻿@page "/{**articlePath}"
+﻿@*@page "/{**articlePath}"*@
 @model WebReader.Reader.Pages.ArticleViewModel
 @{
-	Layout = "_Layout";
+	Layout = "~/Areas/Reader/Pages/Shared/_Layout.cshtml";
 }
 
 <div>@Model.ArticlePath</div>
