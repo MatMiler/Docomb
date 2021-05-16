@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<AssemblyName>Docomb.TestSite</AssemblyName>
+		<RootNamespace>Docomb.TestSite</RootNamespace>
+		<Product>Docomb</Product>
+		<Authors>Matjaž Miler</Authors>
+		<Version>0.0.1</Version>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\WebCore\WebCore.csproj" />
+	  <ProjectReference Include="..\WebReader\WebReader.csproj" />
+	</ItemGroup>
+
+</Project>

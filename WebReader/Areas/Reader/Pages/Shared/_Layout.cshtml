@@ -1,0 +1,11 @@
+﻿<html>
+<head>
+	<title>@(ViewBag.Title ?? Docomb.WebCore.Configurations.MainConfig.Instance.SiteName)</title>
+</head>
+
+<body>
+	@Html.Partial("_Header")
+	@RenderBody()
+	@Html.Partial("_Footer")
+</body>
+</html>
