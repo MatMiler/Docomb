@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+		<AssemblyName>Docomb.CommonCore</AssemblyName>
+		<RootNamespace>Docomb.CommonCore</RootNamespace>
+		<Product>Docomb</Product>
+		<Authors>Matjaž Miler</Authors>
+		<Version>0.0.1</Version>
+	</PropertyGroup>
+
+</Project>

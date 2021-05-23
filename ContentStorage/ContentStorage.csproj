@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<AssemblyName>Docomb.ContentStorage</AssemblyName>
+		<RootNamespace>Docomb.ContentStorage</RootNamespace>
+		<Product>Docomb</Product>
+		<Authors>Matjaž Miler</Authors>
+		<Version>0.0.1</Version>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\CommonCore\CommonCore.csproj" />
+	</ItemGroup>
+
+</Project>
