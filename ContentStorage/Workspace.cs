@@ -29,7 +29,7 @@ namespace Docomb.ContentStorage
 			set
 			{
 				// Split and re-join path parts for consistency
-				UrlParts = SplitPath(value);
+				UrlParts = SplitPath(value, true);
 				_urlPath = string.Join('/', UrlParts) + "/";
 			}
 		}

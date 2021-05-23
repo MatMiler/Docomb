@@ -38,7 +38,7 @@ namespace Docomb.ContentStorage
 		public static readonly List<string> DefaultFileNames = MergeListContents(DefaultFileNameCores, OmittableExtensions, (a, b) => $"{a}.{b}");
 
 
-		public Item FindItem(string path) => FindItem(SplitPath(path));
+		public Item FindItem(string path) => FindItem(SplitPath(path, true));
 		public Item FindItem(List<string> pathParts)
 		{
 			string path = Path.Combine(RootPath, string.Join('/', pathParts));

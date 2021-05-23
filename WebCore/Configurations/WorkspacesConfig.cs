@@ -69,7 +69,7 @@ namespace Docomb.WebCore.Configurations
 
 
 
-		public static (Workspace workspace, List<string> remainingPath)? FindFromPath(string path) => FindFromPath(SplitPath(path));
+		public static (Workspace workspace, List<string> remainingPath)? FindFromPath(string path) => FindFromPath(SplitPath(path, true));
 
 		public static (Workspace workspace, List<string> remainingPath)? FindFromPath(List<string> pathParts)
 		{

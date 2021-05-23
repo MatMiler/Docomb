@@ -9,7 +9,7 @@ namespace Docomb.CommonCore
 	public static partial class Utils
 	{
 
-		public static List<string> SplitPath(string path)
+		public static List<string> SplitPath(string path, bool blockParentTraversal = false)
 		{
 			if (string.IsNullOrWhiteSpace(path)) return new();
 			List<string> parts = new();
@@ -20,7 +20,7 @@ namespace Docomb.CommonCore
 				if (string.IsNullOrWhiteSpace(part)) continue;
 
 				// End processing on obviously invalid entries
-				if ((part == "..") || (part == ".") || (part.Contains(":"))) break;
+				if ((blockParentTraversal) && ((part == "..") || (part == ".") || (part.Contains(":")))) break;
 
 				parts.Add(part);
 			}
@@ -29,6 +29,17 @@ namespace Docomb.CommonCore
 
 
 
+		public static string GetFileNameFromPath(string filePath) => SplitPath(filePath)?.LastOrDefault();
+
+
+		public static string GetFileExtension(string fileName)
+		{
+			if (string.IsNullOrEmpty(fileName)) return null;
+			if ((fileName.Contains('\\')) || (fileName.Contains('/'))) fileName = GetFileNameFromPath(fileName) ?? "";
+			int lastDot = fileName.LastIndexOf('.');
+			if ((lastDot <= 0) || (lastDot >= fileName.Length - 1)) return null;
+			return fileName.Substring(lastDot + 1);
+		}
 
 
 

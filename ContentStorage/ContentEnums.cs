@@ -18,7 +18,8 @@ namespace Docomb.ContentStorage
 	public enum FileType
 	{
 		File,
-		Markdown
+		Markdown,
+		Html
 	}
 
 

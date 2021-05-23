@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContentStorage", "ContentSt
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonCore", "CommonCore\CommonCore.csproj", "{8AD1B044-517F-43E1-9F92-E355FB33410D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{8AD1B044-517F-43E1-9F92-E355FB33410D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AD1B044-517F-43E1-9F92-E355FB33410D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AD1B044-517F-43E1-9F92-E355FB33410D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
