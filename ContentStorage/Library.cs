@@ -30,37 +30,63 @@ namespace Docomb.ContentStorage
 
 
 
-		public static readonly List<string> MarkdownExtensions = new() { ".md", ".MD", ".markdown", ".mdown", ".mkdn", ".mkd", ".mdwn", ".text" };
-		public static readonly List<string> MarkdownDefaultFileCores = new() { "index", "home", "readme", "Index", "Home", "Readme", "INDEX", "HOME", "README" };
-		public static readonly List<string> MarkdownDefaultFiles = MergeListContents(MarkdownDefaultFileCores, MarkdownExtensions, (a, b) => a + b);
+		public static readonly List<string> OmittableExtensions =
+			FileHandlers.Markdown.Extensions
+			.Concat(FileHandlers.Html.Extensions)
+			.ToList();
+		public static readonly List<string> DefaultFileNameCores = new() { "index", "default", "home", "readme" };
+		public static readonly List<string> DefaultFileNames = MergeListContents(DefaultFileNameCores, OmittableExtensions, (a, b) => $"{a}.{b}");
+
 
 		public Item FindItem(string path) => FindItem(SplitPath(path));
 		public Item FindItem(List<string> pathParts)
 		{
 			string path = Path.Combine(RootPath, string.Join('/', pathParts));
 
-			foreach (string extension in MarkdownExtensions)
+
+			#region Exact file match
+			if (File.Exists(path))
 			{
-				string filePath = path + extension;
-				if (File.Exists(filePath))
+				return new ContentFile(path, pathParts);
+			}
+			#endregion
+
+
+			#region Omittable extensions
+			if (pathParts.Count >= 1)
+			{
+				string parentPath = Path.Combine(RootPath, string.Join('/', pathParts.GetRange(0, pathParts.Count - 1)));
+				string fileNameCore = pathParts.Last() + ".";
+				foreach (string extension in OmittableExtensions)
 				{
-					return new ContentFile(filePath, pathParts);
+					string[] files = Directory.GetFiles(parentPath, fileNameCore + extension, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
+					if (files?.Length >= 1)
+					{
+						return new ContentFile(files[0], pathParts);
+					}
 				}
 			}
+			#endregion
 
-			foreach (string fileName in MarkdownDefaultFiles)
+
+			#region Default files
+			foreach (string fileName in DefaultFileNames)
 			{
-				string filePath = Path.Combine(path, fileName);
-				if (File.Exists(filePath))
+				string[] files = Directory.GetFiles(path, fileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
+				if (files?.Length >= 1)
 				{
-					return new ContentFile(filePath, pathParts);
+					return new ContentFile(files[0], pathParts);
 				}
 			}
+			#endregion
 
+
+			#region Directory
 			if (Directory.Exists(path))
 			{
-				return new ContentFolder(path, pathParts);
+				return new ContentDirectory(path, pathParts);
 			}
+			#endregion
 
 
 			return null;

@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Docomb.ContentStorage.FileHandlers
+{
+	public class Html
+	{
+
+		public ContentFile File { get; protected set; }
+
+		public Html(ContentFile file)
+		{
+			File = file;
+		}
+
+
+		public static readonly List<string> Extensions = new() { "html", "htm" };
+
+
+
+
+
+
+
+	}
+}

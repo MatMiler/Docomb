@@ -24,11 +24,11 @@ namespace Docomb.ContentStorage
 		//public ContentFolder Parent { get; protected set; }
 
 
-		public override ItemType Type => ItemType.File;
+		public override ContentItemType Type => ContentItemType.File;
 
-		public ContentFile(string filePath, string url) : base(filePath, url)
-		{
-		}
+
+		public virtual FileType FileType => FileType.File;
+
 
 		public ContentFile(string filePath, List<string> urlParts) : base(filePath, urlParts)
 		{

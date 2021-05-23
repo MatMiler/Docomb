@@ -9,13 +9,7 @@ namespace Docomb.ContentStorage
 {
 	public abstract class Item
 	{
-		public enum ItemType
-		{
-			File,
-			Folder
-		}
-
-		public abstract ItemType Type { get; }
+		public abstract ContentItemType Type { get; }
 
 		public string FilePath { get; protected set; }
 
@@ -27,12 +21,12 @@ namespace Docomb.ContentStorage
 
 		public List<string> UrlParts { get; protected set; }
 
-		public Item(string filePath, string url)
-		{
-			FilePath = filePath;
-			Url = url;
-			UrlParts = SplitPath(url);
-		}
+		//public Item(string filePath, string url)
+		//{
+		//	FilePath = filePath;
+		//	Url = url;
+		//	UrlParts = SplitPath(url);
+		//}
 		public Item(string filePath, List<string> urlParts)
 		{
 			FilePath = filePath;
