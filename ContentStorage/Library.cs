@@ -47,7 +47,7 @@ namespace Docomb.ContentStorage
 			#region Exact file match
 			if (File.Exists(path))
 			{
-				return new ContentFile(path, pathParts);
+				return new ContentFile(path, pathParts, false);
 			}
 			#endregion
 
@@ -56,13 +56,16 @@ namespace Docomb.ContentStorage
 			if (pathParts.Count >= 1)
 			{
 				string parentPath = Path.Combine(RootPath, string.Join('/', pathParts.GetRange(0, pathParts.Count - 1)));
-				string fileNameCore = pathParts.Last() + ".";
-				foreach (string extension in OmittableExtensions)
+				if (Directory.Exists(parentPath))
 				{
-					string[] files = Directory.GetFiles(parentPath, fileNameCore + extension, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
-					if (files?.Length >= 1)
+					string fileNameCore = pathParts.Last() + ".";
+					foreach (string extension in OmittableExtensions)
 					{
-						return new ContentFile(files[0], pathParts);
+						string[] files = Directory.GetFiles(parentPath, fileNameCore + extension, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
+						if (files?.Length >= 1)
+						{
+							return new ContentFile(files[0], pathParts, false);
+						}
 					}
 				}
 			}
@@ -77,7 +80,7 @@ namespace Docomb.ContentStorage
 					string[] files = Directory.GetFiles(path, fileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
 					if (files?.Length >= 1)
 					{
-						return new ContentFile(files[0], pathParts);
+						return new ContentFile(files[0], pathParts, true);
 					}
 				}
 			}

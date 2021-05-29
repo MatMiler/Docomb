@@ -28,14 +28,20 @@ namespace Docomb.ContentStorage
 
 		public override ContentItemType Type => ContentItemType.File;
 
+		public override bool NeedsTrailingSlash => _needsTrailingslash;
+		private bool _needsTrailingslash = false;
+
 
 		public virtual FileType FileType { get; protected set; } = FileType.File;
 
 
-		public ContentFile(string filePath, List<string> urlParts) : base(filePath, urlParts)
+		public ContentFile(string filePath, List<string> urlParts, bool needsTrailingSlash) : base(filePath, urlParts)
 		{
+			_needsTrailingslash = needsTrailingSlash;
 			IdentifyFileType();
 		}
+
+
 
 
 

@@ -10,6 +10,8 @@ namespace Docomb.ContentStorage
 	{
 		public override ContentItemType Type => ContentItemType.Directory;
 
+		public override bool NeedsTrailingSlash => true;
+
 		//public ContentFolder(string filePath, string url) : base(filePath, url)
 		//{
 		//}

@@ -42,6 +42,10 @@ namespace Docomb.WebReader
 			if (file == null) return Content($"No content file at '{string.Join('/', remainingPath)}'");
 
 
+			if ((itemPath?.Length > 0) && (!itemPath.EndsWith('/')) && (file.NeedsTrailingSlash))
+				return Redirect(Request.Path + "/");
+
+
 			switch (file.FileType)
 			{
 				case FileType.Markdown: return View("~/Areas/Reader/Pages/Article.cshtml", new ViewModels.Article(itemPath, workspace, file, remainingPath));

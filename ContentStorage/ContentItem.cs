@@ -16,6 +16,8 @@ namespace Docomb.ContentStorage
 		//public string FullUrl { get; protected set; }
 		public string Url { get; protected set; }
 
+		public abstract bool NeedsTrailingSlash { get; }
+
 
 		//public string LastUrlPart { get; protected set; }
 
