@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Docomb.ContentStorage
 {
-	public class ContentFile : Item
+	public class ContentFile : ContentItem
 	{
 
 		//public string FilePath { get; protected set; }
@@ -44,10 +45,10 @@ namespace Docomb.ContentStorage
 
 
 
-		#region File handlers
+		#region Format info
 
-		public FileHandlers.Markdown Markdown { get; protected set; }
-		public FileHandlers.Html Html { get; protected set; }
+		public FormatInfo.MarkdownInfo Markdown { get; protected set; }
+		public FormatInfo.HtmlInfo Html { get; protected set; }
 
 		#endregion
 
@@ -59,13 +60,13 @@ namespace Docomb.ContentStorage
 			string fileNameLower = FileName?.ToLower();
 			string extension = GetFileExtension(fileNameLower);
 
-			if (FileHandlers.Markdown.Extensions.Contains(extension))
+			if (FormatInfo.MarkdownInfo.Extensions.Contains(extension))
 			{
 				FileType = FileType.Markdown;
 				Markdown = new(this);
 				return;
 			}
-			else if (FileHandlers.Html.Extensions.Contains(extension))
+			else if (FormatInfo.HtmlInfo.Extensions.Contains(extension))
 			{
 				FileType = FileType.Html;
 				Html = new(this);
@@ -73,6 +74,45 @@ namespace Docomb.ContentStorage
 			}
 
 		}
+
+
+
+
+
+		#region Read & write file
+
+		public string TextContent => _textContent ??= ReadTextFile(FilePath) ?? "";
+		private string _textContent = null;
+
+
+
+
+		public static string ReadTextFile(string filePath)
+		{
+			try
+			{
+				string content = File.ReadAllText(filePath);
+				return content;
+			}
+			catch (Exception e) { }
+			return null;
+		}
+
+
+		public static bool SaveTextFile(string filePath, string content)
+		{
+			try
+			{
+				StreamWriter fileStream = new StreamWriter(filePath);
+				fileStream.Write(content);
+				fileStream.Flush();
+				fileStream.Close();
+				return true;
+			}
+			catch { return false; }
+		}
+
+		#endregion
 
 	}
 }

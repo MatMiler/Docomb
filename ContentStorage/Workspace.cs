@@ -45,6 +45,11 @@ namespace Docomb.ContentStorage
 		public string ContentStoragePath { get; set; }
 
 
+		/// <summary>Which engine should be used to display Markdown files</summary>
+		[JsonPropertyName("markdownEngine")]
+		public string MarkdownEngineCode { get; set; }
+
+
 		//[JsonPropertyName("preloadStructure")]
 		//private bool? _preloadStructure { get; set; }
 		///// <summary>Whether to load file structure into memory</summary>

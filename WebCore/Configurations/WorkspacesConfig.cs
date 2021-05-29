@@ -69,12 +69,12 @@ namespace Docomb.WebCore.Configurations
 
 
 
-		public static (Workspace workspace, List<string> remainingPath)? FindFromPath(string path) => FindFromPath(SplitPath(path, true));
+		public static (Workspace workspace, List<string> remainingPath) FindFromPath(string path) => FindFromPath(SplitPath(path, true));
 
-		public static (Workspace workspace, List<string> remainingPath)? FindFromPath(List<string> pathParts)
+		public static (Workspace workspace, List<string> remainingPath) FindFromPath(List<string> pathParts)
 		{
 			var list = WorkspacesByUrlsPriority;
-			if ((list == null) || (list.Count <= 0)) return null;
+			if ((list == null) || (list.Count <= 0)) return (null, new());
 
 			// Re-join path for consistency in comparison
 			string path = string.Join('/', pathParts) + "/";
@@ -89,7 +89,7 @@ namespace Docomb.WebCore.Configurations
 				}
 			}
 
-			return null;
+			return (null, new());
 		}
 
 

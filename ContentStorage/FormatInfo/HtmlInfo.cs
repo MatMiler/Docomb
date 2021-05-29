@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docomb.ContentStorage.FileHandlers
+namespace Docomb.ContentStorage.FormatInfo
 {
-	public class Html
+	public class HtmlInfo
 	{
+
+		public const string MediaType = "text/html";
 
 		public ContentFile File { get; protected set; }
 
-		public Html(ContentFile file)
+		public HtmlInfo(ContentFile file)
 		{
 			File = file;
 		}

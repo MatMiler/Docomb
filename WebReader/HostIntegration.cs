@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WebReader
+namespace Docomb.WebReader
 {
 	class ConfigureOptions : IPostConfigureOptions<StaticFileOptions>
 	{

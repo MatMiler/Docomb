@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Docomb.ContentStorage
 {
-	public class ContentDirectory : Item
+	public class ContentDirectory : ContentItem
 	{
 		public override ContentItemType Type => ContentItemType.Directory;
 

@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
+    <AssemblyName>Docomb.WebReader</AssemblyName>
+    <RootNamespace>Docomb.WebReader</RootNamespace>
+    <Version>0.0.1</Version>
+    <Authors>Matjaž Miler</Authors>
+    <Product>Docomb</Product>
   </PropertyGroup>
 
   <ItemGroup>

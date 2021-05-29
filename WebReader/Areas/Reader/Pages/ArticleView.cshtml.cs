@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace WebReader.Reader.Pages
+namespace Docomb.WebReader.Reader.Pages
 {
 	public class ArticleViewModel : PageModel
 	{

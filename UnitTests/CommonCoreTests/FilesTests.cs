@@ -12,8 +12,10 @@ namespace UnitTests.CommonCoreTests
 		[TestCase("", null)]
 		[TestCase("file.txt", "txt")]
 		[TestCase(@"c:\directory\file.txt", "txt")]
+		[TestCase("/directory/file.txt", "txt")]
 		[TestCase(@"http://domain/file.txt", "txt")]
 		[TestCase(@"c:\directory\.txt", null)]
+		[TestCase("/directory/.txt", null)]
 		[TestCase(@".file", null)]
 		public void TestGetFileExtension(string path, string extension)
 		{

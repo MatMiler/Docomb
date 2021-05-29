@@ -31,15 +31,15 @@ namespace Docomb.ContentStorage
 
 
 		public static readonly List<string> OmittableExtensions =
-			FileHandlers.Markdown.Extensions
-			.Concat(FileHandlers.Html.Extensions)
+			FormatInfo.MarkdownInfo.Extensions
+			.Concat(FormatInfo.HtmlInfo.Extensions)
 			.ToList();
 		public static readonly List<string> DefaultFileNameCores = new() { "index", "default", "home", "readme" };
 		public static readonly List<string> DefaultFileNames = MergeListContents(DefaultFileNameCores, OmittableExtensions, (a, b) => $"{a}.{b}");
 
 
-		public Item FindItem(string path) => FindItem(SplitPath(path, true));
-		public Item FindItem(List<string> pathParts)
+		public ContentItem FindItem(string path) => FindItem(SplitPath(path, true));
+		public ContentItem FindItem(List<string> pathParts)
 		{
 			string path = Path.Combine(RootPath, string.Join('/', pathParts));
 
@@ -70,12 +70,15 @@ namespace Docomb.ContentStorage
 
 
 			#region Default files
-			foreach (string fileName in DefaultFileNames)
+			if (Directory.Exists(path))
 			{
-				string[] files = Directory.GetFiles(path, fileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
-				if (files?.Length >= 1)
+				foreach (string fileName in DefaultFileNames)
 				{
-					return new ContentFile(files[0], pathParts);
+					string[] files = Directory.GetFiles(path, fileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
+					if (files?.Length >= 1)
+					{
+						return new ContentFile(files[0], pathParts);
+					}
 				}
 			}
 			#endregion
