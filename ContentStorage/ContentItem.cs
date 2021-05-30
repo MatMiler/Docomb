@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Docomb.ContentStorage
 {
-	public abstract class ContentItem
+	public abstract class ContentItem : IContentInfo
 	{
 		public abstract ContentItemType Type { get; }
 
@@ -17,6 +17,12 @@ namespace Docomb.ContentStorage
 		public string Url { get; protected set; }
 
 		public abstract bool NeedsTrailingSlash { get; }
+
+		public virtual string Title { get => _title ??= UrlParts?.LastOrDefault(); set => _title = value; }
+		protected string _title = null;
+
+
+		public Workspace Workspace { get; protected set; }
 
 
 		//public string LastUrlPart { get; protected set; }
@@ -29,11 +35,12 @@ namespace Docomb.ContentStorage
 		//	Url = url;
 		//	UrlParts = SplitPath(url);
 		//}
-		public ContentItem(string filePath, List<string> urlParts)
+		public ContentItem(Workspace workspace, string filePath, List<string> urlParts)
 		{
+			Workspace = workspace;
 			FilePath = filePath;
 			UrlParts = urlParts;
-			Url = string.Join('/', urlParts);
+			Url = string.Join('/', urlParts) + (NeedsTrailingSlash ? '/' : null);
 		}
 
 		public ContentFile AsFile => (this is ContentFile file) ? file : null;

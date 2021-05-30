@@ -44,23 +44,21 @@ namespace Docomb.ContentStorage.FormatInfo
 			MetaData data = null;
 			try
 			{
-				var yamlDeserializer = new DeserializerBuilder()
-					.WithNamingConvention(CamelCaseNamingConvention.Instance)
-					.Build();
-				using (var input = new StringReader(File?.TextContent))
-				{
-					var parser = new YamlDotNet.Core.Parser(input);
-					parser.Consume<StreamStart>();
-					parser.Consume<DocumentStart>();
-					data = yamlDeserializer.Deserialize<MetaData>(parser);
-					parser.Consume<DocumentEnd>();
-				}
+				using TextReader reader = (File?.TextContentWasLoaded == true) ? new StringReader(File?.TextContent) : new StreamReader(File?.FilePath);
+				var parser = new YamlDotNet.Core.Parser(reader);
+				parser.Consume<StreamStart>();
+				parser.Consume<DocumentStart>();
+				data = FrontMatterDeserializer.Deserialize<MetaData>(parser);
+				parser.Consume<DocumentEnd>();
 			}
 			catch { }
 			return data;
 		}
 
-		public string Title { get => Meta?.Title ?? File?.FileName; }
+		protected static IDeserializer FrontMatterDeserializer => _frontMatterDeserializer ??= new DeserializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+		private static IDeserializer _frontMatterDeserializer = null;
+
+		public string Title { get => Meta?.Title; }
 
 		#endregion
 

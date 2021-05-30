@@ -71,7 +71,7 @@ namespace Docomb.ContentStorage
 		//public bool IsUrlCaseSensitive { get; set; } = false;
 
 		[JsonIgnore]
-		public Library Content { get => _content ??= new Library(ContentStoragePath, UrlPath); }
+		public Library Content { get => _content ??= new Library(this, ContentStoragePath, UrlPath); }
 		[JsonIgnore]
 		private Library _content = null;
 

@@ -22,6 +22,20 @@ namespace UnitTests.CommonCoreTests
 			Assert.AreEqual(extension, GetFileExtension(path));
 		}
 
+		[Test]
+		[TestCase("", null)]
+		[TestCase("file.txt", "file")]
+		[TestCase(@"c:\directory\file.txt", "file")]
+		[TestCase("/directory/file.txt", "file")]
+		[TestCase(@"http://domain/file.txt", "file")]
+		[TestCase(@"c:\directory\.txt", ".txt")]
+		[TestCase("/directory/.txt", ".txt")]
+		[TestCase("/directory/.", null)]
+		[TestCase(@".file", ".file")]
+		public void TestGetFileNameWithoutExtension(string path, string extension)
+		{
+			Assert.AreEqual(extension, GetFileNameWithoutExtension(path));
+		}
 
 
 

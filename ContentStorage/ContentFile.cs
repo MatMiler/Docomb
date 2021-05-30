@@ -35,7 +35,7 @@ namespace Docomb.ContentStorage
 		public virtual FileType FileType { get; protected set; } = FileType.File;
 
 
-		public ContentFile(string filePath, List<string> urlParts, bool needsTrailingSlash) : base(filePath, urlParts)
+		public ContentFile(Workspace workspace, string filePath, List<string> urlParts, bool needsTrailingSlash) : base(workspace, filePath, urlParts)
 		{
 			_needsTrailingslash = needsTrailingSlash;
 			IdentifyFileType();
@@ -48,11 +48,17 @@ namespace Docomb.ContentStorage
 		public string FileName => _fileName ??= GetFileNameFromPath(FilePath);
 		protected string _fileName = null;
 
-		public string Title { get => _title ??= GenerateTitle(); set => _title = value; }
-		protected string _title = null;
+		public override string Title { get => _title ??= GenerateTitle(); set => _title = value; }
 		protected string GenerateTitle()
 		{
-			return  Markdown?.Title ?? FileName;
+			string s = Markdown?.Title;
+			if (!string.IsNullOrEmpty(s)) return s;
+			if ((!string.IsNullOrEmpty(FileName)) && (!Library.DefaultFileNames.Contains(FileName.ToLower())))
+			{
+				s = FileName;
+				if (!string.IsNullOrEmpty(s)) return s;
+			}
+			return UrlParts?.LastOrDefault() ?? Workspace.Name;
 		}
 
 
@@ -93,21 +99,24 @@ namespace Docomb.ContentStorage
 
 		#region Read & write file
 
-		public string TextContent => _textContent ??= ReadTextFile(FilePath) ?? "";
+		public string TextContent => _textContent ?? ReadTextFile();
 		private string _textContent = null;
 
 
 
-
-		public static string ReadTextFile(string filePath)
+		public bool TextContentWasLoaded => _textContentWasLoaded;
+		private bool _textContentWasLoaded = false;
+		public string ReadTextFile()
 		{
 			try
 			{
-				string content = File.ReadAllText(filePath);
-				return content;
+				_textContent = File.ReadAllText(FilePath) ?? "";
+				_textContentWasLoaded = true;
+				return _textContent;
 			}
 			catch (Exception e) { }
-			return null;
+			_textContent = "";
+			return _textContent;
 		}
 
 

@@ -1,0 +1,18 @@
+﻿@model Docomb.WebReader.ViewModels.DirectoryList
+@using Docomb.ContentStorage
+@{
+	Layout = "~/Areas/Reader/Pages/Shared/_Layout.cshtml";
+}
+
+@{ Dictionary<string, ContentItemSummary> children = ViewBag.Workspace?.Content?.GetChildren(ViewBag.PathParts); }
+@if (children?.Count > 0)
+{
+	<ul class="directoryChildSelection">
+		@foreach (ContentItemSummary child in children.Values)
+		{
+			<li><a href="@child.FullUrl">@child.Title</a></li>
+		}
+	</ul>
+}
+
+

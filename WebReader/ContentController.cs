@@ -28,7 +28,11 @@ namespace Docomb.WebReader
 			// TODO: Redirect to an alternative URL (parent, root)
 
 			//return View();
-			return Content($"No content at '{itemPath}'");
+			//return Content($"No content at '{itemPath}'");
+			if (string.IsNullOrEmpty(itemPath?.Trim('/')))
+				return View("~/Areas/Reader/Pages/WorkspaceList.cshtml");
+			else
+				return NotFound();
 		}
 
 
@@ -65,11 +69,12 @@ namespace Docomb.WebReader
 		public IActionResult ViewContentDirectory(string itemPath, Workspace workspace = null, ContentDirectory directory = null, List<string> remainingPath = null)
 		{
 			if (workspace == null) (workspace, remainingPath) = Docomb.WebCore.Configurations.WorkspacesConfig.FindFromPath(itemPath);
-			if (workspace == null) return Content($"No workspace at '{string.Join('/', remainingPath)}'");
+			if (workspace == null) return NotFound(); // Content($"No workspace at '{string.Join('/', remainingPath)}'");
 			directory ??= workspace.Content.FindItem(remainingPath)?.AsDirectory;
-			if (directory == null) return Content($"No content directory at '{string.Join('/', remainingPath)}'");
+			if (directory == null) return NotFound(); //Content($"No content directory at '{string.Join('/', remainingPath)}'");
 
-			return Content($"Workspace '{workspace.Name}', URL path '{string.Join('/', directory.UrlParts)}', directory content '{directory.FilePath}'");
+			return View("~/Areas/Reader/Pages/Directory.cshtml", new ViewModels.DirectoryList(itemPath, workspace, directory, remainingPath, ViewBag));
+			//return Content($"Workspace '{workspace.Name}', URL path '{string.Join('/', directory.UrlParts)}', directory content '{directory.FilePath}'");
 		}
 
 

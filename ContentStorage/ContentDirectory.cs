@@ -16,7 +16,7 @@ namespace Docomb.ContentStorage
 		//{
 		//}
 
-		public ContentDirectory(string filePath, List<string> urlParts) : base(filePath, urlParts)
+		public ContentDirectory(Workspace workspace, string filePath, List<string> urlParts) : base(workspace, filePath, urlParts)
 		{
 		}
 

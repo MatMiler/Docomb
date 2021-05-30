@@ -41,6 +41,16 @@ namespace Docomb.CommonCore
 			return fileName.Substring(lastDot + 1);
 		}
 
+		public static string GetFileNameWithoutExtension(string fileName)
+		{
+			if (string.IsNullOrEmpty(fileName)) return null;
+			if ((fileName.Contains('\\')) || (fileName.Contains('/'))) fileName = GetFileNameFromPath(fileName) ?? "";
+			if (string.IsNullOrEmpty(fileName?.Trim('.'))) return null;
+			int lastDot = fileName.LastIndexOf('.');
+			if ((lastDot <= 0) || (lastDot >= fileName.Length - 1)) return fileName;
+			return fileName.Substring(0, lastDot);
+		}
+
 
 
 

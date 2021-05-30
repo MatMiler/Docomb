@@ -1,0 +1,13 @@
+﻿@using Docomb.ContentStorage
+@{
+	Layout = "~/Areas/Reader/Pages/Shared/_Layout.cshtml";
+}
+
+<ul class="workspaceSelection">
+	@foreach (var workspace in Docomb.WebReader.SiteEnvironment.Instance?.Workspaces)
+	{
+		<li><a href="@workspace.FullUrl">@workspace.Name</a></li>
+	}
+</ul>
+
+

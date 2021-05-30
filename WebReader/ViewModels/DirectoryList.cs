@@ -7,36 +7,33 @@ using System.Threading.Tasks;
 
 namespace Docomb.WebReader.ViewModels
 {
-	public class Article
+	public class DirectoryList
 	{
-		public Article() { }
-		public Article(string urlPath, Workspace workspace, ContentFile contentFile, List<string> contentPathParts, dynamic viewBag)
+
+		public DirectoryList() { }
+		public DirectoryList(string urlPath, Workspace workspace, ContentDirectory contentDirectory, List<string> contentPathParts, dynamic viewBag)
 		{
 			UrlPath = urlPath;
 			Workspace = workspace;
-			ContentFile = contentFile;
+			ContentDirectory = contentDirectory;
 			ContentPathParts = contentPathParts;
 			PrepareViewbag(viewBag);
 		}
 
 		public void PrepareViewbag(dynamic viewBag)
 		{
-			viewBag.Title = ContentFile.Title;
+			viewBag.Title = ContentDirectory.Title;
 			viewBag.WorkspacePath = Workspace.UrlPath;
 			viewBag.Workspace = Workspace;
-			viewBag.PathParts = ContentFile.UrlParts;
+			viewBag.PathParts = ContentDirectory.UrlParts;
 			viewBag.HasPageData = true;
 		}
 
 
 		public string UrlPath { get; protected set; }
 		public Workspace Workspace { get; protected set; }
-		public ContentFile ContentFile { get; protected set; }
+		public ContentDirectory ContentDirectory { get; protected set; }
 		public List<string> ContentPathParts { get; protected set; }
-
-
-		public ContentStorage.MarkdownEngines.MarkdownEngine MarkdownEngine => _markdownEngine ??= ContentStorage.MarkdownEngines.Manager.GetEngine(Workspace);
-		private ContentStorage.MarkdownEngines.MarkdownEngine _markdownEngine = null;
 
 	}
 }
