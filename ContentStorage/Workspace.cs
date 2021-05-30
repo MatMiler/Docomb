@@ -35,6 +35,15 @@ namespace Docomb.ContentStorage
 		}
 		private string _urlPath = null;
 
+		[JsonIgnore]
+		public string ParentUrl { get => _parentUrl; set { _parentUrl = value; _fullUrl = null; } }
+		[JsonIgnore]
+		private string _parentUrl = null;
+
+		[JsonIgnore]
+		public string FullUrl => _fullUrl ??= ParentUrl?.TrimEnd('/') + '/' + UrlPath?.TrimStart('/');
+		[JsonIgnore]
+		private string _fullUrl = null;
 
 		[JsonIgnore]
 		public List<string> UrlParts { get; protected set; }

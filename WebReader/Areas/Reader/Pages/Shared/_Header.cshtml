@@ -1,1 +1,11 @@
-﻿
+﻿<header>
+	@if (Docomb.WebReader.SiteEnvironment.Instance?.Workspaces?.Count > 1)
+	{
+		<nav class="workspaces">
+			@foreach (var workspace in Docomb.WebReader.SiteEnvironment.Instance?.Workspaces)
+			{
+				<a href="@workspace.FullUrl" class="@((ViewBag.CurrentWorkspacePath != null) && (workspace.UrlPath == ViewBag.CurrentWorkspacePath) ? "selected" : "")"><span>@workspace.Name</span></a>
+			}
+		</nav>
+	}
+</header>

@@ -1,0 +1,54 @@
+﻿body { border: none; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+// Light/Dark theme setting and mixins
+$bgColor: ( 'dark': #222, 'light': #fff );
+$textColor: ( 'dark': #fff, 'light': #000 );
+$menuBackgroundColor: ( 'dark': #444, 'light': #ddd );
+$menuBorderColor: ( 'dark': #666, 'light': #bbb );
+$linkColor: ( 'dark': #09f, 'light': #06c );
+
+
+// Common light/dark styles
+@mixin lightPreset {
+	body { background: map-get($bgColor, 'light'); color: map-get($textColor, 'light'); }
+	a { color: map-get($linkColor, 'light'); }
+	nav a { color: map-get($textColor, 'light'); }
+}
+@mixin darkPreset {
+	body { background: map-get($bgColor, 'dark'); color: map-get($textColor, 'dark'); }
+	a { color: map-get($linkColor, 'dark'); }
+	nav a { color: map-get($textColor, 'dark'); }
+}
+html { @include lightPreset; }
+.dark { @include darkPreset; }
+@media (prefers-color-scheme: dark) {
+	html { @include darkPreset; }
+	.light { @include lightPreset; }
+}
+
+
+
+@mixin themeMaps($values) {
+	html & { @each $property, $value in $values { #{$property}: map-get($value, 'light'); } }
+	.dark & { @each $property, $value in $values { #{$property}: map-get($value, 'dark'); } }
+	@media (prefers-color-scheme: dark) {
+		html & { @each $property, $value in $values { #{$property}: map-get($value, 'dark'); } }
+		.light & { @each $property, $value in $values { #{$property}: map-get($value, 'light'); } }
+	}
+}
+@mixin themeMap($property, $value) {
+	html & { #{$property}: map-get($value, 'light'); }
+	.dark & { #{$property}: map-get($value, 'dark'); }
+	@media (prefers-color-scheme: dark) {
+		html & { #{$property}: map-get($value, 'dark'); }
+		.light & { #{$property}: map-get($value, 'light'); }
+	}
+}
+
+
+.workspaces {
+	padding: 5px 0; text-align: center;
+	a { display: inline-block; font-size: 16px; margin: 5px 10px 3px 10px; padding: 5px 10px; text-decoration: none; }
+	a span { display: block; padding-bottom: 2px; }
+	a.selected span { padding-bottom: 0; border-bottom-width: 2px; border-bottom-style: solid; @include themeMap("border-bottom-color", $textColor); }
+}

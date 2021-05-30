@@ -48,6 +48,7 @@ namespace Docomb.WebCore.Configurations
 
 				SiteName = jsonConfig?.GetValue<string>("name");
 				if (string.IsNullOrWhiteSpace(SiteName)) SiteName = DefaultSiteName;
+				RootUrl = jsonConfig?.GetValue<string>("url") ?? DefaultRootUrl;
 			}
 		}
 		/// <summary>Reload data from configuration sources</summary>
@@ -63,6 +64,9 @@ namespace Docomb.WebCore.Configurations
 
 		public const string DefaultSiteName = "Docs";
 		public string SiteName { get; private set; } = DefaultSiteName;
+
+		public const string DefaultRootUrl = "/";
+		public string RootUrl { get; private set; } = DefaultRootUrl;
 
 		#endregion
 

@@ -19,5 +19,30 @@ namespace Docomb.ContentStorage.MarkdownEngines
 
 		public abstract string RenderHtml(ContentFile file);
 
+
+
+		public static string RemoveFrontMatter(string content)
+		{
+			if (content.StartsWith("---"))
+			{
+				int firstNewline = content.IndexOfAny(new char[] { '\n', '\r' });
+				if (firstNewline < 0) return content;
+				int closingLineDashes = content.IndexOf("---", firstNewline);
+				int closingLineDots = content.IndexOf("...", firstNewline);
+				int closingLine = closingLineDashes;
+				// Use first '...' position if found ans is before '---'
+				if ((closingLineDots >= firstNewline) && (closingLineDots < closingLine)) closingLine = closingLineDots;
+				if (closingLine < firstNewline) return content; // No valid closing line
+
+
+				int firstClosingNewline = (closingLine >= firstNewline) ? content.IndexOfAny(new char[] { '\n', '\r' }, closingLine) : -1;
+				if (firstClosingNewline >= firstNewline)
+					return content.Substring(firstClosingNewline)?.TrimStart();
+				else
+					return "";
+			}
+
+			return content;
+		}
 	}
 }

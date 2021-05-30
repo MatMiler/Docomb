@@ -10,12 +10,19 @@ namespace Docomb.WebReader.ViewModels
 	public class Article
 	{
 		public Article() { }
-		public Article(string urlPath, Workspace workspace, ContentFile contentFile, List<string> contentPathParts)
+		public Article(string urlPath, Workspace workspace, ContentFile contentFile, List<string> contentPathParts, dynamic viewBag)
 		{
 			UrlPath = urlPath;
 			Workspace = workspace;
 			ContentFile = contentFile;
 			ContentPathParts = contentPathParts;
+			PrepareViewbag(viewBag);
+		}
+
+		public void PrepareViewbag(dynamic viewBag)
+		{
+			viewBag.Title = ContentFile.Title;
+			viewBag.CurrentWorkspacePath = Workspace.UrlPath;
 		}
 
 

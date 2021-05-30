@@ -48,6 +48,12 @@ namespace Docomb.ContentStorage
 		public string FileName => _fileName ??= GetFileNameFromPath(FilePath);
 		protected string _fileName = null;
 
+		public string Title { get => _title ??= GenerateTitle(); set => _title = value; }
+		protected string _title = null;
+		protected string GenerateTitle()
+		{
+			return  Markdown?.Title ?? FileName;
+		}
 
 
 

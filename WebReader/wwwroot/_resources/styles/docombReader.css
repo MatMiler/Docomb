@@ -1,0 +1,67 @@
+﻿body {
+  border: none;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+html body {
+  background: #fff;
+  color: #000; }
+
+html a {
+  color: #06c; }
+
+html nav a {
+  color: #000; }
+
+.dark body {
+  background: #222;
+  color: #fff; }
+
+.dark a {
+  color: #09f; }
+
+.dark nav a {
+  color: #fff; }
+
+@media (prefers-color-scheme: dark) {
+  html body {
+    background: #222;
+    color: #fff; }
+  html a {
+    color: #09f; }
+  html nav a {
+    color: #fff; }
+  .light body {
+    background: #fff;
+    color: #000; }
+  .light a {
+    color: #06c; }
+  .light nav a {
+    color: #000; } }
+
+.workspaces {
+  padding: 5px 0;
+  text-align: center; }
+  .workspaces a {
+    display: inline-block;
+    font-size: 16px;
+    margin: 5px 10px 3px 10px;
+    padding: 5px 10px;
+    text-decoration: none; }
+  .workspaces a span {
+    display: block;
+    padding-bottom: 2px; }
+  .workspaces a.selected span {
+    padding-bottom: 0;
+    border-bottom-width: 2px;
+    border-bottom-style: solid; }
+    html .workspaces a.selected span {
+      border-bottom-color: #000; }
+    .dark .workspaces a.selected span {
+      border-bottom-color: #fff; }
+    @media (prefers-color-scheme: dark) {
+      html .workspaces a.selected span {
+        border-bottom-color: #fff; }
+      .light .workspaces a.selected span {
+        border-bottom-color: #000; } }

@@ -37,6 +37,14 @@ namespace Docomb.WebCore.Configurations
 			lock (_loadLock)
 			{
 				_workspaces = JsonManager.Read()?.Where(x => x != null).ToList();
+				string parentUrl = MainConfig.Instance?.RootUrl;
+				if (_workspaces?.Count > 0)
+				{
+					foreach (Workspace workspace in _workspaces)
+					{
+						workspace.ParentUrl = parentUrl;
+					}
+				}
 
 				// Reset auto-generated values
 				_workspacesByUrl = null;

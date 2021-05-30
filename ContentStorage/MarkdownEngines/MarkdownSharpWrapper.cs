@@ -23,7 +23,7 @@ namespace Docomb.ContentStorage.MarkdownEngines
 
 		public override string RenderHtml(ContentFile file)
 		{
-			return Engine?.Transform(file.TextContent);
+			return Engine?.Transform(RemoveFrontMatter(file.TextContent));
 		}
 
 

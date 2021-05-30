@@ -48,7 +48,7 @@ namespace Docomb.WebReader
 
 			switch (file.FileType)
 			{
-				case FileType.Markdown: return View("~/Areas/Reader/Pages/Article.cshtml", new ViewModels.Article(itemPath, workspace, file, remainingPath));
+				case FileType.Markdown: return View("~/Areas/Reader/Pages/Article.cshtml", new ViewModels.Article(itemPath, workspace, file, remainingPath, ViewBag));
 				case FileType.Html: return Content(file.TextContent, contentType: Docomb.ContentStorage.FormatInfo.HtmlInfo.MediaType);
 			}
 
