@@ -1,7 +1,6 @@
 ﻿using Markdig;
 using Markdig.Parsers;
 using Markdig.Renderers;
-using Markdig.SyntaxHighlighting;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -65,7 +64,7 @@ namespace Docomb.ContentStorage.MarkdownEngines
 			return new MarkdownPipelineBuilder()
 				.UseAdvancedExtensions()
 				.UseYamlFrontMatter()
-				.UseSyntaxHighlighting()
+				.UseColorCodeSyntaxHighlighting()
 				.UseGenericAttributes()
 				.Build();
 		}

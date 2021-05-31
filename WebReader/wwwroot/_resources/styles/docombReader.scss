@@ -1,4 +1,22 @@
-﻿body { border: none; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+﻿// Style reset & basics
+body { border: none; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
+h1, h2, h3, h4, h5, h6 { margin: 30px 0 15px 0; padding: 0; }
+h1 + h2, h1 + h3, h1 + h4, h1 + h5, h1 + h6,
+h2 + h3, h2 + h4, h2 + h5, h2 + h6,
+h3 + h4, h3 + h5, h3 + h6,
+h4 + h5, h4 + h6,
+h5 + h6 { margin-top: 0; }
+p, blockquote, pre, hr, dl, dd, ol, ul, figure { margin: 0; padding: 0; }
+p + p { margin-top: .751em; }
+blockquote, pre, ul, ol, dl, figure, .highlight { margin-top: 10px; margin-bottom: 10px; }
+img { max-width: 100%; vertical-align: middle; }
+figure > img { display: block; }
+ul, ol { margin-left: 30px; }
+li > ul, li > ol { margin-top: 0; margin-bottom: 0; }
+
+
+
+
 
 // Light/Dark theme setting and mixins
 $bgColor: ( 'dark': #222, 'light': #fff );
@@ -6,7 +24,11 @@ $textColor: ( 'dark': #fff, 'light': #000 );
 $textColorLight: ( 'dark': #ccc, 'light': #666 );
 $menuBackgroundColor: ( 'dark': #444, 'light': #ddd );
 $menuBorderColor: ( 'dark': #666, 'light': #bbb );
-$linkColor: ( 'dark': #09f, 'light': #06c );
+$linkColor: ( 'dark': #0bf, 'light': #039 );
+
+
+
+
 
 $tabletWidth: 800px;
 
@@ -31,17 +53,23 @@ $tabletWidth: 800px;
 }
 
 
+
+
+
 // Common light/dark styles
 @mixin lightPreset {
 	body { background: map-get($bgColor, 'light'); color: map-get($textColor, 'light'); }
 	a { color: map-get($linkColor, 'light'); }
-	header { background: map-get($menuBackgroundColor, 'light'); }
+	header, footer { background: map-get($menuBackgroundColor, 'light'); }
 	nav a { color: map-get($textColor, 'light'); }
+	.editor-colors {
+
+	}
 }
 @mixin darkPreset {
 	body { background: map-get($bgColor, 'dark'); color: map-get($textColor, 'dark'); }
 	a { color: map-get($linkColor, 'dark'); }
-	header { background: map-get($menuBackgroundColor, 'dark'); }
+	header, footer { background: map-get($menuBackgroundColor, 'dark'); }
 	nav a { color: map-get($textColor, 'dark'); }
 }
 html { @include lightPreset; }
@@ -50,8 +78,6 @@ html { @include lightPreset; }
 	html { @include darkPreset; }
 	.light { @include lightPreset; }
 }
-
-
 
 @mixin themeMaps($values) {
 	html & { @each $property, $value in $values { #{$property}: map-get($value, 'light'); } }
@@ -71,7 +97,11 @@ html { @include lightPreset; }
 }
 
 
+
+
+
 header {
+	flex: 0 0 auto;
 	.workspaces {
 		padding: 5px 0; text-align: center; border-bottom-width: 1px; border-bottom-style: solid; @include themeMap("border-bottom-color", $menuBorderColor);
 		a { display: inline-block; font-size: 14px; font-weight: bolder; margin: 5px 5px 3px 5px; padding: 5px; text-decoration: none; }
@@ -90,8 +120,65 @@ header {
 			 @include aboveTablet { font-size: 30px; }
 		}
 	}
+	@media only print
+	{
+		.workspaces { display: none !important; }
+		.pageTitle { padding: 0 0 20px 0; }
+		border-bottom: 1px solid; margin-bottom: 40px;
+		@include themeMap("border-bottom-color", $textColor);
+	}
 }
+
+
+
+
+
+footer { flex: 0 0 auto; }
+
+
+
+
 
 .pageContent {
 	@include padding;
+	flex: 1 1 auto;
+	@media only print { padding: 0; }
 }
+
+.pageContent, blockquote
+{
+	& > :first-child { margin-top: 0; }
+	& > :last-child { margin-bottom: 0; }
+}
+
+
+
+
+blockquote {
+	border-left: 4px solid; padding: 5px 5px 5px 15px; font-size: 18px; letter-spacing: -1px; font-style: italic;
+	@include themeMaps(("border-left-color": $menuBorderColor, "background": $menuBackgroundColor));
+}
+
+
+pre, code {
+	font-family: Consolas, Courier New, Courier, monospace; border: 1px solid; font-size: .9em;
+	@include themeMaps(("border-color": $menuBorderColor, "background": $menuBackgroundColor));
+}
+pre { padding: 10px; overflow-x: auto; }
+code { padding: 0 2px; }
+pre > pre, code > code, pre > code, code > pre { font-size: 1em; border: none; padding: 0; margin: 0; }
+
+hr { margin: 30px 0; border-top: 2px solid; border-left: none; border-right: none; border-bottom: none; @include themeMap("border-top-color", $textColorLight); }
+
+
+table
+{
+	margin-top: 15px; margin-bottom: 15px; text-align: left; border-collapse: collapse; border: 1px solid;
+	/*tr:nth-child(even) { background-color: #f7f7f7; }*/
+	th, td { padding: 3px 5px; border: 1px solid; }
+	th { border-bottom-width: 2px; }
+}
+table, table td, table th { @include themeMap("border-color", $menuBorderColor); }
+table th { @include themeMaps(("border-bottom-color": $textColorLight, "background": $menuBackgroundColor)); }
+
+

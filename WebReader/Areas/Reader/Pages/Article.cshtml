@@ -10,10 +10,10 @@
 		{
 			case FileType.Markdown:
 				{
-					Html.Raw(Model.MarkdownEngine.RenderHtml(Model.ContentFile));
+					@Html.Raw(Model.MarkdownEngine.RenderHtml(Model.ContentFile));
 					break;
 				}
-			case FileType.Html: { Html.Raw(Model.ContentFile.TextContent); break; }
+			case FileType.Html: { @Html.Raw(Model.ContentFile.TextContent); break; }
 			default: {
 					<code>@Model.ContentFile.TextContent</code>
 					break;
