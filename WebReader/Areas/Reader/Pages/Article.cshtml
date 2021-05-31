@@ -4,25 +4,21 @@
 	Layout = "~/Areas/Reader/Pages/Shared/_Layout.cshtml";
 }
 
-@*<div><pre>@Model.ContentFile.TextContent</pre></div>*@
-
-@{ 
-	switch (Model.ContentFile.FileType)
-	{
-		case FileType.Markdown:
-			{
-				WriteLiteral("<div style=\"border: 5px solid black; padding: 5px;\">" + Model.MarkdownEngine.Name + "</div>");
-				@Html.Raw(Model.MarkdownEngine.RenderHtml(Model.ContentFile));
-				break;
-			}
-		case FileType.Html: { @Html.Raw(Model.ContentFile.TextContent); break; }
-		default: {
-				WriteLiteral("<code>");
-				Write(Model.ContentFile.TextContent);
-				WriteLiteral("</code>");
-				break;
-			}
+<div class="pageContent">
+	@{ 
+		switch (Model.ContentFile.FileType)
+		{
+			case FileType.Markdown:
+				{
+					Html.Raw(Model.MarkdownEngine.RenderHtml(Model.ContentFile));
+					break;
+				}
+			case FileType.Html: { Html.Raw(Model.ContentFile.TextContent); break; }
+			default: {
+					<code>@Model.ContentFile.TextContent</code>
+					break;
+				}
+		}
 	}
-}
-
+</div>
 

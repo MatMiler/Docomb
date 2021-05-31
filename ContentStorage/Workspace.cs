@@ -77,6 +77,10 @@ namespace Docomb.ContentStorage
 
 
 
+		public bool Is(Workspace workspace)
+		{
+			return UrlPath == workspace?.UrlPath;
+		}
 
 
 	}

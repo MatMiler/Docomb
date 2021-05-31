@@ -4,25 +4,23 @@
 		<nav class="workspaces">
 			@foreach (var workspace in Docomb.WebReader.SiteEnvironment.Instance?.Workspaces)
 			{
-				<a href="@workspace.FullUrl" class="@((ViewBag.WorkspacePath != null) && (workspace.UrlPath == ViewBag.WorkspacePath) ? "selected" : "")"><span>@workspace.Name</span></a>
+				<a href="@workspace.FullUrl" class="@((workspace.Is(ViewBag.Context?.Workspace)) ? "selected" : "")"><span>@workspace.Name</span></a>
 			}
 		</nav>
 	}
 
-	@if (ViewBag.HasPageData == true)
-	{
-		<nav class="breadcrumbs">
-			@{ bool hasParent = false; }
-			@for (int x = 0; x <= ViewBag.PathParts?.Count; x++)
-			{
-				Docomb.ContentStorage.ContentItemSummary summary = ViewBag.Workspace?.Content?.GetItemSummary(ViewBag.PathParts?.GetRange(0, x));
-				if (summary != null)
+	<div class="pageTitle">
+		@{ List<Docomb.ContentStorage.ContentItemSummary> parents = ViewBag.Context?.GetParents(); }
+		@if (parents?.Count > 0)
+		{
+			<nav class="breadcrumbs">
+				@foreach (var parent in parents)
 				{
-					if (hasParent) { <span>&gt;</span> }
-					<a href="@(ViewBag.Workspace?.FullUrl?.TrimEnd('/') + "/" + summary.Url)">@summary.Title</a>
-					hasParent = true;
+					<a href="@parent.FullUrl">@parent.Title</a>
+					<span class="separator">&gt;</span>
 				}
-			}
-		</nav>
-	}
+			</nav>
+		}
+		<h1>@(ViewBag.Title ?? Docomb.WebCore.Configurations.MainConfig.Instance.SiteName)</h1>
+	</div>
 </header>

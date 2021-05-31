@@ -12,30 +12,15 @@ namespace Docomb.WebReader.ViewModels
 		public Article() { }
 		public Article(string urlPath, Workspace workspace, ContentFile contentFile, List<string> contentPathParts, dynamic viewBag)
 		{
-			UrlPath = urlPath;
-			Workspace = workspace;
 			ContentFile = contentFile;
-			ContentPathParts = contentPathParts;
-			PrepareViewbag(viewBag);
+			Context = new(urlPath, workspace, contentFile, contentPathParts, viewBag);
 		}
 
-		public void PrepareViewbag(dynamic viewBag)
-		{
-			viewBag.Title = ContentFile.Title;
-			viewBag.WorkspacePath = Workspace.UrlPath;
-			viewBag.Workspace = Workspace;
-			viewBag.PathParts = ContentFile.UrlParts;
-			viewBag.HasPageData = true;
-		}
-
-
-		public string UrlPath { get; protected set; }
-		public Workspace Workspace { get; protected set; }
 		public ContentFile ContentFile { get; protected set; }
-		public List<string> ContentPathParts { get; protected set; }
+		public PageContext Context { get; protected set; }
 
 
-		public ContentStorage.MarkdownEngines.MarkdownEngine MarkdownEngine => _markdownEngine ??= ContentStorage.MarkdownEngines.Manager.GetEngine(Workspace);
+		public ContentStorage.MarkdownEngines.MarkdownEngine MarkdownEngine => _markdownEngine ??= ContentStorage.MarkdownEngines.Manager.GetEngine(Context?.Workspace);
 		private ContentStorage.MarkdownEngines.MarkdownEngine _markdownEngine = null;
 
 	}

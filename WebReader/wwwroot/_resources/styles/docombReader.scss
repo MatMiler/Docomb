@@ -3,20 +3,45 @@
 // Light/Dark theme setting and mixins
 $bgColor: ( 'dark': #222, 'light': #fff );
 $textColor: ( 'dark': #fff, 'light': #000 );
+$textColorLight: ( 'dark': #ccc, 'light': #666 );
 $menuBackgroundColor: ( 'dark': #444, 'light': #ddd );
 $menuBorderColor: ( 'dark': #666, 'light': #bbb );
 $linkColor: ( 'dark': #09f, 'light': #06c );
+
+$tabletWidth: 800px;
+
+@mixin aboveTablet {
+	@media all and (min-width: $tabletWidth), print {
+		@content;
+	}
+}
+@mixin belowTablet {
+	@media not all and (min-width: $tabletWidth) {
+		@content;
+	}
+}
+
+@mixin padding {
+	padding: 20px;
+	@include belowTablet { padding: 10px; }
+}
+@mixin hPadding {
+	padding-left: 20px; padding-right: 20px;
+	@include belowTablet { padding-left: 10px; padding-right: 10px; }
+}
 
 
 // Common light/dark styles
 @mixin lightPreset {
 	body { background: map-get($bgColor, 'light'); color: map-get($textColor, 'light'); }
 	a { color: map-get($linkColor, 'light'); }
+	header { background: map-get($menuBackgroundColor, 'light'); }
 	nav a { color: map-get($textColor, 'light'); }
 }
 @mixin darkPreset {
 	body { background: map-get($bgColor, 'dark'); color: map-get($textColor, 'dark'); }
 	a { color: map-get($linkColor, 'dark'); }
+	header { background: map-get($menuBackgroundColor, 'dark'); }
 	nav a { color: map-get($textColor, 'dark'); }
 }
 html { @include lightPreset; }
@@ -46,9 +71,27 @@ html { @include lightPreset; }
 }
 
 
-.workspaces {
-	padding: 5px 0; text-align: center;
-	a { display: inline-block; font-size: 16px; margin: 5px 10px 3px 10px; padding: 5px 10px; text-decoration: none; }
-	a span { display: block; padding-bottom: 2px; }
-	a.selected span { padding-bottom: 0; border-bottom-width: 2px; border-bottom-style: solid; @include themeMap("border-bottom-color", $textColor); }
+header {
+	.workspaces {
+		padding: 5px 0; text-align: center; border-bottom-width: 1px; border-bottom-style: solid; @include themeMap("border-bottom-color", $menuBorderColor);
+		a { display: inline-block; font-size: 14px; font-weight: bolder; margin: 5px 5px 3px 5px; padding: 5px; text-decoration: none; }
+		a span { display: block; padding-bottom: 2px; }
+		a.selected span { padding-bottom: 0; border-bottom-width: 2px; border-bottom-style: solid; @include themeMap("border-bottom-color", $textColor); }
+		@include aboveTablet { padding: 5px 15px; font-size: 18px; }
+	}
+	.pageTitle {
+		@include padding;
+		.breadcrumbs {
+			margin: -5px; @include themeMap("color", $textColorLight); position: relative; z-index: 1;
+			a { color: inherit; display: inline-block; padding: 5px; text-decoration: none; font-size: 14px; font-weight: 500; }
+			.separator { display: inline-block; padding: 5px 0; }
+		}
+		h1 { font-size: 24px; font-weight: bolder; margin: 0;
+			 @include aboveTablet { font-size: 30px; }
+		}
+	}
+}
+
+.pageContent {
+	@include padding;
 }
