@@ -83,7 +83,10 @@ namespace Docomb.ContentStorage.MarkdownEngines
 				var attributes = obj.TryGetAttributes() ?? new HtmlAttributes();
 
 				var languageMoniker = fencedCodeBlock.Info.Replace(parser.InfoPrefix, string.Empty);
-				if (string.IsNullOrEmpty(languageMoniker))
+				string firstLine;
+				var code = GetCode(obj, out firstLine);
+				ILanguage language = (!string.IsNullOrEmpty(languageMoniker)) ? ParseLanguage(languageMoniker, firstLine) : null;
+				if ((string.IsNullOrEmpty(languageMoniker)) || (language == null))
 				{
 					_underlyingRenderer.Write(renderer, obj);
 					return;
@@ -94,24 +97,21 @@ namespace Docomb.ContentStorage.MarkdownEngines
 
 				attributes.AddClass("editor-colors");
 
-				string firstLine;
-				var code = GetCode(obj, out firstLine);
 
 				renderer
 					.Write("<div")
 					.WriteAttributes(attributes)
 					.Write(">");
 
-				var markup = ApplySyntaxHighlighting(languageMoniker, firstLine, code);
+				var markup = ApplySyntaxHighlighting(language, firstLine, code);
 
 				renderer.WriteLine(markup);
 				renderer.WriteLine("</div>");
 			}
 
-			private string ApplySyntaxHighlighting(string languageMoniker, string firstLine, string code)
+			private string ApplySyntaxHighlighting(ILanguage language, string firstLine, string code)
 			{
 				//var languageTypeAdapter = new LanguageTypeAdapter();
-				var language = ParseLanguage(languageMoniker, firstLine);
 
 				if (language == null) return code;
 
