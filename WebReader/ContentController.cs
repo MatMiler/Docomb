@@ -1,4 +1,5 @@
-﻿using Docomb.ContentStorage;
+﻿using Docomb.CommonCore;
+using Docomb.ContentStorage;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -49,11 +50,19 @@ namespace Docomb.WebReader
 			if ((itemPath?.Length > 0) && (!itemPath.EndsWith('/')) && (file.NeedsTrailingSlash))
 				return Redirect(Request.Path + "/");
 
+			if (Utils.ParseBool(Request.Query["raw"]))
+			{
+				return PhysicalFile(file.FilePath, ContentStorage.FormatInfo.PlainTextInfo.MediaType);
+			}
+
 
 			switch (file.FileType)
 			{
-				case FileType.Markdown: return View("~/Areas/Reader/Pages/Article.cshtml", new ViewModels.Article(itemPath, workspace, file, remainingPath, ViewBag));
-				case FileType.Html: return Content(file.TextContent, contentType: Docomb.ContentStorage.FormatInfo.HtmlInfo.MediaType);
+				case FileType.Markdown:
+				case FileType.Html:
+				case FileType.PlainText:
+					return View("~/Areas/Reader/Pages/Article.cshtml", new ViewModels.Article(itemPath, workspace, file, remainingPath, ViewBag));
+				//case FileType.Html: return Content(file.TextContent, contentType: Docomb.ContentStorage.FormatInfo.HtmlInfo.MediaType);
 			}
 
 

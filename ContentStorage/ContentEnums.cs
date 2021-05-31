@@ -19,7 +19,8 @@ namespace Docomb.ContentStorage
 	{
 		File,
 		Markdown,
-		Html
+		Html,
+		PlainText
 	}
 
 

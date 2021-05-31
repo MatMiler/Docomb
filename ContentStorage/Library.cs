@@ -38,6 +38,7 @@ namespace Docomb.ContentStorage
 		public static readonly HashSet<string> ArticleExtensions =
 			FormatInfo.MarkdownInfo.Extensions
 			.Concat(FormatInfo.HtmlInfo.Extensions)
+			.Concat(FormatInfo.PlainTextInfo.Extensions)
 			.ToHashSet();
 		public static readonly HashSet<string> DefaultFileNameCores = new() { "index", "default", "home", "readme" };
 		public static readonly HashSet<string> DefaultFileNames = MergeListContents(DefaultFileNameCores, OmittableExtensions, (a, b) => $"{a}.{b}").ToHashSet();

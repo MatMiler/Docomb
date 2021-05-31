@@ -90,6 +90,11 @@ namespace Docomb.ContentStorage
 				Html = new(this);
 				return;
 			}
+			else if (FormatInfo.PlainTextInfo.Extensions.Contains(extension))
+			{
+				FileType = FileType.PlainText;
+				return;
+			}
 
 		}
 

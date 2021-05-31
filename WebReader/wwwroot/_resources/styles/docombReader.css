@@ -198,116 +198,128 @@ footer {
     .pageContent {
       padding: 0; } }
 
-.pageContent > :first-child, blockquote > :first-child {
+.pageContent > :first-child, main > :first-child, blockquote > :first-child {
   margin-top: 0; }
 
-.pageContent > :last-child, blockquote > :last-child {
+.pageContent > :last-child, main > :last-child, blockquote > :last-child {
   margin-bottom: 0; }
 
-blockquote {
+.plainTextFile {
+  white-space: pre-wrap; }
+
+main blockquote {
   border-left: 4px solid;
   padding: 5px 5px 5px 15px;
   font-size: 18px;
   letter-spacing: -1px;
   font-style: italic; }
-  html blockquote {
+  html main blockquote {
     border-left-color: #bbb;
     background: #ddd; }
-  .dark blockquote {
+  .dark main blockquote {
     border-left-color: #666;
     background: #444; }
   @media (prefers-color-scheme: dark) {
-    html blockquote {
+    html main blockquote {
       border-left-color: #666;
       background: #444; }
-    .light blockquote {
+    .light main blockquote {
       border-left-color: #bbb;
       background: #ddd; } }
 
-pre, code {
+main pre, main code {
   font-family: Consolas, Courier New, Courier, monospace;
   border: 1px solid;
   font-size: .9em; }
-  html pre, html code {
+  html main pre, html main code {
     border-color: #bbb;
     background: #ddd; }
-  .dark pre, .dark code {
+  .dark main pre, .dark main code {
     border-color: #666;
     background: #444; }
   @media (prefers-color-scheme: dark) {
-    html pre, html code {
+    html main pre, html main code {
       border-color: #666;
       background: #444; }
-    .light pre, .light code {
+    .light main pre, .light main code {
       border-color: #bbb;
       background: #ddd; } }
 
-pre {
+main pre {
   padding: 10px;
   overflow-x: auto; }
 
-code {
+main code {
   padding: 0 2px; }
 
-pre > pre, code > code, pre > code, code > pre {
+main pre > pre, main code > code, main pre > code, main code > pre {
   font-size: 1em;
   border: none;
   padding: 0;
   margin: 0; }
 
-hr {
+main hr {
   margin: 30px 0;
   border-top: 2px solid;
   border-left: none;
   border-right: none;
   border-bottom: none; }
-  html hr {
+  html main hr {
     border-top-color: #666; }
-  .dark hr {
+  .dark main hr {
     border-top-color: #ccc; }
   @media (prefers-color-scheme: dark) {
-    html hr {
+    html main hr {
       border-top-color: #ccc; }
-    .light hr {
+    .light main hr {
       border-top-color: #666; } }
 
-table {
+main table {
   margin-top: 15px;
   margin-bottom: 15px;
   text-align: left;
   border-collapse: collapse;
-  border: 1px solid;
-  /*tr:nth-child(even) { background-color: #f7f7f7; }*/ }
-  table th, table td {
-    padding: 3px 5px;
-    border: 1px solid; }
-  table th {
+  border: 1px solid; }
+  html main table tr:hover {
+    background: #ddd; }
+  .dark main table tr:hover {
+    background: #444; }
+  @media (prefers-color-scheme: dark) {
+    html main table tr:hover {
+      background: #444; }
+    .light main table tr:hover {
+      background: #ddd; } }
+  main table th, main table td {
+    padding: 5px 10px;
+    border: 1px solid;
+    vertical-align: top; }
+  main table th {
     border-bottom-width: 2px; }
 
-html table, html table td, html table th {
+html main table, html main table td, html main table th {
   border-color: #bbb; }
 
-.dark table, .dark table td, .dark table th {
+.dark main table, .dark main table td, .dark main table th {
   border-color: #666; }
 
 @media (prefers-color-scheme: dark) {
-  html table, html table td, html table th {
+  html main table, html main table td, html main table th {
     border-color: #666; }
-  .light table, .light table td, .light table th {
+  .light main table, .light main table td, .light main table th {
     border-color: #bbb; } }
 
-html table th {
+html main table th {
   border-bottom-color: #666;
   background: #ddd; }
 
-.dark table th {
+.dark main table th {
   border-bottom-color: #ccc;
   background: #444; }
 
 @media (prefers-color-scheme: dark) {
-  html table th {
+  html main table th {
     border-bottom-color: #ccc;
     background: #444; }
-  .light table th {
+  .light main table th {
     border-bottom-color: #666;
     background: #ddd; } }
