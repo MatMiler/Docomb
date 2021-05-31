@@ -56,6 +56,45 @@ html header, html footer {
 html nav a {
   color: #000; }
 
+html .editor-colors .plainText, html .editor-colors .xmlAttributeQuotes {
+  color: #000; }
+
+html .editor-colors .htmlComment, html .editor-colors .comment, html .editor-colors .xmlDocComment, html .editor-colors .xmlComment {
+  color: #008000; }
+
+html .editor-colors .htmlTagDelimiter, html .editor-colors .htmlAttributeValue, html .editor-colors .htmlOperator, html .editor-colors .keyword, html .editor-colors .preprocessorKeyword, html .editor-colors .xmlAttributeValue, html .editor-colors .xmlDelimiter, html .editor-colors .cssPropertyValue, html .editor-colors .controlKeyword {
+  color: #00f; }
+
+html .editor-colors .htmlElementName, html .editor-colors .string, html .editor-colors .stringCSharpVerbatim, html .editor-colors .xmlName, html .editor-colors .cssSelector {
+  color: #a31515; }
+
+html .editor-colors .htmlAttributeName, html .editor-colors .htmlEntity, html .editor-colors .xmlAttribute, html .editor-colors .cssPropertyName {
+  color: #f00; }
+
+html .editor-colors .xmlDocTag, html .editor-colors .xmlCDataSection, html .editor-colors .powershellOperator, html .editor-colors .stringEscape {
+  color: #808080; }
+
+html .editor-colors .className {
+  color: #48d1cc; }
+
+html .editor-colors .sqlSystemFunction {
+  color: #f0f; }
+
+html .editor-colors .powershellAttribute {
+  color: #b0e0e6; }
+
+html .editor-colors .powershellType, html .editor-colors .type, html .editor-colors .markdownCode, html .editor-colors .typeVariable {
+  color: #008080; }
+
+html .editor-colors .powershellVariable {
+  color: #ff4500; }
+
+html .editor-colors .namespace, html .editor-colors .predefined, html .editor-colors .pseudoKeyword {
+  color: #000080; }
+
+html .editor-colors .constructor {
+  color: #800080; }
+
 .dark body {
   background: #222;
   color: #fff; }
@@ -69,6 +108,45 @@ html nav a {
 .dark nav a {
   color: #fff; }
 
+.dark .editor-colors .plainText, .dark .editor-colors .xmlAttributeQuotes {
+  color: #fff; }
+
+.dark .editor-colors .htmlComment, .dark .editor-colors .comment, .dark .editor-colors .xmlDocComment, .dark .editor-colors .xmlComment {
+  color: #57a64a; }
+
+.dark .editor-colors .htmlTagDelimiter, .dark .editor-colors .htmlAttributeValue, .dark .editor-colors .htmlOperator, .dark .editor-colors .keyword, .dark .editor-colors .preprocessorKeyword, .dark .editor-colors .xmlAttributeValue, .dark .editor-colors .xmlDelimiter, .dark .editor-colors .cssPropertyValue, .dark .editor-colors .controlKeyword {
+  color: #c8c8c8; }
+
+.dark .editor-colors .htmlElementName, .dark .editor-colors .string, .dark .editor-colors .stringCSharpVerbatim, .dark .editor-colors .xmlName, .dark .editor-colors .cssSelector {
+  color: #d69d85; }
+
+.dark .editor-colors .htmlAttributeName, .dark .editor-colors .htmlEntity, .dark .editor-colors .xmlAttribute, .dark .editor-colors .cssPropertyName {
+  color: #9cdcfe; }
+
+.dark .editor-colors .xmlDocTag, .dark .editor-colors .xmlCDataSection, .dark .editor-colors .powershellOperator, .dark .editor-colors .stringEscape {
+  color: #ffd68f; }
+
+.dark .editor-colors .className {
+  color: #4ec9b0; }
+
+.dark .editor-colors .sqlSystemFunction {
+  color: #c975d5; }
+
+.dark .editor-colors .powershellAttribute {
+  color: #92caf4; }
+
+.dark .editor-colors .powershellType, .dark .editor-colors .type, .dark .editor-colors .markdownCode, .dark .editor-colors .typeVariable {
+  color: #468cc6; }
+
+.dark .editor-colors .powershellVariable {
+  color: #8c2f2f; }
+
+.dark .editor-colors .namespace, .dark .editor-colors .predefined, .dark .editor-colors .pseudoKeyword {
+  color: #468cc6; }
+
+.dark .editor-colors .constructor {
+  color: #4ec9b0; }
+
 @media (prefers-color-scheme: dark) {
   html body {
     background: #222;
@@ -79,6 +157,32 @@ html nav a {
     background: #444; }
   html nav a {
     color: #fff; }
+  html .editor-colors .plainText, html .editor-colors .xmlAttributeQuotes {
+    color: #fff; }
+  html .editor-colors .htmlComment, html .editor-colors .comment, html .editor-colors .xmlDocComment, html .editor-colors .xmlComment {
+    color: #57a64a; }
+  html .editor-colors .htmlTagDelimiter, html .editor-colors .htmlAttributeValue, html .editor-colors .htmlOperator, html .editor-colors .keyword, html .editor-colors .preprocessorKeyword, html .editor-colors .xmlAttributeValue, html .editor-colors .xmlDelimiter, html .editor-colors .cssPropertyValue, html .editor-colors .controlKeyword {
+    color: #c8c8c8; }
+  html .editor-colors .htmlElementName, html .editor-colors .string, html .editor-colors .stringCSharpVerbatim, html .editor-colors .xmlName, html .editor-colors .cssSelector {
+    color: #d69d85; }
+  html .editor-colors .htmlAttributeName, html .editor-colors .htmlEntity, html .editor-colors .xmlAttribute, html .editor-colors .cssPropertyName {
+    color: #9cdcfe; }
+  html .editor-colors .xmlDocTag, html .editor-colors .xmlCDataSection, html .editor-colors .powershellOperator, html .editor-colors .stringEscape {
+    color: #ffd68f; }
+  html .editor-colors .className {
+    color: #4ec9b0; }
+  html .editor-colors .sqlSystemFunction {
+    color: #c975d5; }
+  html .editor-colors .powershellAttribute {
+    color: #92caf4; }
+  html .editor-colors .powershellType, html .editor-colors .type, html .editor-colors .markdownCode, html .editor-colors .typeVariable {
+    color: #468cc6; }
+  html .editor-colors .powershellVariable {
+    color: #8c2f2f; }
+  html .editor-colors .namespace, html .editor-colors .predefined, html .editor-colors .pseudoKeyword {
+    color: #468cc6; }
+  html .editor-colors .constructor {
+    color: #4ec9b0; }
   .light body {
     background: #fff;
     color: #000; }
@@ -87,7 +191,33 @@ html nav a {
   .light header, .light footer {
     background: #ddd; }
   .light nav a {
-    color: #000; } }
+    color: #000; }
+  .light .editor-colors .plainText, .light .editor-colors .xmlAttributeQuotes {
+    color: #000; }
+  .light .editor-colors .htmlComment, .light .editor-colors .comment, .light .editor-colors .xmlDocComment, .light .editor-colors .xmlComment {
+    color: #008000; }
+  .light .editor-colors .htmlTagDelimiter, .light .editor-colors .htmlAttributeValue, .light .editor-colors .htmlOperator, .light .editor-colors .keyword, .light .editor-colors .preprocessorKeyword, .light .editor-colors .xmlAttributeValue, .light .editor-colors .xmlDelimiter, .light .editor-colors .cssPropertyValue, .light .editor-colors .controlKeyword {
+    color: #00f; }
+  .light .editor-colors .htmlElementName, .light .editor-colors .string, .light .editor-colors .stringCSharpVerbatim, .light .editor-colors .xmlName, .light .editor-colors .cssSelector {
+    color: #a31515; }
+  .light .editor-colors .htmlAttributeName, .light .editor-colors .htmlEntity, .light .editor-colors .xmlAttribute, .light .editor-colors .cssPropertyName {
+    color: #f00; }
+  .light .editor-colors .xmlDocTag, .light .editor-colors .xmlCDataSection, .light .editor-colors .powershellOperator, .light .editor-colors .stringEscape {
+    color: #808080; }
+  .light .editor-colors .className {
+    color: #48d1cc; }
+  .light .editor-colors .sqlSystemFunction {
+    color: #f0f; }
+  .light .editor-colors .powershellAttribute {
+    color: #b0e0e6; }
+  .light .editor-colors .powershellType, .light .editor-colors .type, .light .editor-colors .markdownCode, .light .editor-colors .typeVariable {
+    color: #008080; }
+  .light .editor-colors .powershellVariable {
+    color: #ff4500; }
+  .light .editor-colors .namespace, .light .editor-colors .predefined, .light .editor-colors .pseudoKeyword {
+    color: #000080; }
+  .light .editor-colors .constructor {
+    color: #800080; } }
 
 header {
   flex: 0 0 auto; }
@@ -323,3 +453,9 @@ html main table th {
   .light main table th {
     border-bottom-color: #666;
     background: #ddd; } }
+
+.editor-colors .typeVariable, .editor-colors .italic {
+  font-style: italic; }
+
+.editor-colors .markdownHeader, .editor-colors .markdownListItem, .editor-colors .bold {
+  font-weight: bold; }

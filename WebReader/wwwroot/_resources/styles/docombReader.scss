@@ -27,7 +27,19 @@ $menuBorderColor: ( 'dark': #666, 'light': #bbb );
 $linkColor: ( 'dark': #0bf, 'light': #039 );
 
 
-
+$codeHighlightBlack: $textColor;
+$codeHighlightGreen: ( 'dark': #57a64a, 'light': #008000 );
+$codeHighlightBlue: ( 'dark': #c8c8c8, 'light': #00f );
+$codeHighlightDullRed: ( 'dark': #d69d85, 'light': #a31515 );
+$codeHighlightRed: ( 'dark': #9cdcfe, 'light': #f00 );
+$codeHighlightGray: ( 'dark': #ffd68f, 'light': #808080 );
+$codeHighlightMediumTurquoise: ( 'dark': #4ec9b0, 'light': #48d1cc );
+$codeHighlightMagenta: ( 'dark': #c975d5, 'light': #f0f );
+$codeHighlightPowderBlue: ( 'dark': #92caf4, 'light': #b0e0e6 );
+$codeHighlightTeal: ( 'dark': #468cc6, 'light': #008080 );
+$codeHighlightOrangeRed: ( 'dark': #8c2f2f, 'light': #ff4500 );
+$codeHighlightNavy: ( 'dark': #468cc6, 'light': #000080 );
+$codeHighlightPurple: ( 'dark': #4ec9b0, 'light': #800080 );
 
 
 $tabletWidth: 800px;
@@ -63,7 +75,19 @@ $tabletWidth: 800px;
 	header, footer { background: map-get($menuBackgroundColor, 'light'); }
 	nav a { color: map-get($textColor, 'light'); }
 	.editor-colors {
-
+		.plainText, .xmlAttributeQuotes { color: map-get($codeHighlightBlack, 'light'); }
+		.htmlComment, .comment, .xmlDocComment, .xmlComment { color: map-get($codeHighlightGreen, 'light'); }
+		.htmlTagDelimiter, .htmlAttributeValue, .htmlOperator, .keyword, .preprocessorKeyword, .xmlAttributeValue, .xmlDelimiter, .cssPropertyValue, .controlKeyword { color: map-get($codeHighlightBlue, 'light'); }
+		.htmlElementName, .string, .stringCSharpVerbatim, .xmlName, .cssSelector { color: map-get($codeHighlightDullRed, 'light'); }
+		.htmlAttributeName, .htmlEntity, .xmlAttribute, .cssPropertyName { color: map-get($codeHighlightRed, 'light'); }
+		.xmlDocTag, .xmlCDataSection, .powershellOperator, .stringEscape { color: map-get($codeHighlightGray, 'light'); }
+		.className { color: map-get($codeHighlightMediumTurquoise, 'light'); }
+		.sqlSystemFunction { color: map-get($codeHighlightMagenta, 'light'); }
+		.powershellAttribute { color: map-get($codeHighlightPowderBlue, 'light'); }
+		.powershellType, .type, .markdownCode, .typeVariable { color: map-get($codeHighlightTeal, 'light'); }
+		.powershellVariable { color: map-get($codeHighlightOrangeRed, 'light'); }
+		.namespace, .predefined, .pseudoKeyword { color: map-get($codeHighlightNavy, 'light'); }
+		.constructor { color: map-get($codeHighlightPurple, 'light'); }
 	}
 }
 @mixin darkPreset {
@@ -71,6 +95,21 @@ $tabletWidth: 800px;
 	a { color: map-get($linkColor, 'dark'); }
 	header, footer { background: map-get($menuBackgroundColor, 'dark'); }
 	nav a { color: map-get($textColor, 'dark'); }
+	.editor-colors {
+		.plainText, .xmlAttributeQuotes { color: map-get($codeHighlightBlack, 'dark'); }
+		.htmlComment, .comment, .xmlDocComment, .xmlComment { color: map-get($codeHighlightGreen, 'dark'); }
+		.htmlTagDelimiter, .htmlAttributeValue, .htmlOperator, .keyword, .preprocessorKeyword, .xmlAttributeValue, .xmlDelimiter, .cssPropertyValue, .controlKeyword { color: map-get($codeHighlightBlue, 'dark'); }
+		.htmlElementName, .string, .stringCSharpVerbatim, .xmlName, .cssSelector { color: map-get($codeHighlightDullRed, 'dark'); }
+		.htmlAttributeName, .htmlEntity, .xmlAttribute, .cssPropertyName { color: map-get($codeHighlightRed, 'dark'); }
+		.xmlDocTag, .xmlCDataSection, .powershellOperator, .stringEscape { color: map-get($codeHighlightGray, 'dark'); }
+		.className { color: map-get($codeHighlightMediumTurquoise, 'dark'); }
+		.sqlSystemFunction { color: map-get($codeHighlightMagenta, 'dark'); }
+		.powershellAttribute { color: map-get($codeHighlightPowderBlue, 'dark'); }
+		.powershellType, .type, .markdownCode, .typeVariable { color: map-get($codeHighlightTeal, 'dark'); }
+		.powershellVariable { color: map-get($codeHighlightOrangeRed, 'dark'); }
+		.namespace, .predefined, .pseudoKeyword { color: map-get($codeHighlightNavy, 'dark'); }
+		.constructor { color: map-get($codeHighlightPurple, 'dark'); }
+	}
 }
 html { @include lightPreset; }
 .dark { @include darkPreset; }
@@ -188,3 +227,12 @@ main
 
 
 }
+
+
+.editor-colors {
+	.typeVariable, .italic { font-style: italic; }
+	.markdownHeader, .markdownListItem, .bold { font-weight: bold; }
+}
+
+
+
