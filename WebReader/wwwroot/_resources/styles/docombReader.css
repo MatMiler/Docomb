@@ -270,7 +270,8 @@ header {
     header .pageTitle .breadcrumbs {
       margin: -5px;
       position: relative;
-      z-index: 1; }
+      z-index: 1;
+      font-size: 12px; }
       html header .pageTitle .breadcrumbs {
         color: #666; }
       .dark header .pageTitle .breadcrumbs {
@@ -285,11 +286,13 @@ header {
         display: inline-block;
         padding: 5px;
         text-decoration: none;
-        font-size: 14px;
         font-weight: 500; }
       header .pageTitle .breadcrumbs .separator {
         display: inline-block;
         padding: 5px 0; }
+      @media all and (min-width: 800px), print {
+        header .pageTitle .breadcrumbs {
+          font-size: 14px; } }
     header .pageTitle h1 {
       font-size: 24px;
       font-weight: bolder;

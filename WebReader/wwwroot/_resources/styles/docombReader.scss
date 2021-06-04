@@ -151,9 +151,10 @@ header {
 	.pageTitle {
 		@include padding;
 		.breadcrumbs {
-			margin: -5px; @include themeMap("color", $textColorLight); position: relative; z-index: 1;
-			a { color: inherit; display: inline-block; padding: 5px; text-decoration: none; font-size: 14px; font-weight: 500; }
+			margin: -5px; position: relative; z-index: 1; font-size: 12px; @include themeMap("color", $textColorLight);
+			a { color: inherit; display: inline-block; padding: 5px; text-decoration: none; font-weight: 500; }
 			.separator { display: inline-block; padding: 5px 0; }
+			@include aboveTablet { font-size: 14px; }
 		}
 		h1 { font-size: 24px; font-weight: bolder; margin: 0;
 			 @include aboveTablet { font-size: 30px; }
