@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Docomb.WebReader
+namespace Docomb.WebAdmin
 {
 	class ConfigureOptions : IPostConfigureOptions<StaticFileOptions>
 	{
@@ -44,7 +44,7 @@ namespace Docomb.WebReader
 
 	public static class ServiceCollectionExtensions
 	{
-		public static void AddDocombReader(this IServiceCollection services)
+		public static void AddDocombAdmin(this IServiceCollection services)
 		{
 			services.ConfigureOptions(typeof(ConfigureOptions));
 		}

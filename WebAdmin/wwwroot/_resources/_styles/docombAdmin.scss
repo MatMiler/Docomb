@@ -1,0 +1,92 @@
+﻿// Style reset & basics
+body { border: none; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+h1, h2, h3, h4, h5, h6 { margin: 30px 0 15px 0; padding: 0; }
+h1 + h2, h1 + h3, h1 + h4, h1 + h5, h1 + h6,
+h2 + h3, h2 + h4, h2 + h5, h2 + h6,
+h3 + h4, h3 + h5, h3 + h6,
+h4 + h5, h4 + h6,
+h5 + h6 { margin-top: 0; }
+p, blockquote, pre, hr, dl, dd, ol, ul, figure { margin: 0; padding: 0; }
+p + p { margin-top: .751em; }
+blockquote, pre, ul, ol, dl, figure, .highlight { margin-top: 10px; margin-bottom: 10px; }
+img { max-width: 100%; vertical-align: middle; }
+figure > img { display: block; }
+ul, ol { margin-left: 30px; }
+li > ul, li > ol { margin-top: 0; margin-bottom: 0; }
+
+
+
+
+
+// Light/Dark theme setting and mixins
+$bgColor: ( 'dark': #222, 'light': #fff );
+$textColor: ( 'dark': #fff, 'light': #000 );
+$textColorLight: ( 'dark': #ccc, 'light': #666 );
+$menuBackgroundColor: ( 'dark': #444, 'light': #ddd );
+$menuBorderColor: ( 'dark': #666, 'light': #bbb );
+$linkColor: ( 'dark': #0bf, 'light': #039 );
+
+
+$tabletWidth: 800px;
+
+@mixin aboveTablet {
+	@media all and (min-width: $tabletWidth), print {
+		@content;
+	}
+}
+@mixin belowTablet {
+	@media not all and (min-width: $tabletWidth) {
+		@content;
+	}
+}
+
+@mixin padding {
+	padding: 20px;
+	@include belowTablet { padding: 10px; }
+}
+@mixin hPadding {
+	padding-left: 20px; padding-right: 20px;
+	@include belowTablet { padding-left: 10px; padding-right: 10px; }
+}
+
+
+
+
+
+// Common light/dark styles
+@mixin lightPreset {
+	body { background: map-get($bgColor, 'light'); color: map-get($textColor, 'light'); }
+	a { color: map-get($linkColor, 'light'); }
+}
+@mixin darkPreset {
+	body { background: map-get($bgColor, 'dark'); color: map-get($textColor, 'dark'); }
+	a { color: map-get($linkColor, 'dark'); }
+}
+html { @include lightPreset; }
+.dark { @include darkPreset; }
+@media (prefers-color-scheme: dark) {
+	html { @include darkPreset; }
+	.light { @include lightPreset; }
+}
+
+@mixin themeMaps($values) {
+	html & { @each $property, $value in $values { #{$property}: map-get($value, 'light'); } }
+	.dark & { @each $property, $value in $values { #{$property}: map-get($value, 'dark'); } }
+	@media (prefers-color-scheme: dark) {
+		html & { @each $property, $value in $values { #{$property}: map-get($value, 'dark'); } }
+		.light & { @each $property, $value in $values { #{$property}: map-get($value, 'light'); } }
+	}
+}
+@mixin themeMap($property, $value) {
+	html & { #{$property}: map-get($value, 'light'); }
+	.dark & { #{$property}: map-get($value, 'dark'); }
+	@media (prefers-color-scheme: dark) {
+		html & { #{$property}: map-get($value, 'dark'); }
+		.light & { #{$property}: map-get($value, 'light'); }
+	}
+}
+
+
+
+
+.adminRoot { width: 100vw; height: 100vh; }

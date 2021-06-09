@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Docomb.WebReader;
+using Docomb.WebAdmin;
 
 namespace TestSite
 {
@@ -19,7 +20,8 @@ namespace TestSite
 		{
 			services.AddRazorPages();
 			services.AddMvc();
-			services.AddDocomReader();
+			services.AddDocombAdmin();
+			services.AddDocombReader();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
