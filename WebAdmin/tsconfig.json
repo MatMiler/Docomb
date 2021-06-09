@@ -1,0 +1,20 @@
+{
+	"compilerOptions": {
+        "jsx": "react",
+		"noImplicitAny": false,
+		"noEmitOnError": true,
+		"removeComments": false,
+		"sourceMap": true,
+		"target": "ES2015",
+		"outDir": "wwwroot/_resources/admin/js",
+		"moduleResolution": "Node"
+	},
+	"exclude": [
+		"node_modules",
+		"wwwroot"
+	],
+	"include": [
+		"scripts/**/*"
+	],
+	"compileOnSave": true
+}

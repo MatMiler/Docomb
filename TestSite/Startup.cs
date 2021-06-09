@@ -19,9 +19,9 @@ namespace TestSite
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddRazorPages();
-			services.AddMvc();
 			services.AddDocombAdmin();
 			services.AddDocombReader();
+			services.AddMvc();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -31,6 +31,8 @@ namespace TestSite
 			{
 				app.UseDeveloperExceptionPage();
 			}
+
+			app.UseDocombAdmin();
 
 			app.UseStaticFiles();
 
