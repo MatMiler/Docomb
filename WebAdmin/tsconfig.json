@@ -1,20 +1,24 @@
 {
 	"compilerOptions": {
-        "jsx": "react",
+		"jsx": "react",
 		"noImplicitAny": false,
 		"noEmitOnError": true,
 		"removeComments": false,
 		"sourceMap": true,
 		"target": "ES2015",
-		"outDir": "wwwroot/_resources/admin/js",
-		"moduleResolution": "Node"
+		"outDir": "ClientApp/src",
+		"moduleResolution": "node",
+		"esModuleInterop": true
 	},
 	"exclude": [
+		"ClientApp/node_modules",
 		"node_modules",
 		"wwwroot"
 	],
 	"include": [
-		"scripts/**/*"
+		"scripts/**/*",
+		"ClientApp/**/*",
+		"ClientApp/TypeScript/**/*"
 	],
 	"compileOnSave": true
 }

@@ -40,10 +40,4 @@
 	  <None Include="compilerconfig.json" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="scripts\" />
-	  <Folder Include="wwwroot\_admin\" />
-	  <Folder Include="wwwroot\_resources\admin\js\" />
-	</ItemGroup>
-
 </Project>

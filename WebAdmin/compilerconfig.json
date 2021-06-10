@@ -1,6 +1,6 @@
 ﻿[
   {
-    "outputFile": "wwwroot/_resources/_styles/docombAdmin.css",
-    "inputFile": "wwwroot/_resources/_styles/docombAdmin.scss"
+    "outputFile": "wwwroot/_resources/styles/docombAdmin.css",
+    "inputFile": "wwwroot/_resources/styles/docombAdmin.scss"
   }
 ]

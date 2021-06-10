@@ -1,8 +1,15 @@
-﻿@page "/_admin"
-@using Docomb.ContentStorage
-@{
-	Layout = "~/Areas/Admin/Pages/Shared/_Layout.cshtml";
-}
-
-<div id="adminRoot">
-</div>
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+	<title>@(Docomb.WebCore.Configurations.MainConfig.Instance.SiteName)</title>
+	<base href="@ViewBag.baseHref" />
+	<link rel="stylesheet" href="~/_resources/styles/docombAdmin.css" />
+	<script>window["basePath"] = @Json.Serialize(ViewBag.basePath);</script>
+</head>
+<body>
+	<div id="root"></div>
+	<script type="module" src="@Url.Content("~/_resources/admin/bundle.js")"></script>
+</body>
+</html>
