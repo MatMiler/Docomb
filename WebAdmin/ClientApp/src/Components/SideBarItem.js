@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { FontIcon } from '@fluentui/react/lib/Icon';
+import { LayoutUtils } from '../LayoutUtils';
 export class SideBarItem extends Component {
     constructor(props) {
         super(props);
-        this.state = { name: props.name, url: props.url, initials: props.initials, icon: props.icon };
+        this.state = { name: props.name, url: props.url, initials: props.initials, icon: props.icon, exactMatch: props.exactMatch, itemKey: props.itemKey };
     }
     render() {
         let classNames = "sideBarItem";
@@ -13,7 +14,9 @@ export class SideBarItem extends Component {
             iconContent = React.createElement("span", { className: "icon" },
                 React.createElement(FontIcon, { iconName: this.state.icon }));
         }
-        return (React.createElement("div", { className: classNames },
+        if (LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem) == this.state.itemKey)
+            classNames += " selected";
+        return (React.createElement("div", { className: classNames, "data-key": this.state.itemKey },
             React.createElement(Link, { to: this.state.url },
                 iconContent,
                 React.createElement("span", { className: "name" }, this.state.name))));

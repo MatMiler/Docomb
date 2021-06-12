@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Docomb.WebAdmin
@@ -47,7 +48,10 @@ namespace Docomb.WebAdmin
 	{
 		public static void AddDocombAdmin(this IServiceCollection services)
 		{
-
+			services.AddMvc().AddJsonOptions(options =>
+			{
+				options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+			});
 			services.ConfigureOptions(typeof(ConfigureOptions));
 		}
 

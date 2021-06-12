@@ -6,7 +6,17 @@ import { MainNav } from './MainNav';
 import { darkTheme, lightTheme } from '../Themes';
 
 
-export class Layout extends Component {
+type LayoutData = {
+	showMainNav: boolean
+};
+
+
+export class Layout extends Component<LayoutData, LayoutData> {
+	constructor(props: LayoutData) {
+		super(props);
+		this.state = { showMainNav: props.showMainNav };
+	}
+
 	render() {
 		let isDark = false;
 		try {
@@ -21,9 +31,13 @@ export class Layout extends Component {
 					<div className="sideBarNav">
 						<SideBarNav />
 					</div>
-					<div className="mainNav">
-						<MainNav />
-					</div>
+					{
+						(this.state.showMainNav == true) ?
+							<div className="mainNav">
+								<MainNav />
+							</div>
+							: ""
+					}
 					<div className="mainNavGridContent">
 						{this.props.children}
 					</div>

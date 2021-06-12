@@ -4,6 +4,10 @@ import { SideBarNav } from './SideBarNav';
 import { MainNav } from './MainNav';
 import { darkTheme, lightTheme } from '../Themes';
 export class Layout extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { showMainNav: props.showMainNav };
+    }
     render() {
         let isDark = false;
         try {
@@ -18,8 +22,10 @@ export class Layout extends Component {
             React.createElement("div", { className: "adminRoot mainNavGrid" },
                 React.createElement("div", { className: "sideBarNav" },
                     React.createElement(SideBarNav, null)),
-                React.createElement("div", { className: "mainNav" },
-                    React.createElement(MainNav, null)),
+                (this.state.showMainNav == true) ?
+                    React.createElement("div", { className: "mainNav" },
+                        React.createElement(MainNav, null))
+                    : "",
                 React.createElement("div", { className: "mainNavGridContent" }, this.props.children))));
     }
 }

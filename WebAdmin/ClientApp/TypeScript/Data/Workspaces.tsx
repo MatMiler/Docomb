@@ -3,7 +3,7 @@ import { Utils } from './Utils';
 
 export module Workspaces {
 	/** Load a list of workspaces */
-	export async function load(): Promise<Array<Workspace>> {
+	export async function loadWorkspaceList(): Promise<Array<Workspace>> {
 		let list: Array<Workspace> = [];
 		let data = await Apis.fetchJsonAsync("api/general/workspaces", true);
 		if (Utils.ArrayHasValues(data)) {
@@ -16,35 +16,101 @@ export module Workspaces {
 
 		return list;
 	}
-}
 
 
-
-
-
-/** Workspace information */
-export class Workspace {
-	/** Name of the workspace (site name) */
-	public name: string = null;
-	/** URL of the workspace */
-	public url: string = null;
-	/** Local URL of the workspace for React */
-	public localUrl: string = null;
-	/** Initials to display as icon if icon is missing */
-	public initials: string = null;
-	/** Representation of the workspace */
-	public icon: string = null;
-
-	/** Quick check if data is valid */
-	public isValid(): boolean {
-		return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.url == "string") && (this.url.length > 0));
+	export async function loadPageInfo(url: string): Promise<WorkspacePageInfo> {
+		let data: any = await Apis.fetchJsonAsync("api/general/workspacePageInfo?url=" + encodeURI(url), false);
+		let item: WorkspacePageInfo = new WorkspacePageInfo(data);
+		return ((item != null) && (item.isValid())) ? item : null;
 	}
 
-	public constructor(source: any) {
-		this.name = Utils.TryGetString(source, "name");
-		this.url = Utils.TryGetString(source, "url");
-		this.localUrl = Utils.TryGetString(source, "localUrl");
-		this.initials = Utils.TryGetString(source, "initials");
-		this.icon = Utils.TryGetString(source, "icon");
+
+
+	/** Workspace information */
+	export class Workspace {
+		/** Name of the workspace (site name) */
+		public name: string = null;
+		/** URL of the workspace */
+		public url: string = null;
+		/** Local URL of the workspace for React */
+		public localUrl: string = null;
+		/** Initials to display as icon if icon is missing */
+		public initials: string = null;
+		/** Representation of the workspace */
+		public icon: string = null;
+
+		/** Quick check if data is valid */
+		public isValid(): boolean {
+			return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.localUrl == "string") && (this.localUrl.length > 0));
+		}
+
+		public constructor(source: any) {
+			this.name = Utils.TryGetString(source, "name");
+			this.url = Utils.TryGetString(source, "url");
+			this.localUrl = Utils.TryGetString(source, "localUrl");
+			this.initials = Utils.TryGetString(source, "initials");
+			this.icon = Utils.TryGetString(source, "icon");
+		}
 	}
+
+
+
+	export enum ContentItemType {
+		Directory = "Directory",
+		File = "File"
+	}
+	export class ContentItem {
+		public type: ContentItemType;
+		public name: string;
+		public url: string;
+		public localUrl: string;
+		public children: Array<ContentItem>;
+
+		/** Quick check if data is valid */
+		public isValid(): boolean {
+			return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.localUrl == "string") && (this.localUrl.length > 0));
+		}
+
+		public constructor(source: any) {
+			this.type = Utils.TryGetEnum(source, "type", ContentItemType);
+			this.name = Utils.TryGetString(source, "name");
+			this.url = Utils.TryGetString(source, "url");
+			this.localUrl = Utils.TryGetString(source, "localUrl");
+
+			let sourceChildren = Utils.TryGet(source, "children");
+			let children: Array<ContentItem> = [];
+			if (Utils.ArrayHasValues(sourceChildren)) {
+				for (let x = 0; x < sourceChildren.length; x++) {
+					let item: ContentItem = new ContentItem(sourceChildren[x]);
+					if ((item != null) && (item.isValid() == true))
+						children.push(item);
+				}
+			}
+			this.children = children;
+		}
+	}
+
+	export enum ContentItemAction {
+		View = "View",
+		Edit = "Edit"
+	}
+	export class WorkspacePageInfo {
+		public workspace: Workspace;
+		public contentItem: ContentItem;
+		public action: ContentItemAction;
+
+		public isValid(): boolean {
+			return ((this.workspace != null) && (this.workspace.isValid()) && (this.contentItem != null) && (this.contentItem.isValid()));
+		}
+
+		public constructor(source: any) {
+			let workspace: Workspace = new Workspace(Utils.TryGet(source, "workspace"));
+			let contentItem: ContentItem = new ContentItem(Utils.TryGet(source, "contentItem"));
+			if ((workspace != null) && (workspace.isValid())) this.workspace = workspace;
+			if ((contentItem != null) && (contentItem.isValid())) this.contentItem = contentItem;
+			this.action = Utils.TryGetEnum(source, "action", ContentItemAction, ContentItemAction.View);
+		}
+	}
+
+
 }

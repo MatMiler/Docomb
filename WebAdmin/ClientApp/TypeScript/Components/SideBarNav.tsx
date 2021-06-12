@@ -1,10 +1,11 @@
 ﻿import React, { Component } from 'react';
 import { SideBarItem } from './SideBarItem';
-import { Workspace, Workspaces } from "../Data/Workspaces";
+import { Workspaces } from "../Data/Workspaces";
+import { LayoutUtils } from '../LayoutUtils';
 
 
 type SideBarState = {
-	workspaces: Array<Workspace>,
+	workspaces: Array<Workspaces.Workspace>,
 	loading: boolean
 };
 
@@ -13,15 +14,16 @@ export class SideBarNav extends Component<{}, SideBarState> {
 	constructor(props) {
 		super(props);
 		this.state = { workspaces: [], loading: true };
+		//LayoutUtils.NavBar.updateNavBar = LayoutUtils.NavBar.updateNavBar.bind(this)
 	}
 
 	componentDidMount() {
 		this.populateWorkspaces();
 	}
 
-	static renderWorkspaces(workspaces: Array<Workspace>) {
+	static renderWorkspaces(workspaces: Array<Workspaces.Workspace>) {
 		let content = workspaces.map(item =>
-			<SideBarItem key={item.url} name={item.name} url={item.localUrl} initials={item.initials} />
+			<SideBarItem key={item.url} name={item.name} url={"/workspace" + item.localUrl} initials={item.initials} exactMatch={false} itemKey={item.url} />
 		);
 		return (content);
 	}
@@ -34,16 +36,19 @@ export class SideBarNav extends Component<{}, SideBarState> {
 
 		return (
 			<div className="sideBar">
-				<div className="workspaces">{contents}</div>
+				<div className="workspaces">
+					<SideBarItem name="Home" url="/" initials="H" icon="Home" itemKey={LayoutUtils.NavBar.ItemKey.Home} />
+					{contents}
+				</div>
 				<div className="system">
-					<SideBarItem name="Settings" url="" initials="S" icon="Settings" />
+					<SideBarItem name="Settings" url="/settings" initials="S" icon="Settings" itemKey={LayoutUtils.NavBar.ItemKey.Settings} />
 				</div>
 			</div>
 		);
 	}
 
 	async populateWorkspaces() {
-		let data: Array<Workspace> = await Workspaces.load();
+		let data: Array<Workspaces.Workspace> = await Workspaces.loadWorkspaceList();
 		this.setState({ workspaces: data, loading: false });
 	}
 

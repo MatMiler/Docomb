@@ -2,13 +2,13 @@
 import { LayoutUtils } from '../LayoutUtils';
 import { Layout } from './Layout';
 
-export class Home extends Component {
+export class Settings extends Component {
 	render() {
-		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, LayoutUtils.NavBar.ItemKey.Home);
+		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, LayoutUtils.NavBar.ItemKey.Settings);
 		return (
 			<Layout showMainNav={false}>
 				<div>
-					Docomb administration home page
+					Settings
 				</div>
 			</Layout>
 		);

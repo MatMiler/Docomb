@@ -43,6 +43,17 @@
 		return defaultValue;
 	}
 
+	/**
+	 * Convert a value to enumerator
+	 * @param value Value to convert
+	 * @param set Set of all available values / Reference to the enumerator
+	 * @param defaultValue Default value if searched value is not present in the set
+	 */
+	export function ParseEnum<T>(value: any, set: { [key: string]: any }, defaultValue: T): T {
+		if (GetObjectValues(set).includes(value)) return value;
+		return defaultValue;
+	}
+
 	//#endregion
 
 
@@ -138,7 +149,7 @@
 
 
 
-	//#region Arrays
+	//#region Arrays & Objects
 
 	/**
 	 * Check whether a value is an array and has any values
@@ -146,6 +157,41 @@
 	 */
 	export function ArrayHasValues(array: Array<any>): boolean {
 		return (IsType(array, Array)) && (array.length > 0);
+	}
+
+	/**
+	 * Get array of all keys in an object
+	 * @param object Object from which to extract keys
+	 */
+	export function GetObjectKeys(object: object): Array<string> {
+		var list = [];
+		for (var key in object)
+			if (object.hasOwnProperty(key))
+				list.push(key);
+		return list;
+	}
+
+	/**
+	 * Get array of all values in an object
+	 * @param object Object from which to extract values
+	 */
+	export function GetObjectValues(object: any): Array<any> {
+		var list = [];
+		for (var value in object)
+			list.push(object[value]);
+		return list;
+	}
+
+	/**
+	 * Check whether the object has the specified key
+	 * @param object Object in which to check for key
+	 * @param key Key to look for
+	 */
+	export function HasObjectKey(object: object, key: string): boolean {
+		for (var s in object)
+			if (s == key)
+				return true;
+		return false;
 	}
 
 	//#endregion
@@ -258,6 +304,18 @@
 	export function TryGetBool(container: any, property: any, defaultValue?: boolean): boolean {
 		return ParseBool(TryGet(container, property, defaultValue), defaultValue);
 	}
+
+	/**
+	 * Try to return an enumerator value in a property or index of an object. If the value isn't found, the default value will be returned
+	 * @param container Container object in which to look for the property/index
+	 * @param property Property or index (or array of properties/indexes) to find
+	 * @param set Set of all available values / Reference to the enumerator
+	 * @param defaultValue Default value if property/index is not found, is null, or can't be converted into a boolean
+	 */
+	export function TryGetEnum<T>(container: any, property: any, set: { [key: string]: any }, defaultValue?: T): T {
+		return ParseEnum(TryGet(container, property, defaultValue), set, defaultValue);
+	}
+
 
 	//#endregion
 

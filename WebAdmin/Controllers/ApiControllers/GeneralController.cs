@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Docomb.WebAdmin.Workspaces.Summary;
 
 namespace Docomb.WebAdmin.Controllers.Api
 {
@@ -10,9 +11,20 @@ namespace Docomb.WebAdmin.Controllers.Api
 	public class GeneralController : Controller
 	{
 		[HttpGet("workspaces")]
-		public ActionResult<List<Workspaces.Summary.WorkspaceSummary>> Workspaces()
+		public ActionResult<List<WorkspaceSummary>> Workspaces()
 		{
-			return WebAdmin.Workspaces.Summary.GetList();
+			return GetWorkspaceSummaryList();
 		}
+
+
+		[HttpGet("workspacePageInfo")]
+		public ActionResult<WorkspacePageInfo> WorkspacePageInfo(string url)
+		{
+			return GetWorkspacePageInfo(url);
+		}
+
+
 	}
+
+
 }

@@ -25,6 +25,7 @@ $textColorLight: ( 'dark': #ccc, 'light': #666 );
 $menuBackgroundColor: ( 'dark': #333, 'light': #eee );
 $menuBorderColor: ( 'dark': #494949, 'light': #eee );
 $linkColor: ( 'dark': #0bf, 'light': #039 );
+$accentColor: ( 'dark': #0bf, 'light': #039 );
 
 
 $tabletWidth: 800px;
@@ -122,12 +123,18 @@ html { @include lightPreset; }
 
 
 .sideBarItem {
-	a { display: flex; align-items: center; padding: 10px; color: inherit; text-decoration: none;
+	a { display: flex; align-items: center; padding: 10px; color: inherit; text-decoration: none; position: relative;
 		&:hover {
 			@include themeMap("background", $menuBackgroundColor);
 		}
 	}
 	.icon { display: inline-block; flex: 0 0 30px; width: 30px; height: 30px; font-size: 20px; line-height: 30px; text-align: center; overflow: hidden; font-weight: bold; margin-right: 10px; }
 	.name { display: inline-block; flex: 1 1 100%; font-size: 14px; }
+	a:before {
+		content: ""; display: block; position: absolute; top: 10px; bottom: 10px; left: 0; border-left: 3px solid transparent;
+		transition: top 0.267s cubic-bezier(0.1, 0.25, 0.75, 0.9) 0s, bottom 0.267s cubic-bezier(0.1, 0.25, 0.75, 0.9) 0s;
+	}
+	&.selected a:before { @include themeMap("border-color", $accentColor); }
+	&.selected a:hover:before { top: 0; bottom: 0; }
 }
 
