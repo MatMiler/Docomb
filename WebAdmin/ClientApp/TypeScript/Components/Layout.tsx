@@ -15,7 +15,6 @@ export class Layout extends Component {
 			if (document.documentElement.classList.contains("dark")) isDark = true;
 		}
 		catch (e) { }
-		console.log("Is dark: " + isDark);
 		return (
 			<ThemeProvider theme={isDark ? darkTheme : lightTheme}>
 				<div className="adminRoot mainNavGrid">

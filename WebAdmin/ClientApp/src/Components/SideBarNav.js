@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import React, { Component } from 'react';
 import { SideBarItem } from './SideBarItem';
+import { Workspaces } from "../Data/Workspaces";
 export class SideBarNav extends Component {
     constructor(props) {
         super(props);
@@ -18,13 +19,12 @@ export class SideBarNav extends Component {
         this.populateWorkspaces();
     }
     static renderWorkspaces(workspaces) {
-        let content = workspaces.map(item => React.createElement(SideBarItem, { key: item.url, name: item.name, url: item.url, initials: item.initials }));
+        let content = workspaces.map(item => React.createElement(SideBarItem, { key: item.url, name: item.name, url: item.localUrl, initials: item.initials }));
         return (content);
     }
     render() {
         let contents = this.state.loading
-            ? React.createElement("p", null,
-                React.createElement("em", null, "Loading..."))
+            ? React.createElement("div", null)
             : SideBarNav.renderWorkspaces(this.state.workspaces);
         return (React.createElement("div", { className: "sideBar" },
             React.createElement("div", { className: "workspaces" }, contents),
@@ -33,8 +33,7 @@ export class SideBarNav extends Component {
     }
     populateWorkspaces() {
         return __awaiter(this, void 0, void 0, function* () {
-            let response = yield fetch("api/general/workspaces");
-            let data = yield response.json();
+            let data = yield Workspaces.load();
             this.setState({ workspaces: data, loading: false });
         });
     }

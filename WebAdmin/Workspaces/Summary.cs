@@ -19,9 +19,13 @@ namespace Docomb.WebAdmin.Workspaces
 			[JsonPropertyName("url")]
 			public string Url { get; set; }
 
+			[JsonPropertyName("localUrl")]
+			public string LocalUrl { get; set; }
+
 			[JsonPropertyName("initials")]
 			public string Initials { get; set; }
 
+			[JsonPropertyName("icon")]
 			public string Icon { get; set; }
 
 			public WorkspaceSummary()
@@ -32,7 +36,8 @@ namespace Docomb.WebAdmin.Workspaces
 			public WorkspaceSummary(ContentStorage.Workspace workspace)
 			{
 				Name = workspace.Name?.Trim();
-				Url = Utils.CombineUrlPaths("", workspace.UrlPath);
+				Url = Utils.CombineUrlPaths(AdminConfig.UrlPathPrefix, workspace.UrlPath);
+				LocalUrl = Utils.CombineUrlPaths("", workspace.UrlPath);
 				Initials = (Name?.Length > 0) ? Name[0..1] : "?";
 			}
 		}

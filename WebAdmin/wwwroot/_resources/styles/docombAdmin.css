@@ -49,7 +49,7 @@ html a {
   color: #039; }
 
 .dark body {
-  background: #222;
+  background: #191919;
   color: #fff; }
 
 .dark a {
@@ -57,7 +57,7 @@ html a {
 
 @media (prefers-color-scheme: dark) {
   html body {
-    background: #222;
+    background: #191919;
     color: #fff; }
   html a {
     color: #0bf; }
@@ -76,27 +76,40 @@ html a {
   width: 100vw;
   height: 100vh; }
   .mainNavGrid > .sideBarNav {
-    flex: 0 0 50px; }
+    flex: 0 0 50px;
+    border-right: 1px solid;
+    box-sizing: content-box; }
     .mainNavGrid > .sideBarNav .sideBar {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       height: 100%; }
+      .mainNavGrid > .sideBarNav .sideBar .workspaces {
+        flex: 1 1 100%;
+        overflow: auto;
+        scrollbar-width: none; }
+        .mainNavGrid > .sideBarNav .sideBar .workspaces::-webkit-scrollbar {
+          display: none; }
+      .mainNavGrid > .sideBarNav .sideBar .system {
+        flex: 0 0 auto;
+        border-top: 1px solid; }
     .mainNavGrid > .sideBarNav .sideBarItem .icon {
       margin-right: 0; }
     .mainNavGrid > .sideBarNav .sideBarItem .name {
       display: none; }
   .mainNavGrid > .mainNav {
-    flex: 0 0 250px; }
+    flex: 0 0 250px;
+    border-right: 1px solid;
+    box-sizing: content-box; }
     html .mainNavGrid > .mainNav {
-      background: #ddd; }
+      background: #eee; }
     .dark .mainNavGrid > .mainNav {
-      background: #444; }
+      background: #333; }
     @media (prefers-color-scheme: dark) {
       html .mainNavGrid > .mainNav {
-        background: #444; }
+        background: #333; }
       .light .mainNavGrid > .mainNav {
-        background: #ddd; } }
+        background: #eee; } }
     .mainNavGrid > .mainNav > .toolbar {
       display: flex;
       height: 100%;
@@ -107,6 +120,15 @@ html a {
       .mainNavGrid > .mainNav > .toolbar > .tabpanel {
         flex: 1 1 100%;
         overflow: auto; }
+  html .mainNavGrid > .sideBarNav, html .mainNavGrid .mainNav, html .mainNavGrid > .sideBarNav .sideBar .system {
+    border-color: #eee; }
+  .dark .mainNavGrid > .sideBarNav, .dark .mainNavGrid .mainNav, .dark .mainNavGrid > .sideBarNav .sideBar .system {
+    border-color: #494949; }
+  @media (prefers-color-scheme: dark) {
+    html .mainNavGrid > .sideBarNav, html .mainNavGrid .mainNav, html .mainNavGrid > .sideBarNav .sideBar .system {
+      border-color: #494949; }
+    .light .mainNavGrid > .sideBarNav, .light .mainNavGrid .mainNav, .light .mainNavGrid > .sideBarNav .sideBar .system {
+      border-color: #eee; } }
   .mainNavGrid > .mainNavGridContent {
     flex: 1 1 100%; }
 
@@ -117,14 +139,14 @@ html a {
   color: inherit;
   text-decoration: none; }
   html .sideBarItem a:hover {
-    background: #ddd; }
+    background: #eee; }
   .dark .sideBarItem a:hover {
-    background: #444; }
+    background: #333; }
   @media (prefers-color-scheme: dark) {
     html .sideBarItem a:hover {
-      background: #444; }
+      background: #333; }
     .light .sideBarItem a:hover {
-      background: #ddd; } }
+      background: #eee; } }
 
 .sideBarItem .icon {
   display: inline-block;

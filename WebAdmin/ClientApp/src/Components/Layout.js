@@ -14,7 +14,6 @@ export class Layout extends Component {
                 isDark = true;
         }
         catch (e) { }
-        console.log("Is dark: " + isDark);
         return (React.createElement(ThemeProvider, { theme: isDark ? darkTheme : lightTheme },
             React.createElement("div", { className: "adminRoot mainNavGrid" },
                 React.createElement("div", { className: "sideBarNav" },

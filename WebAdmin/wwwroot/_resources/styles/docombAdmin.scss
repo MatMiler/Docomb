@@ -19,11 +19,11 @@ li > ul, li > ol { margin-top: 0; margin-bottom: 0; }
 
 
 // Light/Dark theme setting and mixins
-$bgColor: ( 'dark': #222, 'light': #fff );
+$bgColor: ( 'dark': #191919, 'light': #fff );
 $textColor: ( 'dark': #fff, 'light': #000 );
 $textColorLight: ( 'dark': #ccc, 'light': #666 );
-$menuBackgroundColor: ( 'dark': #444, 'light': #ddd );
-$menuBorderColor: ( 'dark': #666, 'light': #bbb );
+$menuBackgroundColor: ( 'dark': #333, 'light': #eee );
+$menuBorderColor: ( 'dark': #494949, 'light': #eee );
 $linkColor: ( 'dark': #0bf, 'light': #039 );
 
 
@@ -92,8 +92,13 @@ html { @include lightPreset; }
 .adminRoot { width: 100vw; height: 100vh; }
 
 .mainNavGrid { display: flex; width: 100vw; height: 100vh;
-	> .sideBarNav { flex: 0 0 50px;
-		.sideBar { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+	> .sideBarNav { flex: 0 0 50px; border-right: 1px solid; box-sizing: content-box;
+		.sideBar { display: flex; flex-direction: column; justify-content: space-between; height: 100%;
+			.workspaces { flex: 1 1 100%; overflow: auto; scrollbar-width: none;
+				&::-webkit-scrollbar { display: none; }
+			}
+			.system { flex: 0 0 auto; border-top: 1px solid; }
+		}
 		.sideBarItem {
 			.icon { margin-right: 0; }
 			.name { display: none; }
@@ -101,11 +106,16 @@ html { @include lightPreset; }
 	}
 	> .mainNav {
 		flex: 0 0 250px;
+		border-right: 1px solid;
+		box-sizing: content-box;
 		@include themeMap("background", $menuBackgroundColor);
 		> .toolbar { display: flex; height: 100%; width: 100%; flex-direction: column;
 			> .tablist { flex: 0 0 auto; }
 			> .tabpanel { flex: 1 1 100%; overflow: auto; }
 		}
+	}
+	> .sideBarNav, .mainNav, > .sideBarNav .sideBar .system {
+		@include themeMap("border-color", $menuBorderColor);
 	}
 	> .mainNavGridContent { flex: 1 1 100%; }
 }

@@ -1,9 +1,10 @@
 ﻿import React, { Component } from 'react';
 import { SideBarItem } from './SideBarItem';
+import { Workspace, Workspaces } from "../Data/Workspaces";
 
 
 type SideBarState = {
-	workspaces: {}[],
+	workspaces: Array<Workspace>,
 	loading: boolean
 };
 
@@ -18,9 +19,9 @@ export class SideBarNav extends Component<{}, SideBarState> {
 		this.populateWorkspaces();
 	}
 
-	static renderWorkspaces(workspaces) {
+	static renderWorkspaces(workspaces: Array<Workspace>) {
 		let content = workspaces.map(item =>
-			<SideBarItem key={item.url} name={item.name} url={item.url} initials={item.initials} />
+			<SideBarItem key={item.url} name={item.name} url={item.localUrl} initials={item.initials} />
 		);
 		return (content);
 	}
@@ -28,7 +29,7 @@ export class SideBarNav extends Component<{}, SideBarState> {
 
 	render() {
 		let contents = this.state.loading
-			? <p><em>Loading...</em></p>
+			? <div></div>
 			: SideBarNav.renderWorkspaces(this.state.workspaces);
 
 		return (
@@ -42,8 +43,7 @@ export class SideBarNav extends Component<{}, SideBarState> {
 	}
 
 	async populateWorkspaces() {
-		let response = await fetch("api/general/workspaces");
-		let data = await response.json();
+		let data: Array<Workspace> = await Workspaces.load();
 		this.setState({ workspaces: data, loading: false });
 	}
 

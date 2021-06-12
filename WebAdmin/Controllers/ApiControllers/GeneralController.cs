@@ -10,9 +10,9 @@ namespace Docomb.WebAdmin.Controllers.Api
 	public class GeneralController : Controller
 	{
 		[HttpGet("workspaces")]
-		public IActionResult Workspaces()
+		public ActionResult<List<Workspaces.Summary.WorkspaceSummary>> Workspaces()
 		{
-			return Json(WebAdmin.Workspaces.Summary.GetList());
+			return WebAdmin.Workspaces.Summary.GetList();
 		}
 	}
 }
