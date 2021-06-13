@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { ThemeProvider } from '@fluentui/react/lib/Theme';
 import { SideBarNav } from './SideBarNav';
-import { MainNav } from './MainNav';
+import { MainNavWithRouter } from './MainNav';
 import { darkTheme, lightTheme } from '../Themes';
 export class Layout extends Component {
     constructor(props) {
@@ -18,14 +18,16 @@ export class Layout extends Component {
                 isDark = true;
         }
         catch (e) { }
+        let mainNav = null;
+        if (this.state.showMainNav == true) {
+            mainNav = React.createElement("div", { className: "mainNav" },
+                React.createElement(MainNavWithRouter, null));
+        }
         return (React.createElement(ThemeProvider, { theme: isDark ? darkTheme : lightTheme },
             React.createElement("div", { className: "adminRoot mainNavGrid" },
                 React.createElement("div", { className: "sideBarNav" },
                     React.createElement(SideBarNav, null)),
-                (this.state.showMainNav == true) ?
-                    React.createElement("div", { className: "mainNav" },
-                        React.createElement(MainNav, null))
-                    : "",
+                mainNav,
                 React.createElement("div", { className: "mainNavGridContent" }, this.props.children))));
     }
 }

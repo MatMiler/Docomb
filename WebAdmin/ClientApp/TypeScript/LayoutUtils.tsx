@@ -18,15 +18,17 @@ export module LayoutUtils {
 		export const windowProperty: string = "docombProp";
 
 		export enum ItemKey {
-			SelectedSideBarItem = "selectedSideBarItem"
+			SelectedSideBarItem = "selectedSideBarItem",
+			WorkspaceData = "workspaceData",
+			ContentItemData = "contentItemData"
 		}
 
 
-		export function get(key: ItemKey): string {
-			return Utils.TryGetString(window, [windowProperty, key]);
+		export function get(key: ItemKey | string): any {
+			return Utils.TryGet(window, [windowProperty, key]);
 		}
 
-		export function set(key: ItemKey, value: string): void {
+		export function set(key: ItemKey | string, value: any): void {
 			if (window[windowProperty] == null)
 				window[windowProperty] = {};
 			window[windowProperty][key] = value;

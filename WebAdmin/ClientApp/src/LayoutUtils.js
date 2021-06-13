@@ -19,9 +19,11 @@ export var LayoutUtils;
         let ItemKey;
         (function (ItemKey) {
             ItemKey["SelectedSideBarItem"] = "selectedSideBarItem";
+            ItemKey["WorkspaceData"] = "workspaceData";
+            ItemKey["ContentItemData"] = "contentItemData";
         })(ItemKey = WindowData.ItemKey || (WindowData.ItemKey = {}));
         function get(key) {
-            return Utils.TryGetString(window, [WindowData.windowProperty, key]);
+            return Utils.TryGet(window, [WindowData.windowProperty, key]);
         }
         WindowData.get = get;
         function set(key, value) {

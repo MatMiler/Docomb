@@ -110,16 +110,18 @@ html a {
         background: #333; }
       .light .mainNavGrid > .mainNav {
         background: #eee; } }
-    .mainNavGrid > .mainNav > .toolbar {
+    .mainNavGrid > .mainNav > [role="toolbar"] {
       display: flex;
       height: 100%;
       width: 100%;
       flex-direction: column; }
-      .mainNavGrid > .mainNav > .toolbar > .tablist {
+      .mainNavGrid > .mainNav > [role="toolbar"] > [role="tablist"] {
         flex: 0 0 auto; }
-      .mainNavGrid > .mainNav > .toolbar > .tabpanel {
+      .mainNavGrid > .mainNav > [role="toolbar"] > [role="tabpanel"] {
         flex: 1 1 100%;
-        overflow: auto; }
+        overflow: auto;
+        width: 250px;
+        /*a { white-space: normal; line-height: inherit; height: auto; }*/ }
   html .mainNavGrid > .sideBarNav, html .mainNavGrid .mainNav, html .mainNavGrid > .sideBarNav .sideBar .system {
     border-color: #eee; }
   .dark .mainNavGrid > .sideBarNav, .dark .mainNavGrid .mainNav, .dark .mainNavGrid > .sideBarNav .sideBar .system {

@@ -1,7 +1,7 @@
 ﻿import React, { Component } from 'react';
 import { ThemeProvider, PartialTheme } from '@fluentui/react/lib/Theme';
 import { SideBarNav } from './SideBarNav';
-import { MainNav } from './MainNav';
+import { MainNav, MainNavWithRouter } from './MainNav';
 
 import { darkTheme, lightTheme } from '../Themes';
 
@@ -25,19 +25,21 @@ export class Layout extends Component<LayoutData, LayoutData> {
 			if (document.documentElement.classList.contains("dark")) isDark = true;
 		}
 		catch (e) { }
+
+		let mainNav: JSX.Element = null;
+		if (this.state.showMainNav == true) {
+			mainNav = <div className="mainNav">
+				<MainNavWithRouter />
+			</div>;
+		}
+
 		return (
 			<ThemeProvider theme={isDark ? darkTheme : lightTheme}>
 				<div className="adminRoot mainNavGrid">
 					<div className="sideBarNav">
 						<SideBarNav />
 					</div>
-					{
-						(this.state.showMainNav == true) ?
-							<div className="mainNav">
-								<MainNav />
-							</div>
-							: ""
-					}
+					{mainNav}
 					<div className="mainNavGridContent">
 						{this.props.children}
 					</div>

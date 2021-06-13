@@ -110,9 +110,11 @@ html { @include lightPreset; }
 		border-right: 1px solid;
 		box-sizing: content-box;
 		@include themeMap("background", $menuBackgroundColor);
-		> .toolbar { display: flex; height: 100%; width: 100%; flex-direction: column;
-			> .tablist { flex: 0 0 auto; }
-			> .tabpanel { flex: 1 1 100%; overflow: auto; }
+		> [role="toolbar"] { display: flex; height: 100%; width: 100%; flex-direction: column;
+			> [role="tablist"] { flex: 0 0 auto; }
+			> [role="tabpanel"] { flex: 1 1 100%; overflow: auto; width: 250px;
+				/*a { white-space: normal; line-height: inherit; height: auto; }*/
+			}
 		}
 	}
 	> .sideBarNav, .mainNav, > .sideBarNav .sideBar .system {

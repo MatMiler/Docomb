@@ -1,4 +1,6 @@
-﻿import { Apis } from './Apis';
+﻿import { LayoutUtils } from '../LayoutUtils';
+import { Apis } from './Apis';
+import { SessionCache } from './SessionCache';
 import { Utils } from './Utils';
 
 export module Workspaces {
@@ -24,6 +26,29 @@ export module Workspaces {
 		return ((item != null) && (item.isValid())) ? item : null;
 	}
 
+
+	export async function loadTree(workspaceUrl: string): Promise<Array<ContentItem>> {
+		let list: Array<ContentItem> = [];
+		let url = "api/general/workspaceContentTree?workspaceUrl=" + encodeURI(workspaceUrl);
+
+		let data = null;
+		let storedItem: SessionCache.Item = SessionCache.getItem(url);
+		if ((storedItem != null) && (storedItem.value != null)) {
+			data = storedItem.value;
+		} else {
+			data = await Apis.fetchJsonAsync(url, true);
+			LayoutUtils.WindowData.set("workspaceTreeTimestamp-" + encodeURI(workspaceUrl), Date.now());
+		}
+
+		if (Utils.ArrayHasValues(data)) {
+			for (let x = 0; x < data.length; x++) {
+				let item: ContentItem = new ContentItem(data[x]);
+				if ((item != null) && (item.isValid() == true))
+					list.push(item);
+			}
+		}
+		return list;
+	}
 
 
 	/** Workspace information */

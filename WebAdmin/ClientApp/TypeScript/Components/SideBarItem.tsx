@@ -21,14 +21,14 @@ export class SideBarItem extends Component<SideBarItemData, SideBarItemData> {
 
 	render() {
 		let classNames = "sideBarItem";
-		let iconContent = <span className="icon">{this.state.initials}</span>;
+		let iconContent = <span className="icon" aria-hidden="true">{this.state.initials}</span>;
 		if (this.state.icon) {
-			iconContent = <span className="icon"><FontIcon iconName={this.state.icon} /></span>;
+			iconContent = <span className="icon" aria-hidden="true"><FontIcon iconName={this.state.icon} /></span>;
 		}
 		if (LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem) == this.state.itemKey)
 			classNames += " selected";
 		return (
-			<div className={classNames} data-key={this.state.itemKey}>
+			<div className={classNames} data-key={this.state.itemKey} title={this.state.name}>
 				<Link to={this.state.url}>
 					{iconContent}
 					<span className="name">{this.state.name}</span>

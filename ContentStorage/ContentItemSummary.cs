@@ -1,4 +1,5 @@
-﻿using System;
+﻿using static Docomb.CommonCore.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,8 @@ namespace Docomb.ContentStorage
 	public class ContentItemSummary : IContentInfo
 	{
 		public ContentItemType Type { get; protected set; }
+
+		public string FileName { get; protected set; }
 
 		public string FilePath { get; protected set; }
 
@@ -33,6 +36,7 @@ namespace Docomb.ContentStorage
 			Workspace = workspace;
 			Type = type;
 			FilePath = filePath;
+			FileName = GetFileNameFromPath(FilePath);
 			UrlParts = urlParts;
 			NeedsTrailingSlash = needsTrailingSlash;
 			Title = title;
@@ -46,6 +50,7 @@ namespace Docomb.ContentStorage
 				Workspace = item.Workspace;
 				Type = item.Type;
 				FilePath = item.FilePath;
+				FileName = GetFileNameFromPath(FilePath);
 				UrlParts = item.UrlParts;
 				NeedsTrailingSlash = item.NeedsTrailingSlash;
 				Title = item.Title;

@@ -2,37 +2,59 @@
 import { SideBarItem } from './SideBarItem';
 import { Workspaces } from "../Data/Workspaces";
 import { LayoutUtils } from '../LayoutUtils';
+import { EventBus } from '../EventBus';
 
 
 type SideBarState = {
 	workspaces: Array<Workspaces.Workspace>,
-	loading: boolean
+	loading: boolean,
+	lastSelection: string
 };
 
 export class SideBarNav extends Component<{}, SideBarState> {
+	private instanceData = { isMounted: false };
 
 	constructor(props) {
 		super(props);
-		this.state = { workspaces: [], loading: true };
-		//LayoutUtils.NavBar.updateNavBar = LayoutUtils.NavBar.updateNavBar.bind(this)
+		this.instanceData.isMounted = false;
+		let lastSelection = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem);
+		this.state = { workspaces: [], loading: true, lastSelection: lastSelection };
 	}
 
 	componentDidMount() {
+		this.instanceData.isMounted = true;
 		this.populateWorkspaces();
+		this.navUpdateCall = this.onNavUpdate.bind(this);
+		EventBus.on("navUpdate", this.navUpdateCall);
 	}
 
-	static renderWorkspaces(workspaces: Array<Workspaces.Workspace>) {
+	componentWillUnmount() {
+		this.instanceData.isMounted = false;
+		EventBus.remove("navUpdate", this.navUpdateCall);
+	}
+
+	renderWorkspaces(workspaces: Array<Workspaces.Workspace>) {
 		let content = workspaces.map(item =>
 			<SideBarItem key={item.url} name={item.name} url={"/workspace" + item.localUrl} initials={item.initials} exactMatch={false} itemKey={item.url} />
 		);
 		return (content);
 	}
 
+	shouldComponentUpdate(nextProps, nextState: SideBarState) {
+		let currentSelection: string = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem);
+		return ((currentSelection != this.state.lastSelection) || (this.state.loading != nextState.loading));
+	}
+
+	navUpdateCall = null;
+	onNavUpdate() {
+		if (this.instanceData.isMounted != true) return;
+		let lastSelection: string = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem);
+		this.setState({ lastSelection: lastSelection });
+	}
+
 
 	render() {
-		let contents = this.state.loading
-			? <div></div>
-			: SideBarNav.renderWorkspaces(this.state.workspaces);
+		let contents = (this.state.loading) ? null : this.renderWorkspaces(this.state.workspaces);
 
 		return (
 			<div className="sideBar">
@@ -49,7 +71,8 @@ export class SideBarNav extends Component<{}, SideBarState> {
 
 	async populateWorkspaces() {
 		let data: Array<Workspaces.Workspace> = await Workspaces.loadWorkspaceList();
-		this.setState({ workspaces: data, loading: false });
+		if (this.instanceData.isMounted)
+			this.setState({ workspaces: data, loading: false });
 	}
 
 }

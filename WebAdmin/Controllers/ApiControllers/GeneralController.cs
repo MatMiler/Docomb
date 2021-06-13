@@ -24,6 +24,13 @@ namespace Docomb.WebAdmin.Controllers.Api
 		}
 
 
+		[HttpGet("workspaceContentTree")]
+		public ActionResult<List<ContentItemSummary>> WorkspaceContentTree(string workspaceUrl)
+		{
+			return GetTree(workspaceUrl);
+		}
+
+
 	}
 
 

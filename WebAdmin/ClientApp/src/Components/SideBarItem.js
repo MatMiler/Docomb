@@ -9,14 +9,14 @@ export class SideBarItem extends Component {
     }
     render() {
         let classNames = "sideBarItem";
-        let iconContent = React.createElement("span", { className: "icon" }, this.state.initials);
+        let iconContent = React.createElement("span", { className: "icon", "aria-hidden": "true" }, this.state.initials);
         if (this.state.icon) {
-            iconContent = React.createElement("span", { className: "icon" },
+            iconContent = React.createElement("span", { className: "icon", "aria-hidden": "true" },
                 React.createElement(FontIcon, { iconName: this.state.icon }));
         }
         if (LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem) == this.state.itemKey)
             classNames += " selected";
-        return (React.createElement("div", { className: classNames, "data-key": this.state.itemKey },
+        return (React.createElement("div", { className: classNames, "data-key": this.state.itemKey, title: this.state.name },
             React.createElement(Link, { to: this.state.url },
                 iconContent,
                 React.createElement("span", { className: "name" }, this.state.name))));

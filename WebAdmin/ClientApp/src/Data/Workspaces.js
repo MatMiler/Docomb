@@ -7,7 +7,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+import { LayoutUtils } from '../LayoutUtils';
 import { Apis } from './Apis';
+import { SessionCache } from './SessionCache';
 import { Utils } from './Utils';
 export var Workspaces;
 (function (Workspaces) {
@@ -35,6 +37,30 @@ export var Workspaces;
         });
     }
     Workspaces.loadPageInfo = loadPageInfo;
+    function loadTree(workspaceUrl) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let list = [];
+            let url = "api/general/workspaceContentTree?workspaceUrl=" + encodeURI(workspaceUrl);
+            let data = null;
+            let storedItem = SessionCache.getItem(url);
+            if ((storedItem != null) && (storedItem.value != null)) {
+                data = storedItem.value;
+            }
+            else {
+                data = yield Apis.fetchJsonAsync(url, true);
+                LayoutUtils.WindowData.set("workspaceTreeTimestamp-" + encodeURI(workspaceUrl), Date.now());
+            }
+            if (Utils.ArrayHasValues(data)) {
+                for (let x = 0; x < data.length; x++) {
+                    let item = new ContentItem(data[x]);
+                    if ((item != null) && (item.isValid() == true))
+                        list.push(item);
+                }
+            }
+            return list;
+        });
+    }
+    Workspaces.loadTree = loadTree;
     /** Workspace information */
     class Workspace {
         constructor(source) {

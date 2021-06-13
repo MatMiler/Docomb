@@ -116,6 +116,7 @@ namespace Docomb.ContentStorage
 
 		private Dictionary<string, ContentItemSummary> _itemSummaryByPath = new();
 		private Dictionary<string, Dictionary<string, ContentItemSummary>> _itemSummariesByParentPath = new();
+		private Dictionary<string, List<ContentItemSummary>> _physicalItemSummariesByParentPath = new();
 
 		public ContentItemSummary GetItemSummary(List<string> pathParts)
 		{
@@ -218,9 +219,55 @@ namespace Docomb.ContentStorage
 			}
 			#endregion
 
-			_itemSummariesByParentPath.Add(parentPath, dict);
+			_itemSummariesByParentPath.TryAdd(parentPath, dict);
 			return dict;
 		}
+
+
+		public List<ContentItemSummary> GetPhysicalChildren(List<string> parentPathParts)
+		{
+			string parentPath = string.Join('/', parentPathParts);
+			if (_physicalItemSummariesByParentPath.TryGetValue(parentPath, out List<ContentItemSummary> cachedList))
+				return cachedList;
+
+			List<ContentItemSummary> list = new();
+			string path = Path.Combine(RootPath, parentPath);
+			if (!Directory.Exists(path)) return list;
+
+			#region Directories
+			{
+				string[] directoryPaths = Directory.GetDirectories(path);
+				if (directoryPaths?.Length > 0)
+				{
+					foreach (string directoryPath in directoryPaths)
+					{
+						string directoryName = GetFileNameFromPath(directoryPath);
+						ContentItemSummary summary = new(new ContentDirectory(Workspace, directoryPath, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
+						list.Add(summary);
+					}
+				}
+			}
+			#endregion
+
+			#region Files
+			{
+				string[] filePaths = Directory.GetFiles(path);
+				if (filePaths?.Length > 0)
+				{
+					foreach (string filePath in filePaths)
+					{
+						string fileName = GetFileNameFromPath(filePath);
+						ContentItemSummary summary = new(new ContentFile(Workspace, filePath, parentPathParts.Concat(new List<string>() { fileName }).ToList(), false));
+						list.Add(summary);
+					}
+				}
+			}
+			#endregion
+
+			_physicalItemSummariesByParentPath.TryAdd(parentPath, list);
+			return list;
+		}
+
 
 		#endregion
 

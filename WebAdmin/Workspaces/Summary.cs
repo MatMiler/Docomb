@@ -77,6 +77,14 @@ namespace Docomb.WebAdmin.Workspaces
 				Url = item.Url;
 				LocalUrl = Utils.CombineUrlPaths("", Utils.CombineUrlPaths(workspace.UrlPath, item.Url));
 			}
+
+			public ContentItemSummary(ContentStorage.ContentItemSummary item, Workspace workspace)
+			{
+				Type = item.Type;
+				Name = item.Title;
+				Url = item.Url;
+				LocalUrl = Utils.CombineUrlPaths("", Utils.CombineUrlPaths(workspace.UrlPath, item.Url));
+			}
 		}
 
 
@@ -114,6 +122,31 @@ namespace Docomb.WebAdmin.Workspaces
 			};
 		}
 
+
+		public static List<ContentItemSummary> GetTree(string workspaceUrl)
+		{
+			(Workspace workspace, _) = WebCore.Configurations.WorkspacesConfig.FindFromPath(workspaceUrl);
+			if (workspace == null) return null;
+			return GetTree(workspace, new());
+		}
+
+		public static List<ContentItemSummary> GetTree(Workspace workspace, List<string> parentPathParts, int depth = 0)
+		{
+			if (depth > 50) return null;
+			List<ContentStorage.ContentItemSummary> children = workspace.Content.GetPhysicalChildren(parentPathParts);
+			if ((children == null) || (children.Count <= 0)) return null;
+
+			List<ContentItemSummary> items = new();
+			foreach (ContentStorage.ContentItemSummary child in children)
+			{
+				if (child == null) continue;
+				ContentItemSummary item = new(child, workspace) { Name = child.FileName };
+				items.Add(item);
+				item.Children = GetTree(workspace, child.UrlParts, depth + 1);
+			}
+
+			return items;
+		}
 
 	}
 }
