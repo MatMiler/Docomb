@@ -44,7 +44,7 @@ export class WorkspaceWrapper extends Component {
     render() {
         var _a;
         let content = null;
-        if (this.state.loading != true) {
+        if (this.state.loading == false) {
             if (Utils.TrimString((_a = this.state.pageInfo.contentItem) === null || _a === void 0 ? void 0 : _a.url, null) == null) {
                 content = React.createElement(Home, null);
             }
@@ -68,8 +68,8 @@ export class WorkspaceWrapper extends Component {
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, data === null || data === void 0 ? void 0 : data.workspace);
             //LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.ContentItemData, data?.contentItem);
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, data);
-            EventBus.dispatch("navUpdate");
             this.setState({ pageInfo: data, loading: false });
+            EventBus.dispatch("navUpdate");
         });
     }
 }

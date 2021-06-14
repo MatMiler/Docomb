@@ -114,18 +114,18 @@ namespace Docomb.WebAdmin.Workspaces
 		{
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
 			if ((workspace == null) || (remainingPath == null)) return null;
-			ContentItem item = workspace.Content.FindItem(remainingPath);
+			ContentItem item = workspace.Content.FindItem(remainingPath, MatchType.Physical);
 
 			List<ContentItemSummary> breadcrumbs = new();
 			{
-				List<ContentStorage.ContentItemSummary> parents = workspace.Content.GetParents(remainingPath, true);
+				List<ContentStorage.ContentItemSummary> parents = workspace.Content.GetParents(remainingPath, MatchType.Physical, true);
 				if (parents?.Count > 0)
 				{
 					for (int x = 0; x < parents.Count; x++)
 					{
 						ContentStorage.ContentItemSummary parent = parents[x];
 						ContentItemSummary crumb = new(parent, workspace);
-						//if (x > 0) crumb.Name = parent.FileName;
+						crumb.Name = (x == 0) ? workspace.Name : parent.FileName;
 						breadcrumbs.Add(crumb);
 					}
 				}

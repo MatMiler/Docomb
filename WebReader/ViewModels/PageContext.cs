@@ -34,7 +34,7 @@ namespace Docomb.WebReader.ViewModels
 
 		public List<ContentItemSummary> GetParents()
 		{
-			return Workspace.Content.GetParents(PathParts);
+			return Workspace.Content.GetParents(PathParts, MatchType.Logical);
 		}
 
 	}

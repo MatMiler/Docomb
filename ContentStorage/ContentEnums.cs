@@ -26,4 +26,12 @@ namespace Docomb.ContentStorage
 
 
 
+	public enum MatchType
+	{
+		Physical,
+		Logical
+	}
+
+
+
 }

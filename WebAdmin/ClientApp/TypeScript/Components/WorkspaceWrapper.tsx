@@ -47,9 +47,8 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 
 
 	render() {
-
 		let content: JSX.Element = null;
-		if (this.state.loading != true) {
+		if (this.state.loading == false) {
 			if (Utils.TrimString(this.state.pageInfo.contentItem?.url, null) == null) {
 				content = <Home />;
 			} else if (this.state.pageInfo.contentItem.type == Workspaces.ContentItemType.Directory) {
@@ -75,8 +74,8 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, data?.workspace);
 		//LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.ContentItemData, data?.contentItem);
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, data);
-		EventBus.dispatch("navUpdate");
 		this.setState({ pageInfo: data, loading: false });
+		EventBus.dispatch("navUpdate");
 	}
 
 }

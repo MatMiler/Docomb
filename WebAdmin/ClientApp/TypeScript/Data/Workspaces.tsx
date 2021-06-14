@@ -107,6 +107,9 @@ export module Workspaces {
 			this.url = Utils.TryGetString(source, "url");
 			this.localUrl = Utils.TryGetString(source, "localUrl");
 
+			if ((Utils.TrimString(this.name, null) == null) && ((this.url == "/") || (this.url == "") || (this.url == null)))
+				this.name = "/";
+
 			let sourceChildren = Utils.TryGet(source, "children");
 			let children: Array<ContentItem> = [];
 			if (Utils.ArrayHasValues(sourceChildren)) {

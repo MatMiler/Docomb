@@ -49,4 +49,8 @@
 	  </None>
 	</ItemGroup>
 
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+	  <Exec Command="cd ClientApp&#xD;&#xA;npx webpack --config webpack.config.js&#xD;&#xA;cd .." />
+	</Target>
+
 </Project>

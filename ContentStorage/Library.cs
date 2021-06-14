@@ -44,8 +44,8 @@ namespace Docomb.ContentStorage
 		public static readonly HashSet<string> DefaultFileNames = MergeListContents(DefaultFileNameCores, OmittableExtensions, (a, b) => $"{a}.{b}").ToHashSet();
 
 
-		public ContentItem FindItem(string path) => FindItem(SplitPath(path, true));
-		public ContentItem FindItem(List<string> pathParts)
+		public ContentItem FindItem(string path, MatchType matchType) => FindItem(SplitPath(path, true), matchType);
+		public ContentItem FindItem(List<string> pathParts, MatchType matchType)
 		{
 			string path = Path.Combine(RootPath, string.Join('/', pathParts));
 
@@ -79,7 +79,7 @@ namespace Docomb.ContentStorage
 
 
 			#region Default files
-			if (Directory.Exists(path))
+			if ((matchType == MatchType.Logical) && (Directory.Exists(path)))
 			{
 				foreach (string fileName in DefaultFileNames)
 				{
@@ -118,12 +118,12 @@ namespace Docomb.ContentStorage
 		private Dictionary<string, Dictionary<string, ContentItemSummary>> _itemSummariesByParentPath = new();
 		private Dictionary<string, List<ContentItemSummary>> _physicalItemSummariesByParentPath = new();
 
-		public ContentItemSummary GetItemSummary(List<string> pathParts)
+		public ContentItemSummary GetItemSummary(List<string> pathParts, MatchType matchType)
 		{
 			string path = (pathParts?.Count > 0) ? string.Join('/', pathParts) : "";
 			if (_itemSummaryByPath.ContainsKey(path)) return _itemSummaryByPath[path];
 
-			ContentItem item = FindItem(pathParts);
+			ContentItem item = FindItem(pathParts, matchType);
 			if (item != null)
 			{
 				ContentItemSummary summary = new(item);
@@ -134,7 +134,18 @@ namespace Docomb.ContentStorage
 			return null;
 		}
 
-		public Dictionary<string, ContentItemSummary> GetChildren(List<string> parentPathParts)
+
+		public List<ContentItemSummary> GetChildren(List<string> parentPathParts, MatchType matchType = MatchType.Logical)
+		{
+			return matchType switch
+			{
+				MatchType.Logical => GetLogicalChildren(parentPathParts)?.Values.ToList(),
+				MatchType.Physical => GetPhysicalChildren(parentPathParts),
+				_ => throw new NotImplementedException()
+			};
+		}
+
+		public Dictionary<string, ContentItemSummary> GetLogicalChildren(List<string> parentPathParts)
 		{
 			string parentPath = string.Join('/', parentPathParts);
 			if (_itemSummariesByParentPath.ContainsKey(parentPath)) return _itemSummariesByParentPath[parentPath];
@@ -269,7 +280,7 @@ namespace Docomb.ContentStorage
 		}
 
 
-		public List<ContentItemSummary> GetParents(List<string> pagePathParts, bool includeLast = false)
+		public List<ContentItemSummary> GetParents(List<string> pagePathParts, MatchType matchType, bool includeLast = false)
 		{
 			List<ContentItemSummary> list = new();
 			if (Workspace == null) return list;
@@ -278,13 +289,13 @@ namespace Docomb.ContentStorage
 			{
 				for (int x = 0; x <= (pagePathParts.Count + (includeLast ? 0 : -1)); x++)
 				{
-					ContentItemSummary item = Workspace.Content.GetItemSummary(pagePathParts.GetRange(0, x));
+					ContentItemSummary item = Workspace.Content.GetItemSummary(pagePathParts.GetRange(0, x), matchType);
 					if (item != null) list.Add(item);
 				}
 			}
 			else if (includeLast)
 			{
-				ContentItemSummary root = Workspace.Content.GetItemSummary(new());
+				ContentItemSummary root = Workspace.Content.GetItemSummary(new(), matchType);
 				if (root != null) list.Add(root);
 			}
 
