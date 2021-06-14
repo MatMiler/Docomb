@@ -84,6 +84,10 @@ export var Workspaces;
         isValid() {
             return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.localUrl == "string") && (this.localUrl.length > 0));
         }
+        static create(source) {
+            let item = new Workspace(source);
+            return ((item === null || item === void 0 ? void 0 : item.isValid()) == true) ? item : null;
+        }
     }
     Workspaces.Workspace = Workspace;
     let ContentItemType;
@@ -112,6 +116,10 @@ export var Workspaces;
         isValid() {
             return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.localUrl == "string") && (this.localUrl.length > 0));
         }
+        static create(source) {
+            let item = new ContentItem(source);
+            return ((item === null || item === void 0 ? void 0 : item.isValid()) == true) ? item : null;
+        }
     }
     Workspaces.ContentItem = ContentItem;
     let ContentItemAction;
@@ -121,12 +129,9 @@ export var Workspaces;
     })(ContentItemAction = Workspaces.ContentItemAction || (Workspaces.ContentItemAction = {}));
     class WorkspacePageInfo {
         constructor(source) {
-            let workspace = new Workspace(Utils.TryGet(source, "workspace"));
-            let contentItem = new ContentItem(Utils.TryGet(source, "contentItem"));
-            if ((workspace != null) && (workspace.isValid()))
-                this.workspace = workspace;
-            if ((contentItem != null) && (contentItem.isValid()))
-                this.contentItem = contentItem;
+            this.workspace = Workspace.create(Utils.TryGet(source, "workspace"));
+            this.contentItem = ContentItem.create(Utils.TryGet(source, "contentItem"));
+            this.breadcrumbs = Utils.MapArray(Utils.TryGet(source, "breadcrumbs"), x => ContentItem.create(x));
             this.action = Utils.TryGetEnum(source, "action", ContentItemAction, ContentItemAction.View);
         }
         isValid() {

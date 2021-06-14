@@ -13,10 +13,14 @@ import { Utils } from '../Data/Utils';
 import { Workspaces } from '../Data/Workspaces';
 import { LayoutUtils } from '../LayoutUtils';
 import { EventBus } from '../EventBus';
-export class WorkspaceHome extends Component {
+import Home from './Workspace/Home';
+import ContentDirectory from './Workspace/ContentDirectory';
+import ContentFile from './Workspace/ContentFile';
+export class WorkspaceWrapper extends Component {
     constructor(props) {
         super(props);
         this.navCall = null;
+        this.state = { pageInfo: null, loading: true };
     }
     componentDidMount() {
         LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
@@ -38,14 +42,23 @@ export class WorkspaceHome extends Component {
     onNav() {
     }
     render() {
-        var _a, _b, _c;
-        return (React.createElement(Layout, { showMainNav: true },
-            React.createElement("div", { className: "" },
-                "Workspace home page (", (_c = (_b = (_a = this.state) === null || _a === void 0 ? void 0 : _a.pageInfo) === null || _b === void 0 ? void 0 : _b.workspace) === null || _c === void 0 ? void 0 :
-                _c.name,
-                ", ",
-                Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.ContentItemData), "name"),
-                ")")));
+        var _a;
+        let content = null;
+        if (this.state.loading != true) {
+            if (Utils.TrimString((_a = this.state.pageInfo.contentItem) === null || _a === void 0 ? void 0 : _a.url, null) == null) {
+                content = React.createElement(Home, null);
+            }
+            else if (this.state.pageInfo.contentItem.type == Workspaces.ContentItemType.Directory) {
+                content = React.createElement(ContentDirectory, null);
+            }
+            else {
+                content = React.createElement(ContentFile, null);
+            }
+        }
+        //		<div className="">
+        //			Workspace home page ({this.state?.pageInfo?.workspace?.name}, {Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.ContentItemData), "name")})
+        //		</div>
+        return (React.createElement(Layout, { showMainNav: true }, content));
     }
     populateInfo() {
         var _a;
@@ -53,10 +66,11 @@ export class WorkspaceHome extends Component {
             let data = yield Workspaces.loadPageInfo(Utils.TryGet(this.props, ["match", "params", "itemPath"]));
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, (_a = data === null || data === void 0 ? void 0 : data.workspace) === null || _a === void 0 ? void 0 : _a.url);
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, data === null || data === void 0 ? void 0 : data.workspace);
-            LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.ContentItemData, data === null || data === void 0 ? void 0 : data.contentItem);
+            //LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.ContentItemData, data?.contentItem);
+            LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, data);
             EventBus.dispatch("navUpdate");
             this.setState({ pageInfo: data, loading: false });
         });
     }
 }
-//# sourceMappingURL=WorkspaceHome.js.map
+//# sourceMappingURL=WorkspaceWrapper.js.map

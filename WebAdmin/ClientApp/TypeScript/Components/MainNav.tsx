@@ -20,7 +20,7 @@ export class MainNav extends Component<{}, MainNavState> {
 	constructor(props) {
 		super(props);
 		let workspaceUrl = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
-		let selectedKey: string = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.ContentItemData), "url");
+		let selectedKey: string = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
 		this.state = { loading: true, lastLoadedTimestamp: LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl)), currentWorkspaceUrl: workspaceUrl, selectedKey: selectedKey };
 	}
 
@@ -52,7 +52,7 @@ export class MainNav extends Component<{}, MainNavState> {
 	onNavUpdate() {
 		let workspaceUrl = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
 		let lastLoadedTimestamp = LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl));
-		let selectedKey: string = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.ContentItemData), "url");
+		let selectedKey: string = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
 		if ((workspaceUrl != this.state.currentWorkspaceUrl) || (lastLoadedTimestamp != this.state.lastLoadedTimestamp)) {
 			this.instanceData.treeData = null;
 			this.setState({ loading: true, selectedKey: selectedKey });
@@ -67,7 +67,7 @@ export class MainNav extends Component<{}, MainNavState> {
 	render() {
 		let content: JSX.Element = null;
 		if (this.state.loading) {
-			content = <Spinner label="Loading..." labelPosition="right" size={SpinnerSize.large} />;
+			content = <div className="loadingSpinner"><Spinner label="Loading..." labelPosition="right" size={SpinnerSize.large} /></div>;
 		} else {
 			let selectedKey = this.state.selectedKey;
 			if (selectedKey.endsWith("/")) selectedKey = selectedKey.slice(0, -1);
@@ -125,7 +125,6 @@ export class MainNav extends Component<{}, MainNavState> {
 
 	onLinkClick(ev?: React.MouseEvent<HTMLElement>, item?: INavLink) {
 		ev.preventDefault();
-		//window.history.pushState(null, null, item.url);
 		Utils.TryGet(this.props, "history").push("/" + item.url);
 		EventBus.dispatch("navChange");
 	}

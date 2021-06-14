@@ -2,7 +2,7 @@
   border: none;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
   overflow: hidden; }
 
 h1, h2, h3, h4, h5, h6 {
@@ -110,6 +110,8 @@ html a {
         background: #333; }
       .light .mainNavGrid > .mainNav {
         background: #eee; } }
+    .mainNavGrid > .mainNav .loadingSpinner {
+      padding: 20px 0; }
     .mainNavGrid > .mainNav > [role="toolbar"] {
       display: flex;
       height: 100%;
@@ -117,11 +119,64 @@ html a {
       flex-direction: column; }
       .mainNavGrid > .mainNav > [role="toolbar"] > [role="tablist"] {
         flex: 0 0 auto; }
+        html .mainNavGrid > .mainNav > [role="toolbar"] > [role="tablist"] button:hover {
+          color: #039;
+          background: rgba(0, 0, 0, 0.1); }
+        .dark .mainNavGrid > .mainNav > [role="toolbar"] > [role="tablist"] button:hover {
+          color: #0bf;
+          background: rgba(255, 255, 255, 0.1); }
+        @media (prefers-color-scheme: dark) {
+          html .mainNavGrid > .mainNav > [role="toolbar"] > [role="tablist"] button:hover {
+            color: #0bf;
+            background: rgba(255, 255, 255, 0.1); }
+          .light .mainNavGrid > .mainNav > [role="toolbar"] > [role="tablist"] button:hover {
+            color: #039;
+            background: rgba(0, 0, 0, 0.1); } }
+        html .mainNavGrid > .mainNav > [role="toolbar"] > [role="tablist"] button:active {
+          background: rgba(0, 0, 0, 0.13); }
+        .dark .mainNavGrid > .mainNav > [role="toolbar"] > [role="tablist"] button:active {
+          background: rgba(255, 255, 255, 0.13); }
+        @media (prefers-color-scheme: dark) {
+          html .mainNavGrid > .mainNav > [role="toolbar"] > [role="tablist"] button:active {
+            background: rgba(255, 255, 255, 0.13); }
+          .light .mainNavGrid > .mainNav > [role="toolbar"] > [role="tablist"] button:active {
+            background: rgba(0, 0, 0, 0.13); } }
       .mainNavGrid > .mainNav > [role="toolbar"] > [role="tabpanel"] {
         flex: 1 1 100%;
         overflow: auto;
         width: 250px;
         /*a { white-space: normal; line-height: inherit; height: auto; }*/ }
+      .mainNavGrid > .mainNav > [role="toolbar"] .is-selected > button {
+        background: transparent; }
+        .mainNavGrid > .mainNav > [role="toolbar"] .is-selected > button::after {
+          display: none; }
+      html .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] .is-selected a {
+        background: rgba(0, 0, 0, 0.1); }
+      .dark .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] .is-selected a {
+        background: rgba(255, 255, 255, 0.1); }
+      @media (prefers-color-scheme: dark) {
+        html .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] .is-selected a {
+          background: rgba(255, 255, 255, 0.1); }
+        .light .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] .is-selected a {
+          background: rgba(0, 0, 0, 0.1); } }
+      html .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] button:hover, html .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] a:hover {
+        background: rgba(0, 0, 0, 0.1); }
+      .dark .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] button:hover, .dark .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] a:hover {
+        background: rgba(255, 255, 255, 0.1); }
+      @media (prefers-color-scheme: dark) {
+        html .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] button:hover, html .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] a:hover {
+          background: rgba(255, 255, 255, 0.1); }
+        .light .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] button:hover, .light .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] a:hover {
+          background: rgba(0, 0, 0, 0.1); } }
+      html .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] button:active, html .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] a:active {
+        background: rgba(0, 0, 0, 0.13); }
+      .dark .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] button:active, .dark .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] a:active {
+        background: rgba(255, 255, 255, 0.13); }
+      @media (prefers-color-scheme: dark) {
+        html .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] button:active, html .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] a:active {
+          background: rgba(255, 255, 255, 0.13); }
+        .light .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] button:active, .light .mainNavGrid > .mainNav > [role="toolbar"] [role="listitem"] a:active {
+          background: rgba(0, 0, 0, 0.13); } }
   html .mainNavGrid > .sideBarNav, html .mainNavGrid .mainNav, html .mainNavGrid > .sideBarNav .sideBar .system {
     border-color: #eee; }
   .dark .mainNavGrid > .sideBarNav, .dark .mainNavGrid .mainNav, .dark .mainNavGrid > .sideBarNav .sideBar .system {
@@ -142,14 +197,27 @@ html a {
   text-decoration: none;
   position: relative; }
   html .sideBarItem a:hover {
-    background: #eee; }
+    color: #039;
+    background: rgba(0, 0, 0, 0.1); }
   .dark .sideBarItem a:hover {
-    background: #333; }
+    color: #0bf;
+    background: rgba(255, 255, 255, 0.1); }
   @media (prefers-color-scheme: dark) {
     html .sideBarItem a:hover {
-      background: #333; }
+      color: #0bf;
+      background: rgba(255, 255, 255, 0.1); }
     .light .sideBarItem a:hover {
-      background: #eee; } }
+      color: #039;
+      background: rgba(0, 0, 0, 0.1); } }
+  html .sideBarItem a:active {
+    background: rgba(0, 0, 0, 0.13); }
+  .dark .sideBarItem a:active {
+    background: rgba(255, 255, 255, 0.13); }
+  @media (prefers-color-scheme: dark) {
+    html .sideBarItem a:active {
+      background: rgba(255, 255, 255, 0.13); }
+    .light .sideBarItem a:active {
+      background: rgba(0, 0, 0, 0.13); } }
 
 .sideBarItem .icon {
   display: inline-block;
@@ -193,3 +261,31 @@ html .sideBarItem.selected a:before {
 .sideBarItem.selected a:hover:before {
   top: 0;
   bottom: 0; }
+
+.pageGrid {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column; }
+  .pageGrid .pageTitle {
+    flex: 0 0 auto;
+    padding: 0 10px 10px 10px;
+    width: 100%; }
+  .pageGrid .pageCommands {
+    flex: 0 0 auto;
+    width: 100%; }
+  .pageGrid .pageContent {
+    flex: 1 1 100%;
+    overflow: auto; }
+  .pageGrid .pageTitle + .pageContent, .pageGrid .pageCommands + .pageContent {
+    border-top: 1px solid; }
+    html .pageGrid .pageTitle + .pageContent, html .pageGrid .pageCommands + .pageContent {
+      border-color: #eee; }
+    .dark .pageGrid .pageTitle + .pageContent, .dark .pageGrid .pageCommands + .pageContent {
+      border-color: #494949; }
+    @media (prefers-color-scheme: dark) {
+      html .pageGrid .pageTitle + .pageContent, html .pageGrid .pageCommands + .pageContent {
+        border-color: #494949; }
+      .light .pageGrid .pageTitle + .pageContent, .light .pageGrid .pageCommands + .pageContent {
+        border-color: #eee; } }

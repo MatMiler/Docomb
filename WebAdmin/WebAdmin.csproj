@@ -40,4 +40,13 @@
 	  <None Include="compilerconfig.json" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentFile.tsx">
+	    <SubType>Code</SubType>
+	  </None>
+	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentDirectory.tsx">
+	    <SubType>Code</SubType>
+	  </None>
+	</ItemGroup>
+
 </Project>

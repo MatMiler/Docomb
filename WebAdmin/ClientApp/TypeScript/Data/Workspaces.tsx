@@ -76,6 +76,11 @@ export module Workspaces {
 			this.initials = Utils.TryGetString(source, "initials");
 			this.icon = Utils.TryGetString(source, "icon");
 		}
+
+		public static create(source: any): Workspace {
+			let item = new Workspace(source);
+			return (item?.isValid() == true) ? item : null;
+		}
 	}
 
 
@@ -113,6 +118,11 @@ export module Workspaces {
 			}
 			this.children = children;
 		}
+
+		public static create(source: any): ContentItem {
+			let item = new ContentItem(source);
+			return (item?.isValid() == true) ? item : null;
+		}
 	}
 
 	export enum ContentItemAction {
@@ -123,16 +133,16 @@ export module Workspaces {
 		public workspace: Workspace;
 		public contentItem: ContentItem;
 		public action: ContentItemAction;
+		public breadcrumbs: Array<ContentItem>;
 
 		public isValid(): boolean {
 			return ((this.workspace != null) && (this.workspace.isValid()) && (this.contentItem != null) && (this.contentItem.isValid()));
 		}
 
 		public constructor(source: any) {
-			let workspace: Workspace = new Workspace(Utils.TryGet(source, "workspace"));
-			let contentItem: ContentItem = new ContentItem(Utils.TryGet(source, "contentItem"));
-			if ((workspace != null) && (workspace.isValid())) this.workspace = workspace;
-			if ((contentItem != null) && (contentItem.isValid())) this.contentItem = contentItem;
+			this.workspace = Workspace.create(Utils.TryGet(source, "workspace"));
+			this.contentItem = ContentItem.create(Utils.TryGet(source, "contentItem"));
+			this.breadcrumbs = Utils.MapArray<ContentItem>(Utils.TryGet(source, "breadcrumbs"), x => ContentItem.create(x));
 			this.action = Utils.TryGetEnum(source, "action", ContentItemAction, ContentItemAction.View);
 		}
 	}

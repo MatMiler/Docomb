@@ -4,17 +4,21 @@ import { Utils } from '../Data/Utils';
 import { Workspaces } from '../Data/Workspaces';
 import { LayoutUtils } from '../LayoutUtils';
 import { EventBus } from '../EventBus';
+import Home from './Workspace/Home';
+import ContentDirectory from './Workspace/ContentDirectory';
+import ContentFile from './Workspace/ContentFile';
 
 
 
-type WorkspaceHomeState = {
+type WorkspaceWrapperState = {
 	pageInfo: Workspaces.WorkspacePageInfo,
 	loading: boolean
 };
 
-export class WorkspaceHome extends Component<void, WorkspaceHomeState> {
+export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 	constructor(props) {
 		super(props);
+		this.state = { pageInfo: null, loading: true };
 	}
 
 	componentDidMount() {
@@ -43,11 +47,24 @@ export class WorkspaceHome extends Component<void, WorkspaceHomeState> {
 
 
 	render() {
+
+		let content: JSX.Element = null;
+		if (this.state.loading != true) {
+			if (Utils.TrimString(this.state.pageInfo.contentItem?.url, null) == null) {
+				content = <Home />;
+			} else if (this.state.pageInfo.contentItem.type == Workspaces.ContentItemType.Directory) {
+				content = <ContentDirectory />;
+			} else {
+				content = <ContentFile />;
+			}
+		}
+
+		//		<div className="">
+		//			Workspace home page ({this.state?.pageInfo?.workspace?.name}, {Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.ContentItemData), "name")})
+		//		</div>
 		return (
 			<Layout showMainNav={true}>
-				<div className="">
-					Workspace home page ({this.state?.pageInfo?.workspace?.name}, {Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.ContentItemData), "name")})
-				</div>
+				{content}
 			</Layout>
 		);
 	}
@@ -56,7 +73,8 @@ export class WorkspaceHome extends Component<void, WorkspaceHomeState> {
 		let data: Workspaces.WorkspacePageInfo = await Workspaces.loadPageInfo(Utils.TryGet(this.props, ["match", "params", "itemPath"]));
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, data?.workspace?.url);
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, data?.workspace);
-		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.ContentItemData, data?.contentItem);
+		//LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.ContentItemData, data?.contentItem);
+		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, data);
 		EventBus.dispatch("navUpdate");
 		this.setState({ pageInfo: data, loading: false });
 	}

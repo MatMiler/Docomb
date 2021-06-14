@@ -72,7 +72,7 @@ namespace Docomb.WebAdmin.Workspaces
 
 			public ContentItemSummary(ContentItem item, Workspace workspace)
 			{
-				Type = item.Type;
+				Type = item.NeedsTrailingSlash ? ContentItemType.Directory : item.Type;
 				Name = item.Title;
 				Url = item.Url;
 				LocalUrl = Utils.CombineUrlPaths("", Utils.CombineUrlPaths(workspace.UrlPath, item.Url));
@@ -80,7 +80,7 @@ namespace Docomb.WebAdmin.Workspaces
 
 			public ContentItemSummary(ContentStorage.ContentItemSummary item, Workspace workspace)
 			{
-				Type = item.Type;
+				Type = item.NeedsTrailingSlash ? ContentItemType.Directory : item.Type;
 				Name = item.Title;
 				Url = item.Url;
 				LocalUrl = Utils.CombineUrlPaths("", Utils.CombineUrlPaths(workspace.UrlPath, item.Url));
@@ -103,6 +103,9 @@ namespace Docomb.WebAdmin.Workspaces
 			[JsonPropertyName("contentItem")]
 			public ContentItemSummary ContentItem { get; set; }
 
+			[JsonPropertyName("breadcrumbs")]
+			public List<ContentItemSummary> Breadcrumbs { get; set; }
+
 			[JsonPropertyName("action")]
 			public ContentItemAction Action { get; set; }
 		}
@@ -113,12 +116,27 @@ namespace Docomb.WebAdmin.Workspaces
 			if ((workspace == null) || (remainingPath == null)) return null;
 			ContentItem item = workspace.Content.FindItem(remainingPath);
 
+			List<ContentItemSummary> breadcrumbs = new();
+			{
+				List<ContentStorage.ContentItemSummary> parents = workspace.Content.GetParents(remainingPath, true);
+				if (parents?.Count > 0)
+				{
+					for (int x = 0; x < parents.Count; x++)
+					{
+						ContentStorage.ContentItemSummary parent = parents[x];
+						ContentItemSummary crumb = new(parent, workspace);
+						//if (x > 0) crumb.Name = parent.FileName;
+						breadcrumbs.Add(crumb);
+					}
+				}
+			}
 
 			return new()
 			{
 				Workspace = new(workspace),
 				ContentItem = (item != null) ? new(item, workspace) : null,
-				Action = ContentItemAction.View
+				Action = ContentItemAction.View,
+				Breadcrumbs = breadcrumbs
 			};
 		}
 
@@ -142,7 +160,8 @@ namespace Docomb.WebAdmin.Workspaces
 				if (child == null) continue;
 				ContentItemSummary item = new(child, workspace) { Name = child.FileName };
 				items.Add(item);
-				item.Children = GetTree(workspace, child.UrlParts, depth + 1);
+				if (item.Type == ContentItemType.Directory)
+					item.Children = GetTree(workspace, child.UrlParts, depth + 1);
 			}
 
 			return items;

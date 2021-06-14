@@ -34,22 +34,7 @@ namespace Docomb.WebReader.ViewModels
 
 		public List<ContentItemSummary> GetParents()
 		{
-			List<ContentItemSummary> list = new();
-			if (Workspace == null) return list;
-
-			//var root = Workspace.Content.GetItemSummary(new());
-			//if (root != null) list.Add(root);
-
-			if (PathParts?.Count > 0)
-			{
-				for (int x = 0; x < PathParts.Count; x++)
-				{
-					ContentItemSummary item = Workspace.Content.GetItemSummary(PathParts.GetRange(0, x));
-					if (item != null) list.Add(item);
-				}
-			}
-
-			return list;
+			return Workspace.Content.GetParents(PathParts);
 		}
 
 	}

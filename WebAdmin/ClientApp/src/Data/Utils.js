@@ -154,6 +154,31 @@ export var Utils;
     }
     Utils.ArrayHasValues = ArrayHasValues;
     /**
+     * Converts an array of values to another type and validates each new value
+     * @param data Array of data to convert
+     * @param conversion Conversion function
+     * @param validation Function with which to validate the new item
+     * @param includeNull Should null values be included in the new array
+     */
+    function MapArray(data, conversion, validation = null, includeNull = false) {
+        if (!ArrayHasValues(data))
+            return null;
+        let list = [];
+        for (let x = 0; x < data.length; x++) {
+            let item = null;
+            try {
+                item = conversion(data[x]);
+            }
+            catch (e) { }
+            if ((validation != null) && (validation(item) != true))
+                item = null;
+            if ((includeNull == true) || (item != null))
+                list.push(item);
+        }
+        return list;
+    }
+    Utils.MapArray = MapArray;
+    /**
      * Get array of all keys in an object
      * @param object Object from which to extract keys
      */

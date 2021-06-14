@@ -22,7 +22,7 @@ export class MainNav extends Component {
         };
         this.navUpdateCall = null;
         let workspaceUrl = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
-        let selectedKey = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.ContentItemData), "url");
+        let selectedKey = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
         this.state = { loading: true, lastLoadedTimestamp: LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl)), currentWorkspaceUrl: workspaceUrl, selectedKey: selectedKey };
     }
     componentDidMount() {
@@ -45,7 +45,7 @@ export class MainNav extends Component {
     onNavUpdate() {
         let workspaceUrl = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
         let lastLoadedTimestamp = LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl));
-        let selectedKey = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.ContentItemData), "url");
+        let selectedKey = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
         if ((workspaceUrl != this.state.currentWorkspaceUrl) || (lastLoadedTimestamp != this.state.lastLoadedTimestamp)) {
             this.instanceData.treeData = null;
             this.setState({ loading: true, selectedKey: selectedKey });
@@ -58,7 +58,8 @@ export class MainNav extends Component {
     render() {
         let content = null;
         if (this.state.loading) {
-            content = React.createElement(Spinner, { label: "Loading...", labelPosition: "right", size: SpinnerSize.large });
+            content = React.createElement("div", { className: "loadingSpinner" },
+                React.createElement(Spinner, { label: "Loading...", labelPosition: "right", size: SpinnerSize.large }));
         }
         else {
             let selectedKey = this.state.selectedKey;
@@ -106,7 +107,6 @@ export class MainNav extends Component {
     }
     onLinkClick(ev, item) {
         ev.preventDefault();
-        //window.history.pushState(null, null, item.url);
         Utils.TryGet(this.props, "history").push("/" + item.url);
         EventBus.dispatch("navChange");
     }

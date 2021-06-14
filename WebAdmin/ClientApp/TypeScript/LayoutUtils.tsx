@@ -19,6 +19,7 @@ export module LayoutUtils {
 
 		export enum ItemKey {
 			SelectedSideBarItem = "selectedSideBarItem",
+			WorkspacePageInfo = "workspacePageInfo",
 			WorkspaceData = "workspaceData",
 			ContentItemData = "contentItemData"
 		}

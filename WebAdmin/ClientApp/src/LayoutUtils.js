@@ -19,6 +19,7 @@ export var LayoutUtils;
         let ItemKey;
         (function (ItemKey) {
             ItemKey["SelectedSideBarItem"] = "selectedSideBarItem";
+            ItemKey["WorkspacePageInfo"] = "workspacePageInfo";
             ItemKey["WorkspaceData"] = "workspaceData";
             ItemKey["ContentItemData"] = "contentItemData";
         })(ItemKey = WindowData.ItemKey || (WindowData.ItemKey = {}));

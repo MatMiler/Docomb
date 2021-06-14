@@ -269,6 +269,28 @@ namespace Docomb.ContentStorage
 		}
 
 
+		public List<ContentItemSummary> GetParents(List<string> pagePathParts, bool includeLast = false)
+		{
+			List<ContentItemSummary> list = new();
+			if (Workspace == null) return list;
+
+			if (pagePathParts?.Count > 0)
+			{
+				for (int x = 0; x <= (pagePathParts.Count + (includeLast ? 0 : -1)); x++)
+				{
+					ContentItemSummary item = Workspace.Content.GetItemSummary(pagePathParts.GetRange(0, x));
+					if (item != null) list.Add(item);
+				}
+			}
+			else if (includeLast)
+			{
+				ContentItemSummary root = Workspace.Content.GetItemSummary(new());
+				if (root != null) list.Add(root);
+			}
+
+			return list;
+		}
+
 		#endregion
 
 	}
