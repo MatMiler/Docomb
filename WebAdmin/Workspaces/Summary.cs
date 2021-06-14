@@ -20,8 +20,8 @@ namespace Docomb.WebAdmin.Workspaces
 			[JsonPropertyName("url")]
 			public string Url { get; set; }
 
-			[JsonPropertyName("localUrl")]
-			public string LocalUrl { get; set; }
+			[JsonPropertyName("reactLocalUrl")]
+			public string ReactLocalUrl { get; set; }
 
 			[JsonPropertyName("initials")]
 			public string Initials { get; set; }
@@ -39,7 +39,7 @@ namespace Docomb.WebAdmin.Workspaces
 				if (workspace == null) return;
 				Name = workspace.Name?.Trim();
 				Url = workspace.UrlPath;
-				LocalUrl = Utils.CombineUrlPaths("", workspace.UrlPath);
+				ReactLocalUrl = Utils.CombineUrlPaths("", workspace.UrlPath);
 				Initials = (Name?.Length > 0) ? Name[0..1] : "?";
 			}
 		}
@@ -49,42 +49,6 @@ namespace Docomb.WebAdmin.Workspaces
 		public static List<WorkspaceSummary> GetWorkspaceSummaryList()
 		{
 			return WebCore.Configurations.WorkspacesConfig.Workspaces.Select(x => new WorkspaceSummary(x))?.ToList();
-		}
-
-
-
-		public class ContentItemSummary
-		{
-			[JsonPropertyName("type")]
-			public ContentItemType Type { get; set; }
-
-			[JsonPropertyName("name")]
-			public string Name { get; set; }
-
-			[JsonPropertyName("url")]
-			public string Url { get; set; }
-
-			[JsonPropertyName("localUrl")]
-			public string LocalUrl { get; set; }
-
-			[JsonPropertyName("children")]
-			public List<ContentItemSummary> Children { get; set; }
-
-			public ContentItemSummary(ContentItem item, Workspace workspace)
-			{
-				Type = item.NeedsTrailingSlash ? ContentItemType.Directory : item.Type;
-				Name = item.Title;
-				Url = item.Url;
-				LocalUrl = Utils.CombineUrlPaths("", Utils.CombineUrlPaths(workspace.UrlPath, item.Url));
-			}
-
-			public ContentItemSummary(ContentStorage.ContentItemSummary item, Workspace workspace)
-			{
-				Type = item.NeedsTrailingSlash ? ContentItemType.Directory : item.Type;
-				Name = item.Title;
-				Url = item.Url;
-				LocalUrl = Utils.CombineUrlPaths("", Utils.CombineUrlPaths(workspace.UrlPath, item.Url));
-			}
 		}
 
 
@@ -123,9 +87,9 @@ namespace Docomb.WebAdmin.Workspaces
 				{
 					for (int x = 0; x < parents.Count; x++)
 					{
-						ContentStorage.ContentItemSummary parent = parents[x];
-						ContentItemSummary crumb = new(parent, workspace);
-						crumb.Name = (x == 0) ? workspace.Name : parent.FileName;
+						ContentItemSummary parent = parents[x];
+						ContentItemSummary crumb = parent.Clone();
+						crumb.Title = (x == 0) ? workspace.Name : parent.FileName;
 						breadcrumbs.Add(crumb);
 					}
 				}
@@ -134,7 +98,7 @@ namespace Docomb.WebAdmin.Workspaces
 			return new()
 			{
 				Workspace = new(workspace),
-				ContentItem = (item != null) ? new(item, workspace) : null,
+				ContentItem = (item != null) ? new(item) : null,
 				Action = ContentItemAction.View,
 				Breadcrumbs = breadcrumbs
 			};
@@ -158,7 +122,8 @@ namespace Docomb.WebAdmin.Workspaces
 			foreach (ContentStorage.ContentItemSummary child in children)
 			{
 				if (child == null) continue;
-				ContentItemSummary item = new(child, workspace) { Name = child.FileName };
+				ContentItemSummary item = child.Clone();
+				item.Title = child.FileName;
 				items.Add(item);
 				if (item.Type == ContentItemType.Directory)
 					item.Children = GetTree(workspace, child.UrlParts, depth + 1);

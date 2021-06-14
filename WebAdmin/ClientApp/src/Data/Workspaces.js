@@ -69,20 +69,20 @@ export var Workspaces;
             /** URL of the workspace */
             this.url = null;
             /** Local URL of the workspace for React */
-            this.localUrl = null;
+            this.reactLocalUrl = null;
             /** Initials to display as icon if icon is missing */
             this.initials = null;
             /** Representation of the workspace */
             this.icon = null;
             this.name = Utils.TryGetString(source, "name");
             this.url = Utils.TryGetString(source, "url");
-            this.localUrl = Utils.TryGetString(source, "localUrl");
+            this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
             this.initials = Utils.TryGetString(source, "initials");
             this.icon = Utils.TryGetString(source, "icon");
         }
         /** Quick check if data is valid */
         isValid() {
-            return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.localUrl == "string") && (this.localUrl.length > 0));
+            return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.reactLocalUrl == "string") && (this.reactLocalUrl.length > 0));
         }
         static create(source) {
             let item = new Workspace(source);
@@ -100,7 +100,7 @@ export var Workspaces;
             this.type = Utils.TryGetEnum(source, "type", ContentItemType);
             this.name = Utils.TryGetString(source, "name");
             this.url = Utils.TryGetString(source, "url");
-            this.localUrl = Utils.TryGetString(source, "localUrl");
+            this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
             if ((Utils.TrimString(this.name, null) == null) && ((this.url == "/") || (this.url == "") || (this.url == null)))
                 this.name = "/";
             let sourceChildren = Utils.TryGet(source, "children");
@@ -116,7 +116,7 @@ export var Workspaces;
         }
         /** Quick check if data is valid */
         isValid() {
-            return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.localUrl == "string") && (this.localUrl.length > 0));
+            return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.reactLocalUrl == "string") && (this.reactLocalUrl.length > 0));
         }
         static create(source) {
             let item = new ContentItem(source);

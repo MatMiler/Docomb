@@ -4,26 +4,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace Docomb.ContentStorage
 {
 	public class ContentItemSummary : IContentInfo
 	{
+		[JsonPropertyName("type")]
 		public ContentItemType Type { get; protected set; }
 
 		public string FileName { get; protected set; }
 
 		public string FilePath { get; protected set; }
 
+		[JsonPropertyName("url")]
 		public string Url { get; protected set; }
 
 		public bool NeedsTrailingSlash { get; protected set; }
 
 		public List<string> UrlParts { get; protected set; }
 
-		public string Title { get; protected set; }
+		[JsonPropertyName("name")]
+		public string Title { get; set; }
 
 		public Workspace Workspace { get; protected set; }
+
+		[JsonPropertyName("children")]
+		public List<ContentItemSummary> Children { get; set; }
+
+		[JsonPropertyName("reactLocalUrl")]
+		public string ReactLocalUrl => CombineUrlPaths("", CombineUrlPaths(Workspace.UrlPath, Url));
+
 
 		public string FullUrl => Workspace?.FullUrl?.TrimEnd('/') + "/" + Url?.TrimStart('/');
 
@@ -56,6 +67,22 @@ namespace Docomb.ContentStorage
 				Title = item.Title;
 				Url = string.Join('/', UrlParts) + (NeedsTrailingSlash ? '/' : null);
 			}
+		}
+
+		public ContentItemSummary Clone()
+		{
+			return new()
+			{
+				Type = Type,
+				FileName = FileName,
+				FilePath = FilePath,
+				Url = Url,
+				NeedsTrailingSlash = NeedsTrailingSlash,
+				UrlParts = UrlParts,
+				Title = Title,
+				Workspace = Workspace,
+				Children = Children
+			};
 		}
 
 

@@ -26,7 +26,7 @@ const PageBreadcrumbs: FC<{}> = (): ReactElement => {
 			let crumb: IBreadcrumbItem = {
 				text: item.name,
 				key: item.url,
-				href: isCurrent ? null : "workspace" + item.localUrl,
+				href: isCurrent ? null : "workspace" + item.reactLocalUrl,
 				onClick: onClick,
 				isCurrentItem: isCurrent
 			};

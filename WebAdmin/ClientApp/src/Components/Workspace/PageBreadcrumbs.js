@@ -20,7 +20,7 @@ const PageBreadcrumbs = () => {
             let crumb = {
                 text: item.name,
                 key: item.url,
-                href: isCurrent ? null : "workspace" + item.localUrl,
+                href: isCurrent ? null : "workspace" + item.reactLocalUrl,
                 onClick: onClick,
                 isCurrentItem: isCurrent
             };

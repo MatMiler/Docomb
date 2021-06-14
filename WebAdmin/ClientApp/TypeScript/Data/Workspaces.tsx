@@ -58,7 +58,7 @@ export module Workspaces {
 		/** URL of the workspace */
 		public url: string = null;
 		/** Local URL of the workspace for React */
-		public localUrl: string = null;
+		public reactLocalUrl: string = null;
 		/** Initials to display as icon if icon is missing */
 		public initials: string = null;
 		/** Representation of the workspace */
@@ -66,13 +66,13 @@ export module Workspaces {
 
 		/** Quick check if data is valid */
 		public isValid(): boolean {
-			return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.localUrl == "string") && (this.localUrl.length > 0));
+			return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.reactLocalUrl == "string") && (this.reactLocalUrl.length > 0));
 		}
 
 		public constructor(source: any) {
 			this.name = Utils.TryGetString(source, "name");
 			this.url = Utils.TryGetString(source, "url");
-			this.localUrl = Utils.TryGetString(source, "localUrl");
+			this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
 			this.initials = Utils.TryGetString(source, "initials");
 			this.icon = Utils.TryGetString(source, "icon");
 		}
@@ -93,19 +93,19 @@ export module Workspaces {
 		public type: ContentItemType;
 		public name: string;
 		public url: string;
-		public localUrl: string;
+		public reactLocalUrl: string;
 		public children: Array<ContentItem>;
 
 		/** Quick check if data is valid */
 		public isValid(): boolean {
-			return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.localUrl == "string") && (this.localUrl.length > 0));
+			return ((typeof this.name == "string") && (this.name.length > 0) && (typeof this.reactLocalUrl == "string") && (this.reactLocalUrl.length > 0));
 		}
 
 		public constructor(source: any) {
 			this.type = Utils.TryGetEnum(source, "type", ContentItemType);
 			this.name = Utils.TryGetString(source, "name");
 			this.url = Utils.TryGetString(source, "url");
-			this.localUrl = Utils.TryGetString(source, "localUrl");
+			this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
 
 			if ((Utils.TrimString(this.name, null) == null) && ((this.url == "/") || (this.url == "") || (this.url == null)))
 				this.name = "/";

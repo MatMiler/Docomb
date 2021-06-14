@@ -32,7 +32,7 @@ export class SideBarNav extends Component {
         EventBus.remove("navUpdate", this.navUpdateCall);
     }
     renderWorkspaces(workspaces) {
-        let content = workspaces.map(item => React.createElement(SideBarItem, { key: item.url, name: item.name, url: "/workspace" + item.localUrl, initials: item.initials, exactMatch: false, itemKey: item.url }));
+        let content = workspaces.map(item => React.createElement(SideBarItem, { key: item.url, name: item.name, url: "/workspace" + item.reactLocalUrl, initials: item.initials, exactMatch: false, itemKey: item.url }));
         return (content);
     }
     shouldComponentUpdate(nextProps, nextState) {

@@ -35,7 +35,7 @@ export class SideBarNav extends Component<{}, SideBarState> {
 
 	renderWorkspaces(workspaces: Array<Workspaces.Workspace>) {
 		let content = workspaces.map(item =>
-			<SideBarItem key={item.url} name={item.name} url={"/workspace" + item.localUrl} initials={item.initials} exactMatch={false} itemKey={item.url} />
+			<SideBarItem key={item.url} name={item.name} url={"/workspace" + item.reactLocalUrl} initials={item.initials} exactMatch={false} itemKey={item.url} />
 		);
 		return (content);
 	}

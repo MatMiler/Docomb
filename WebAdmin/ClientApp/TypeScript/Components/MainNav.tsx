@@ -116,7 +116,7 @@ export class MainNav extends Component<{}, MainNavState> {
 		let isExpanded: boolean = ((item.url == currentUrl) || (currentUrlTrailed.startsWith(itemUrlTrailed)));
 		return {
 			name: item.name,
-			url: "workspace" + item.localUrl,
+			url: "workspace" + item.reactLocalUrl,
 			key: (item.url.endsWith("/")) ? item.url.slice(0, -1) : item.url,
 			icon: (item.type == Workspaces.ContentItemType.Directory) ? "FolderHorizontal" : "TextDocument",
 			isExpanded: isExpanded
