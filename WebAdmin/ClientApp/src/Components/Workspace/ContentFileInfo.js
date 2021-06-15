@@ -73,9 +73,21 @@ var ContentFileInfoController;
             return (React.createElement("div", { className: "loadingSpinner" },
                 React.createElement(Spinner, { label: "Loading...", labelPosition: "right", size: SpinnerSize.large })));
         switch (ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.type) {
-            case Workspaces.FileType.Markdown: {
+            case Workspaces.FileType.Markdown:
+            case Workspaces.FileType.Html: {
                 return (React.createElement("div", { className: "contentFileDetails" },
                     React.createElement("div", { className: "articleContent", dangerouslySetInnerHTML: { __html: fixLocalLinksInHtml(ContentFileInfoController.fileDetails.contentHtml) } }),
+                    getFileMetaDataPanel()));
+            }
+            case Workspaces.FileType.PlainText: {
+                return (React.createElement("div", { className: "contentFileDetails" },
+                    React.createElement("div", { className: "articleContent" },
+                        React.createElement("pre", { className: "plainTextFile" }, ContentFileInfoController.fileDetails.contentText)),
+                    getFileMetaDataPanel()));
+            }
+            default: {
+                return (React.createElement("div", { className: "contentFileDetails" },
+                    React.createElement("div", { className: "articleContent" }, "Preview is not supported for this file type"),
                     getFileMetaDataPanel()));
             }
         }

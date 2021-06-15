@@ -79,13 +79,29 @@ module ContentFileInfoController {
 
 
 		switch (fileDetails?.type) {
-			case Workspaces.FileType.Markdown: {
+			case Workspaces.FileType.Markdown: case Workspaces.FileType.Html: {
 				return (
 					<div className="contentFileDetails">
 						<div className="articleContent" dangerouslySetInnerHTML={{ __html: fixLocalLinksInHtml(fileDetails.contentHtml) }} />
 						{getFileMetaDataPanel()}
 					</div>
-					);
+				);
+			}
+			case Workspaces.FileType.PlainText: {
+				return (
+					<div className="contentFileDetails">
+						<div className="articleContent"><pre className="plainTextFile">{fileDetails.contentText}</pre></div>
+						{getFileMetaDataPanel()}
+					</div>
+				);
+			}
+			default: {
+				return (
+					<div className="contentFileDetails">
+						<div className="articleContent">Preview is not supported for this file type</div>
+						{getFileMetaDataPanel()}
+					</div>
+				);
 			}
 		}
 

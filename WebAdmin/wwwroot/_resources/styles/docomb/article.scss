@@ -49,6 +49,7 @@
 		@include themeMaps(("border-left-color": $textColorLight, "background": $menuBackgroundColor));
 	}
 
+	.plainTextFile { white-space: pre-wrap; border: none; background: transparent; padding: 0; }
 }
 
 .articleContent, .articleContent blockquote {

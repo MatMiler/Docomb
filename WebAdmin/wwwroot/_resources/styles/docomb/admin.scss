@@ -51,17 +51,23 @@ html { @include lightPreset; }
 .adminRoot { width: 100vw; height: 100vh; }
 
 .mainNavGrid { display: flex; width: 100vw; height: 100vh;
-	> .sideBarNav { flex: 0 0 50px; border-right: 1px solid; box-sizing: content-box;
+	> .sideBarNav { border-right: 1px solid; box-sizing: content-box;
 		.sideBar { display: flex; flex-direction: column; justify-content: space-between; height: 100%;
-			.workspaces { flex: 1 1 100%; overflow: auto; scrollbar-width: none;
-				&::-webkit-scrollbar { display: none; }
-			}
+			.workspaces { flex: 1 1 100%; overflow: auto; }
 			.system { flex: 0 0 auto; border-top: 1px solid; }
 		}
 		.sideBarItem {
 			.icon { margin-right: 0; }
+		}
+		&.collapsed { flex: 0 0 50px;
+			.sideBar { 
+				.workspaces { scrollbar-width: none;
+					&::-webkit-scrollbar { display: none; }
+				}
+			}
 			.name { display: none; }
 		}
+		&.expanded { flex: 0 0 250px; }
 	}
 	> .mainNav {
 		flex: 0 0 250px;
@@ -98,11 +104,11 @@ html { @include lightPreset; }
 
 .sideBarItem {
 	a { display: flex; align-items: center; padding: 10px; color: inherit; text-decoration: none; position: relative;
-		&:hover { @include themeMaps(("color": $accentColor, "background": $buttonHoverColor)); }
+		&:hover { @include themeMaps(("color": $accentColor, "background": $buttonHoverColor)); .name { color: inherit; } }
 		&:active { @include themeMap("background", $buttonActiveColor); }
 	}
 	.icon { display: inline-block; flex: 0 0 30px; width: 30px; height: 30px; font-size: 20px; line-height: 30px; text-align: center; overflow: hidden; font-weight: bold; margin-right: 10px; }
-	.name { display: inline-block; flex: 1 1 100%; font-size: 14px; }
+	.name { display: inline-block; flex: 1 1 100%; font-size: 14px; padding-left: 10px; @include themeMap("color", $textColorLight); }
 	a:before {
 		content: ""; display: block; position: absolute; top: 10px; bottom: 10px; left: 0; border-left: 3px solid transparent;
 		transition: top 0.267s cubic-bezier(0.1, 0.25, 0.75, 0.9) 0s, bottom 0.267s cubic-bezier(0.1, 0.25, 0.75, 0.9) 0s;
@@ -123,6 +129,12 @@ html { @include lightPreset; }
 }
 
 
+
+.emptyPage { position: relative; width: 100%; height: 100%; overflow: hidden;
+	.watermark { position: absolute; left: 50%; top: 50%; font-size: 20vmin; margin: -10vmin; opacity: .2;
+		i { width: 1em; height: 1em; margin: 0; padding: 0; }
+	}
+}
 
 
 .contentFileDetails { display: flex; width: 100%; height: 100%;

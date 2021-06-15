@@ -26,17 +26,22 @@ export class Layout extends Component<LayoutData, LayoutData> {
 		}
 		catch (e) { }
 
+		let siteBarNavClassName = "sideBarNav";
+
 		let mainNav: JSX.Element = null;
 		if (this.state.showMainNav == true) {
-			mainNav = <div className="mainNav">
+			mainNav = (<div className="mainNav">
 				<MainNavWithRouter />
-			</div>;
+			</div>);
+			siteBarNavClassName += " collapsed";
+		} else {
+			siteBarNavClassName += " expanded";
 		}
 
 		return (
 			<ThemeProvider theme={isDark ? darkTheme : lightTheme}>
 				<div className="adminRoot mainNavGrid">
-					<div className="sideBarNav">
+					<div className={siteBarNavClassName}>
 						<SideBarNav />
 					</div>
 					{mainNav}

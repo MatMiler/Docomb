@@ -83,7 +83,6 @@ html a {
   width: 100vw;
   height: 100vh; }
   .mainNavGrid > .sideBarNav {
-    flex: 0 0 50px;
     border-right: 1px solid;
     box-sizing: content-box; }
     .mainNavGrid > .sideBarNav .sideBar {
@@ -93,17 +92,22 @@ html a {
       height: 100%; }
       .mainNavGrid > .sideBarNav .sideBar .workspaces {
         flex: 1 1 100%;
-        overflow: auto;
-        scrollbar-width: none; }
-        .mainNavGrid > .sideBarNav .sideBar .workspaces::-webkit-scrollbar {
-          display: none; }
+        overflow: auto; }
       .mainNavGrid > .sideBarNav .sideBar .system {
         flex: 0 0 auto;
         border-top: 1px solid; }
     .mainNavGrid > .sideBarNav .sideBarItem .icon {
       margin-right: 0; }
-    .mainNavGrid > .sideBarNav .sideBarItem .name {
-      display: none; }
+    .mainNavGrid > .sideBarNav.collapsed {
+      flex: 0 0 50px; }
+      .mainNavGrid > .sideBarNav.collapsed .sideBar .workspaces {
+        scrollbar-width: none; }
+        .mainNavGrid > .sideBarNav.collapsed .sideBar .workspaces::-webkit-scrollbar {
+          display: none; }
+      .mainNavGrid > .sideBarNav.collapsed .name {
+        display: none; }
+    .mainNavGrid > .sideBarNav.expanded {
+      flex: 0 0 250px; }
   .mainNavGrid > .mainNav {
     flex: 0 0 250px;
     border-right: 1px solid;
@@ -217,6 +221,8 @@ html a {
     .light .sideBarItem a:hover {
       color: #039;
       background: rgba(0, 0, 0, 0.1); } }
+  .sideBarItem a:hover .name {
+    color: inherit; }
   html .sideBarItem a:active {
     background: rgba(0, 0, 0, 0.13); }
   .dark .sideBarItem a:active {
@@ -242,7 +248,17 @@ html a {
 .sideBarItem .name {
   display: inline-block;
   flex: 1 1 100%;
-  font-size: 14px; }
+  font-size: 14px;
+  padding-left: 10px; }
+  html .sideBarItem .name {
+    color: #666; }
+  .dark .sideBarItem .name {
+    color: #ccc; }
+  @media (prefers-color-scheme: dark) {
+    html .sideBarItem .name {
+      color: #ccc; }
+    .light .sideBarItem .name {
+      color: #666; } }
 
 .sideBarItem a:before {
   content: "";
@@ -299,6 +315,24 @@ html .sideBarItem.selected a:before {
         border-color: #494949; }
       .light .pageGrid .pageTitle + .pageContent, .light .pageGrid .pageCommands + .pageContent {
         border-color: #eee; } }
+
+.emptyPage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; }
+  .emptyPage .watermark {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    font-size: 20vmin;
+    margin: -10vmin;
+    opacity: .2; }
+    .emptyPage .watermark i {
+      width: 1em;
+      height: 1em;
+      margin: 0;
+      padding: 0; }
 
 .contentFileDetails {
   display: flex;
@@ -447,6 +481,12 @@ html .articleContent table th {
   .light .articleContent table th {
     border-left-color: #666;
     background: #eee; } }
+
+.articleContent .plainTextFile {
+  white-space: pre-wrap;
+  border: none;
+  background: transparent;
+  padding: 0; }
 
 .articleContent > :first-child, .articleContent blockquote > :first-child {
   margin-top: 0; }
