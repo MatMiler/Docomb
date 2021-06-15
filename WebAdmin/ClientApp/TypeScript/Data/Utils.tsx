@@ -54,6 +54,20 @@
 		return defaultValue;
 	}
 
+	/**
+	 * Convert a value to date
+	 * @param value Value to convert
+	 * @param defaultValue Default value to return if null or can't be converted
+	 */
+	export function ParseDate(value: any, defaultValue?: Date): Date {
+		try {
+			let date = new Date(value);
+			return (IsNumeric(date.getTime())) ? date : defaultValue;
+		}
+		catch (e) {}
+		return defaultValue;
+	}
+
 	//#endregion
 
 
@@ -298,6 +312,20 @@
 	}
 
 	/**
+	 * Try to return a trimmed string in a property or index of an object. If found value isn't a string, it will be converted
+	 * Examples:
+	 * - TryGetString({ a: "Value 1" }, "a") => "Value 1"
+	 * - TryGetString(["Value 1", "Value 2"], 0) => "Value 1"
+	 * - TryGetString([{ a: "Value 1"}, { a: "Value 2" }], [1, "a"]) => "Value 2"
+	 * @param container Container object in which to look for the property/index
+	 * @param property Property or index (or array of properties/indexes) to find
+	 * @param defaultValue Default value if property/index is not found or is null or empty
+	 */
+	export function TryGetTrimmedString(container: any, property: any, defaultValue: string = null): string {
+		return TrimString(TryGet(container, property, defaultValue), defaultValue);
+	}
+
+	/**
 	 * Try to return a number in a property or index of an object. If found value isn't a number, it will be converted
 	 * Examples:
 	 * - TryGetNumber({ a: 1 }, "a") => 1
@@ -334,6 +362,16 @@
 	 */
 	export function TryGetEnum<T>(container: any, property: any, set: { [key: string]: any }, defaultValue?: T): T {
 		return ParseEnum(TryGet(container, property, defaultValue), set, defaultValue);
+	}
+
+	/**
+	 * Try to return a date in a property or index of an object. If found value isn't a date, it will be converted
+	 * @param container Container object in which to look for the property/index
+	 * @param property Property or index (or array of properties/indexes) to find
+	 * @param defaultValue Default value if property/index is not found, is null, or can't be converted into a date
+	 */
+	export function TryGetDate(container: any, property: any, defaultValue?: Date): Date {
+		return ParseDate(TryGet(container, property, defaultValue), defaultValue);
 	}
 
 

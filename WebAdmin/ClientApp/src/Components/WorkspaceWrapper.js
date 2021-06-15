@@ -15,7 +15,7 @@ import { LayoutUtils } from '../LayoutUtils';
 import { EventBus } from '../EventBus';
 import Home from './Workspace/Home';
 import ContentDirectory from './Workspace/ContentDirectory';
-import ContentFile from './Workspace/ContentFile';
+import ContentFileInfo from './Workspace/ContentFileInfo';
 export class WorkspaceWrapper extends Component {
     constructor(props) {
         super(props);
@@ -52,12 +52,9 @@ export class WorkspaceWrapper extends Component {
                 content = React.createElement(ContentDirectory, null);
             }
             else {
-                content = React.createElement(ContentFile, null);
+                content = React.createElement(ContentFileInfo, null);
             }
         }
-        //		<div className="">
-        //			Workspace home page ({this.state?.pageInfo?.workspace?.name}, {Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.ContentItemData), "name")})
-        //		</div>
         return (React.createElement(Layout, { showMainNav: true }, content));
     }
     populateInfo() {
@@ -66,7 +63,6 @@ export class WorkspaceWrapper extends Component {
             let data = yield Workspaces.loadPageInfo(Utils.TryGet(this.props, ["match", "params", "itemPath"]));
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, (_a = data === null || data === void 0 ? void 0 : data.workspace) === null || _a === void 0 ? void 0 : _a.url);
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, data === null || data === void 0 ? void 0 : data.workspace);
-            //LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.ContentItemData, data?.contentItem);
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, data);
             this.setState({ pageInfo: data, loading: false });
             EventBus.dispatch("navUpdate");

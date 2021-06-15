@@ -26,10 +26,12 @@ const PageBreadcrumbs: FC<{}> = (): ReactElement => {
 			let crumb: IBreadcrumbItem = {
 				text: item.name,
 				key: item.url,
-				href: isCurrent ? null : "workspace" + item.reactLocalUrl,
-				onClick: onClick,
 				isCurrentItem: isCurrent
 			};
+			if (!isCurrent) {
+				crumb.href = "workspace" + item.reactLocalUrl;
+				crumb.onClick = onClick;
+			}
 			breadcrumbs.push(crumb);
 		}
 	}

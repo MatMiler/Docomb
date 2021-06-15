@@ -35,7 +35,7 @@ namespace Docomb.ContentStorage
 		[JsonPropertyName("reactLocalUrl")]
 		public string ReactLocalUrl => CombineUrlPaths("", CombineUrlPaths(Workspace.UrlPath, Url));
 
-
+		[JsonPropertyName("fullUrl")]
 		public string FullUrl => Workspace?.FullUrl?.TrimEnd('/') + "/" + Url?.TrimStart('/');
 
 

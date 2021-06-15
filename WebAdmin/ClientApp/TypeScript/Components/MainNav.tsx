@@ -118,7 +118,7 @@ export class MainNav extends Component<{}, MainNavState> {
 			name: item.name,
 			url: "workspace" + item.reactLocalUrl,
 			key: (item.url.endsWith("/")) ? item.url.slice(0, -1) : item.url,
-			icon: (item.type == Workspaces.ContentItemType.Directory) ? "FolderHorizontal" : "TextDocument",
+			icon: (item.type == Workspaces.ContentItemType.Directory) ? "FolderHorizontal" : "Page",
 			isExpanded: isExpanded
 		};
 	}

@@ -67,6 +67,20 @@ export var Utils;
         return defaultValue;
     }
     Utils.ParseEnum = ParseEnum;
+    /**
+     * Convert a value to date
+     * @param value Value to convert
+     * @param defaultValue Default value to return if null or can't be converted
+     */
+    function ParseDate(value, defaultValue) {
+        try {
+            let date = new Date(value);
+            return (IsNumeric(date.getTime())) ? date : defaultValue;
+        }
+        catch (e) { }
+        return defaultValue;
+    }
+    Utils.ParseDate = ParseDate;
     //#endregion
     //#region Type checks
     /**
@@ -297,6 +311,20 @@ export var Utils;
     }
     Utils.TryGetString = TryGetString;
     /**
+     * Try to return a trimmed string in a property or index of an object. If found value isn't a string, it will be converted
+     * Examples:
+     * - TryGetString({ a: "Value 1" }, "a") => "Value 1"
+     * - TryGetString(["Value 1", "Value 2"], 0) => "Value 1"
+     * - TryGetString([{ a: "Value 1"}, { a: "Value 2" }], [1, "a"]) => "Value 2"
+     * @param container Container object in which to look for the property/index
+     * @param property Property or index (or array of properties/indexes) to find
+     * @param defaultValue Default value if property/index is not found or is null or empty
+     */
+    function TryGetTrimmedString(container, property, defaultValue = null) {
+        return TrimString(TryGet(container, property, defaultValue), defaultValue);
+    }
+    Utils.TryGetTrimmedString = TryGetTrimmedString;
+    /**
      * Try to return a number in a property or index of an object. If found value isn't a number, it will be converted
      * Examples:
      * - TryGetNumber({ a: 1 }, "a") => 1
@@ -335,6 +363,16 @@ export var Utils;
         return ParseEnum(TryGet(container, property, defaultValue), set, defaultValue);
     }
     Utils.TryGetEnum = TryGetEnum;
+    /**
+     * Try to return a date in a property or index of an object. If found value isn't a date, it will be converted
+     * @param container Container object in which to look for the property/index
+     * @param property Property or index (or array of properties/indexes) to find
+     * @param defaultValue Default value if property/index is not found, is null, or can't be converted into a date
+     */
+    function TryGetDate(container, property, defaultValue) {
+        return ParseDate(TryGet(container, property, defaultValue), defaultValue);
+    }
+    Utils.TryGetDate = TryGetDate;
     //#endregion
 })(Utils || (Utils = {}));
 //# sourceMappingURL=Utils.js.map

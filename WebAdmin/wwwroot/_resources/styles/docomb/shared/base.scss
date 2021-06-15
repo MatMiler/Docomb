@@ -1,0 +1,30 @@
+﻿@import "theme.scss";
+
+
+$tabletWidth: 800px;
+
+@mixin aboveTablet {
+	@media all and (min-width: $tabletWidth), print {
+		@content;
+	}
+}
+
+@mixin belowTablet {
+	@media not all and (min-width: $tabletWidth) {
+		@content;
+	}
+}
+
+@mixin padding {
+	padding: 20px;
+	@include belowTablet { padding: 10px; }
+}
+
+@mixin hPadding {
+	padding-left: 20px;
+	padding-right: 20px;
+	@include belowTablet { padding-left: 10px; padding-right: 10px; }
+}
+
+
+

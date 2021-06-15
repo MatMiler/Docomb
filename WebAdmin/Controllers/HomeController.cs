@@ -14,6 +14,7 @@ namespace Docomb.WebAdmin.Controllers
 		{
 			ViewBag.baseHref = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/{AdminConfig.UrlPathPrefix}/";
 			ViewBag.basePath = $"{Request.PathBase}/{AdminConfig.UrlPathPrefix}/";
+			ViewBag.readerBasePath = $"{Request.PathBase}/";
 			return View("~/Areas/Admin/Pages/Index.cshtml");
 		}
 	}

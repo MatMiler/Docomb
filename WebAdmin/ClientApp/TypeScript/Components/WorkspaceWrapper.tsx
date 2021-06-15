@@ -6,7 +6,7 @@ import { LayoutUtils } from '../LayoutUtils';
 import { EventBus } from '../EventBus';
 import Home from './Workspace/Home';
 import ContentDirectory from './Workspace/ContentDirectory';
-import ContentFile from './Workspace/ContentFile';
+import ContentFileInfo from './Workspace/ContentFileInfo';
 
 
 
@@ -54,13 +54,10 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 			} else if (this.state.pageInfo.contentItem.type == Workspaces.ContentItemType.Directory) {
 				content = <ContentDirectory />;
 			} else {
-				content = <ContentFile />;
+				content = <ContentFileInfo />;
 			}
 		}
 
-		//		<div className="">
-		//			Workspace home page ({this.state?.pageInfo?.workspace?.name}, {Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.ContentItemData), "name")})
-		//		</div>
 		return (
 			<Layout showMainNav={true}>
 				{content}
@@ -72,7 +69,6 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 		let data: Workspaces.WorkspacePageInfo = await Workspaces.loadPageInfo(Utils.TryGet(this.props, ["match", "params", "itemPath"]));
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, data?.workspace?.url);
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, data?.workspace);
-		//LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.ContentItemData, data?.contentItem);
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, data);
 		this.setState({ pageInfo: data, loading: false });
 		EventBus.dispatch("navUpdate");

@@ -8,6 +8,10 @@
 h1, h2, h3, h4, h5, h6 {
   margin: 30px 0 15px 0;
   padding: 0; }
+  h1:first-child, h2:first-child, h3:first-child, h4:first-child, h5:first-child, h6:first-child {
+    margin-top: 0; }
+  h1:last-child, h2:last-child, h3:last-child, h4:last-child, h5:last-child, h6:last-child {
+    margin-bottom: 0; }
 
 h1 + h2, h1 + h3, h1 + h4, h1 + h5, h1 + h6,
 h2 + h3, h2 + h4, h2 + h5, h2 + h6,
@@ -40,6 +44,9 @@ ul, ol {
 li > ul, li > ol {
   margin-top: 0;
   margin-bottom: 0; }
+
+* {
+  box-sizing: border-box; }
 
 html body {
   background: #fff;
@@ -187,7 +194,8 @@ html a {
     .light .mainNavGrid > .sideBarNav, .light .mainNavGrid .mainNav, .light .mainNavGrid > .sideBarNav .sideBar .system {
       border-color: #eee; } }
   .mainNavGrid > .mainNavGridContent {
-    flex: 1 1 100%; }
+    flex: 1 1 100%;
+    overflow: hidden; }
 
 .sideBarItem a {
   display: flex;
@@ -270,7 +278,7 @@ html .sideBarItem.selected a:before {
   flex-direction: column; }
   .pageGrid .pageTitle {
     flex: 0 0 auto;
-    padding: 0 10px 10px 10px;
+    padding: 0px 24px 10px 24px;
     width: 100%; }
   .pageGrid .pageCommands {
     flex: 0 0 auto;
@@ -278,6 +286,8 @@ html .sideBarItem.selected a:before {
   .pageGrid .pageContent {
     flex: 1 1 100%;
     overflow: auto; }
+  .pageGrid .pageTitle + .pageCommands {
+    margin-top: -10px; }
   .pageGrid .pageTitle + .pageContent, .pageGrid .pageCommands + .pageContent {
     border-top: 1px solid; }
     html .pageGrid .pageTitle + .pageContent, html .pageGrid .pageCommands + .pageContent {
@@ -289,3 +299,157 @@ html .sideBarItem.selected a:before {
         border-color: #494949; }
       .light .pageGrid .pageTitle + .pageContent, .light .pageGrid .pageCommands + .pageContent {
         border-color: #eee; } }
+
+.contentFileDetails {
+  display: flex;
+  width: 100%;
+  height: 100%; }
+  .contentFileDetails .articleContent {
+    flex: 1 1 100%;
+    overflow: auto;
+    padding: 32px; }
+  .contentFileDetails .metaInfo {
+    flex: 0 0 250px;
+    padding: 16px;
+    height: 100%;
+    overflow: auto;
+    border-left: 1px solid;
+    /*h2 { margin-top: 0; }*/ }
+    html .contentFileDetails .metaInfo {
+      border-color: #eee;
+      background: #eee; }
+    .dark .contentFileDetails .metaInfo {
+      border-color: #494949;
+      background: #333; }
+    @media (prefers-color-scheme: dark) {
+      html .contentFileDetails .metaInfo {
+        border-color: #494949;
+        background: #333; }
+      .light .contentFileDetails .metaInfo {
+        border-color: #eee;
+        background: #eee; } }
+    .contentFileDetails .metaInfo h2 i {
+      vertical-align: middle; }
+
+.articleContent blockquote {
+  border-left: 4px solid;
+  padding: 5px 5px 5px 15px;
+  font-size: 18px;
+  letter-spacing: -1px;
+  font-style: italic; }
+  html .articleContent blockquote {
+    border-left-color: #eee;
+    background: #eee; }
+  .dark .articleContent blockquote {
+    border-left-color: #494949;
+    background: #333; }
+  @media (prefers-color-scheme: dark) {
+    html .articleContent blockquote {
+      border-left-color: #494949;
+      background: #333; }
+    .light .articleContent blockquote {
+      border-left-color: #eee;
+      background: #eee; } }
+
+.articleContent pre, .articleContent code {
+  font-family: Consolas, Courier New, Courier, monospace;
+  border: 1px solid;
+  font-size: .9em; }
+  html .articleContent pre, html .articleContent code {
+    border-color: #eee;
+    background: #eee; }
+  .dark .articleContent pre, .dark .articleContent code {
+    border-color: #494949;
+    background: #333; }
+  @media (prefers-color-scheme: dark) {
+    html .articleContent pre, html .articleContent code {
+      border-color: #494949;
+      background: #333; }
+    .light .articleContent pre, .light .articleContent code {
+      border-color: #eee;
+      background: #eee; } }
+
+.articleContent pre {
+  padding: 10px;
+  overflow-x: auto; }
+
+.articleContent code {
+  padding: 0 2px; }
+
+.articleContent pre > pre, .articleContent code > code, .articleContent pre > code, .articleContent code > pre {
+  font-size: 1em;
+  border: none;
+  padding: 0;
+  margin: 0; }
+
+.articleContent hr {
+  margin: 30px 0;
+  border-top: 2px solid;
+  border-left: none;
+  border-right: none;
+  border-bottom: none; }
+  html .articleContent hr {
+    border-top-color: #666; }
+  .dark .articleContent hr {
+    border-top-color: #ccc; }
+  @media (prefers-color-scheme: dark) {
+    html .articleContent hr {
+      border-top-color: #ccc; }
+    .light .articleContent hr {
+      border-top-color: #666; } }
+
+.articleContent table {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  text-align: left;
+  border-collapse: collapse;
+  border: 1px solid; }
+  html .articleContent table tr:hover {
+    background: #eee; }
+  .dark .articleContent table tr:hover {
+    background: #333; }
+  @media (prefers-color-scheme: dark) {
+    html .articleContent table tr:hover {
+      background: #333; }
+    .light .articleContent table tr:hover {
+      background: #eee; } }
+  .articleContent table th, .articleContent table td {
+    padding: 5px 10px;
+    border: 1px solid;
+    vertical-align: top; }
+  .articleContent table th {
+    border-bottom-width: 2px; }
+
+html .articleContent table, html .articleContent table td, html .articleContent table th {
+  border-color: #eee; }
+
+.dark .articleContent table, .dark .articleContent table td, .dark .articleContent table th {
+  border-color: #494949; }
+
+@media (prefers-color-scheme: dark) {
+  html .articleContent table, html .articleContent table td, html .articleContent table th {
+    border-color: #494949; }
+  .light .articleContent table, .light .articleContent table td, .light .articleContent table th {
+    border-color: #eee; } }
+
+html .articleContent table th {
+  border-left-color: #666;
+  background: #eee; }
+
+.dark .articleContent table th {
+  border-left-color: #ccc;
+  background: #333; }
+
+@media (prefers-color-scheme: dark) {
+  html .articleContent table th {
+    border-left-color: #ccc;
+    background: #333; }
+  .light .articleContent table th {
+    border-left-color: #666;
+    background: #eee; } }
+
+.articleContent > :first-child, .articleContent blockquote > :first-child {
+  margin-top: 0; }
+
+.articleContent > :last-child, .articleContent blockquote > :last-child {
+  margin-bottom: 0; }

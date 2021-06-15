@@ -30,6 +30,9 @@
 
 	<ItemGroup>
 	  <Content Remove="compilerconfig.json" />
+	  <Content Remove="wwwroot\_resources\styles\article.scss" />
+	  <Content Remove="wwwroot\_resources\styles\docomb\shared\base.scss" />
+	  <Content Remove="wwwroot\_resources\styles\docomb\theme.scss" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -41,7 +44,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentFile.tsx">
+	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentFileInfo.tsx">
 	    <SubType>Code</SubType>
 	  </None>
 	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentDirectory.tsx">

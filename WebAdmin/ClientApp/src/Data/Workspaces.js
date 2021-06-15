@@ -37,6 +37,13 @@ export var Workspaces;
         });
     }
     Workspaces.loadPageInfo = loadPageInfo;
+    function loadFileDetails(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data = yield Apis.fetchJsonAsync("api/content/fileDetails?url=" + encodeURI(url), false);
+            return FileDetails.create(data);
+        });
+    }
+    Workspaces.loadFileDetails = loadFileDetails;
     function loadTree(workspaceUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             let list = [];
@@ -141,5 +148,35 @@ export var Workspaces;
         }
     }
     Workspaces.WorkspacePageInfo = WorkspacePageInfo;
+    let FileType;
+    (function (FileType) {
+        FileType["File"] = "File";
+        FileType["Markdown"] = "Markdown";
+        FileType["Html"] = "Html";
+        FileType["PlainText"] = "PlainText";
+    })(FileType = Workspaces.FileType || (Workspaces.FileType = {}));
+    class FileDetails {
+        constructor(source) {
+            this.title = Utils.TryGetString(source, "title");
+            this.fileName = Utils.TryGetString(source, "fileName");
+            this.url = Utils.TryGetString(source, "url");
+            this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
+            this.type = Utils.TryGetEnum(source, "type", FileType, FileType.File);
+            this.workspace = Workspace.create(Utils.TryGet(source, "workspace"));
+            this.fileSize = Utils.TryGetNumber(source, "fileSize");
+            this.fileSizeDesc = Utils.TryGetString(source, "fileSizeDesc");
+            this.lastModifiedDate = Utils.TryGetDate(source, "lastModifiedDate");
+            this.contentText = Utils.TryGetString(source, "contentText");
+            this.contentHtml = Utils.TryGetString(source, "contentHtml");
+        }
+        isValid() {
+            return ((typeof this.fileName == "string") && (this.fileName.length > 0) && (typeof this.type == "string") && (this.type.length > 0));
+        }
+        static create(source) {
+            let item = new FileDetails(source);
+            return ((item === null || item === void 0 ? void 0 : item.isValid()) == true) ? item : null;
+        }
+    }
+    Workspaces.FileDetails = FileDetails;
 })(Workspaces || (Workspaces = {}));
 //# sourceMappingURL=Workspaces.js.map

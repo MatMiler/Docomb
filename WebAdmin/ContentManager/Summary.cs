@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Docomb.WebAdmin.Workspaces
 {
-	public static class Summary
+	public static class ContentManager
 	{
 
 		public class WorkspaceSummary

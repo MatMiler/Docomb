@@ -27,6 +27,12 @@ export module Workspaces {
 	}
 
 
+	export async function loadFileDetails(url: string): Promise<FileDetails> {
+		let data: any = await Apis.fetchJsonAsync("api/content/fileDetails?url=" + encodeURI(url), false);
+		return FileDetails.create(data);
+	}
+
+
 	export async function loadTree(workspaceUrl: string): Promise<Array<ContentItem>> {
 		let list: Array<ContentItem> = [];
 		let url = "api/general/workspaceContentTree?workspaceUrl=" + encodeURI(workspaceUrl);
@@ -150,5 +156,48 @@ export module Workspaces {
 		}
 	}
 
+
+	export enum FileType {
+		File = "File",
+		Markdown = "Markdown",
+		Html = "Html",
+		PlainText = "PlainText"
+	}
+	export class FileDetails {
+		public title: string;
+		public fileName: string;
+		public url: string;
+		public reactLocalUrl: string;
+		public type: FileType;
+		public workspace: Workspace;
+		public fileSize: number;
+		public fileSizeDesc: string;
+		public lastModifiedDate: Date;
+		public contentText: string;
+		public contentHtml: string;
+
+		public isValid(): boolean {
+			return ((typeof this.fileName == "string") && (this.fileName.length > 0) && (typeof this.type == "string") && (this.type.length > 0));
+		}
+
+		public constructor(source: any) {
+			this.title = Utils.TryGetString(source, "title");
+			this.fileName = Utils.TryGetString(source, "fileName");
+			this.url = Utils.TryGetString(source, "url");
+			this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
+			this.type = Utils.TryGetEnum(source, "type", FileType, FileType.File);
+			this.workspace = Workspace.create(Utils.TryGet(source, "workspace"));
+			this.fileSize = Utils.TryGetNumber(source, "fileSize");
+			this.fileSizeDesc = Utils.TryGetString(source, "fileSizeDesc");
+			this.lastModifiedDate = Utils.TryGetDate(source, "lastModifiedDate");
+			this.contentText = Utils.TryGetString(source, "contentText");
+			this.contentHtml = Utils.TryGetString(source, "contentHtml");
+		}
+
+		public static create(source: any): FileDetails {
+			let item = new FileDetails(source);
+			return (item?.isValid() == true) ? item : null;
+		}
+	}
 
 }

@@ -114,20 +114,27 @@ namespace Docomb.ContentStorage
 
 		#region Item summaries
 
-		private Dictionary<string, ContentItemSummary> _itemSummaryByPath = new();
+		private Dictionary<string, ContentItemSummary> _itemPhysicalSummaryByPath = new();
+		private Dictionary<string, ContentItemSummary> _itemLogicalSummaryByPath = new();
 		private Dictionary<string, Dictionary<string, ContentItemSummary>> _itemSummariesByParentPath = new();
 		private Dictionary<string, List<ContentItemSummary>> _physicalItemSummariesByParentPath = new();
 
 		public ContentItemSummary GetItemSummary(List<string> pathParts, MatchType matchType)
 		{
 			string path = (pathParts?.Count > 0) ? string.Join('/', pathParts) : "";
-			if (_itemSummaryByPath.ContainsKey(path)) return _itemSummaryByPath[path];
+			Dictionary<string, ContentItemSummary> cacheDict = matchType switch {
+				MatchType.Physical => _itemPhysicalSummaryByPath,
+				MatchType.Logical => _itemLogicalSummaryByPath,
+				_ => null
+			};
+			if ((cacheDict != null) && (cacheDict.TryGetValue(path, out ContentItemSummary cached)))
+				return cached;
 
 			ContentItem item = FindItem(pathParts, matchType);
 			if (item != null)
 			{
 				ContentItemSummary summary = new(item);
-				_itemSummaryByPath.Add(path, summary);
+				cacheDict?.Add(path, summary);
 				return summary;
 			}
 
@@ -165,9 +172,9 @@ namespace Docomb.ContentStorage
 					{
 						string directoryName = GetFileNameFromPath(directoryPath);
 						string nameLower = directoryName.ToLower();
-						if (_itemSummaryByPath.ContainsKey(directoryName))
+						if (_itemLogicalSummaryByPath.ContainsKey(directoryName))
 						{
-							dict.Add(directoryName, _itemSummaryByPath[directoryName]);
+							dict.Add(directoryName, _itemLogicalSummaryByPath[directoryName]);
 							usedNames.Add(nameLower);
 						}
 
@@ -183,7 +190,7 @@ namespace Docomb.ContentStorage
 							{
 								ContentItemSummary summary = new(new ContentFile(Workspace, files[0], parentPathParts.Concat(new List<string>() { directoryName }).ToList(), true));
 								dict.Add(directoryName, summary);
-								_itemSummaryByPath.Add(directoryName, summary);
+								_itemLogicalSummaryByPath.Add(directoryName, summary);
 								usedNames.Add(nameLower);
 								defaultFileFound = true;
 								break;
@@ -196,7 +203,7 @@ namespace Docomb.ContentStorage
 						{
 							ContentItemSummary summary = new(new ContentDirectory(Workspace, directoryPath, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
 							dict.Add(directoryName, summary);
-							_itemSummaryByPath.Add(directoryName, summary);
+							_itemLogicalSummaryByPath.Add(directoryName, summary);
 							usedNames.Add(nameLower);
 						}
 						#endregion
@@ -223,7 +230,7 @@ namespace Docomb.ContentStorage
 						if (usedNames.Contains(simplifiedLower)) continue;
 						ContentItemSummary summary = new(new ContentFile(Workspace, filePath, parentPathParts.Concat(new List<string>() { simplifiedName }).ToList(), false));
 						dict.Add(simplifiedName, summary);
-						_itemSummaryByPath.Add(simplifiedName, summary);
+						_itemLogicalSummaryByPath.Add(simplifiedName, summary);
 						usedNames.Add(simplifiedLower);
 					}
 				}
