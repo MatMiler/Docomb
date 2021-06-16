@@ -34,5 +34,43 @@ export var LayoutUtils;
         }
         WindowData.set = set;
     })(WindowData = LayoutUtils.WindowData || (LayoutUtils.WindowData = {}));
+    function fixLocalLinksInHtml(html, workspace, contentItem) {
+        try {
+            let container = $("<div />").html(html);
+            let readerBasePath = Utils.TryGetString(window, "readerBasePath");
+            if (!readerBasePath.endsWith("/"))
+                readerBasePath += "/";
+            readerBasePath += workspace === null || workspace === void 0 ? void 0 : workspace.url;
+            if (!readerBasePath.endsWith("/"))
+                readerBasePath += "/";
+            container.find("a").each((index, element) => {
+                let a = $(element);
+                a.attr("target", "_blank");
+                let href = a.attr("href");
+                if (Utils.TrimString(href, null) != null) {
+                    let slashPos = href.indexOf("/");
+                    if (slashPos == 0)
+                        return;
+                    let hashPos = href.indexOf("#");
+                    let doubleSlashPos = href.indexOf("//");
+                    let paramPos = href.indexOf("?");
+                    if (hashPos < 0)
+                        hashPos = href.length;
+                    if (doubleSlashPos < 0)
+                        doubleSlashPos = href.length;
+                    if (paramPos < 0)
+                        paramPos = href.length;
+                    if ((doubleSlashPos >= hashPos) && (doubleSlashPos >= paramPos)) {
+                        href = readerBasePath + href;
+                        a.attr("href", href);
+                    }
+                }
+            });
+            html = container.html();
+        }
+        catch (e) { }
+        return html;
+    }
+    LayoutUtils.fixLocalLinksInHtml = fixLocalLinksInHtml;
 })(LayoutUtils || (LayoutUtils = {}));
 //# sourceMappingURL=LayoutUtils.js.map

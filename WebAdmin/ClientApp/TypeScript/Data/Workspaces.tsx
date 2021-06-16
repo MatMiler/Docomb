@@ -20,17 +20,17 @@ export module Workspaces {
 	}
 
 
-	export async function loadPageInfo(url: string): Promise<WorkspacePageInfo> {
-		let data: any = await Apis.fetchJsonAsync("api/general/workspacePageInfo?url=" + encodeURI(url), false);
+	export async function loadPageInfo(url: string, query: string): Promise<WorkspacePageInfo> {
+		let data: any = await Apis.fetchJsonAsync("api/general/workspacePageInfo?url=" + encodeURI(url) + "&query=" + encodeURI(query), false);
 		let item: WorkspacePageInfo = new WorkspacePageInfo(data);
 		return ((item != null) && (item.isValid())) ? item : null;
 	}
 
 
-	export async function loadFileDetails(url: string): Promise<FileDetails> {
-		let data: any = await Apis.fetchJsonAsync("api/content/fileDetails?url=" + encodeURI(url), false);
-		return FileDetails.create(data);
-	}
+	//export async function loadFileDetails(url: string): Promise<FileDetails> {
+	//	let data: any = await Apis.fetchJsonAsync("api/content/fileDetails?url=" + encodeURI(url), false);
+	//	return FileDetails.create(data);
+	//}
 
 
 	export async function loadTree(workspaceUrl: string): Promise<Array<ContentItem>> {
@@ -141,6 +141,7 @@ export module Workspaces {
 	export class WorkspacePageInfo {
 		public workspace: Workspace;
 		public contentItem: ContentItem;
+		public details: FileDetails;
 		public action: ContentItemAction;
 		public breadcrumbs: Array<ContentItem>;
 
@@ -151,6 +152,7 @@ export module Workspaces {
 		public constructor(source: any) {
 			this.workspace = Workspace.create(Utils.TryGet(source, "workspace"));
 			this.contentItem = ContentItem.create(Utils.TryGet(source, "contentItem"));
+			this.details = FileDetails.create(Utils.TryGet(source, "details"));
 			this.breadcrumbs = Utils.MapArray<ContentItem>(Utils.TryGet(source, "breadcrumbs"), x => ContentItem.create(x));
 			this.action = Utils.TryGetEnum(source, "action", ContentItemAction, ContentItemAction.View);
 		}

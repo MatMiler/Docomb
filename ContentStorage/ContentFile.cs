@@ -125,11 +125,11 @@ namespace Docomb.ContentStorage
 		}
 
 
-		public static bool SaveTextFile(string filePath, string content)
+		public bool SaveTextFile(string content)
 		{
 			try
 			{
-				StreamWriter fileStream = new StreamWriter(filePath);
+				StreamWriter fileStream = new StreamWriter(FilePath);
 				fileStream.Write(content);
 				fileStream.Flush();
 				fileStream.Close();

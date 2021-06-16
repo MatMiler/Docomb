@@ -14,7 +14,7 @@ export class Home extends Component {
 		return (
 			<Layout showMainNav={false}>
 				<div className="adminHome emptyPage">
-					<div className="watermark"><FontIcon iconName="Documentation" /></div>
+					<div className="watermark"><FontIcon iconName="Library" /></div>
 				</div>
 			</Layout>
 		);

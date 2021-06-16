@@ -16,7 +16,7 @@
 
 
 	pre, code {
-		font-family: Consolas, Courier New, Courier, monospace;
+		font-family: $fontFamilyMono;
 		border: 1px solid;
 		font-size: .9em;
 		@include themeMaps(("border-color": $menuBorderColor, "background": $menuBackgroundColor));

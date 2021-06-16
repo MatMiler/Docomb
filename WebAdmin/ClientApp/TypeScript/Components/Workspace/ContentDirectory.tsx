@@ -1,4 +1,4 @@
-﻿import { CommandBar, ContextualMenuItemType, ICommandBarItemProps } from '@fluentui/react';
+﻿import { CommandBar, ContextualMenuItemType, FontIcon, ICommandBarItemProps } from '@fluentui/react';
 import React, { FC, ReactElement } from 'react';
 import { Utils } from '../../Data/Utils';
 import { LayoutUtils } from '../../LayoutUtils';
@@ -22,13 +22,15 @@ const ContentDirectory: FC<{}> = (): ReactElement => {
 		{ key: "upload", text: "Upload", disabled: true, iconProps: { iconName: "Upload" } }
 	];
 
-
+	let isRoot = false;
 	let directoryUrl = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
 	if (!directoryUrl.startsWith("/")) directoryUrl = "/" + directoryUrl;
 	if (!directoryUrl.endsWith("/")) directoryUrl += "/";
 	if (directoryUrl != "/") {
 		commandBarItems.push({ key: "rename", text: "Rename", disabled: true, iconProps: { iconName: "Rename" } });
 		commandBarItems.push({ key: "delete", text: "Delete", disabled: true, iconProps: { iconName: "Delete" } });
+	} else {
+		isRoot = true;
 	}
 
 	return (
@@ -37,7 +39,11 @@ const ContentDirectory: FC<{}> = (): ReactElement => {
 			<div className="pageCommands">
 				<CommandBar items={commandBarItems} />
 			</div>
-			<div className="pageContent">{/*Directory*/}</div>
+			<div className="pageContent">
+				<div className="emptyPage">
+					<div className="watermark"><FontIcon iconName={isRoot ? "ProjectCollection" : "OpenFolderHorizontal"} /></div>
+				</div>
+			</div>
 		</div>
 	);
 };

@@ -9,6 +9,8 @@ $accentColor: ( 'dark': #0bf, 'light': #039 );
 $buttonHoverColor: ( 'dark': rgba(255, 255, 255, .1), 'light': rgba(0, 0, 0, .1) );
 $buttonActiveColor: ( 'dark': rgba(255, 255, 255, .13), 'light': rgba(0, 0, 0, .13) );
 
+$fontFamily: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+$fontFamilyMono: Monaco, Menlo, Consolas, "Droid Sans Mono", Inconsolata, "Courier New", monospace;
 
 @mixin themeMaps($values) {
 	html & {

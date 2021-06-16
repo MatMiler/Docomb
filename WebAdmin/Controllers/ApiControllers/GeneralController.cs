@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Docomb.WebAdmin.Workspaces.ContentManager;
+using static Docomb.WebAdmin.ContentManager.Info;
 
 namespace Docomb.WebAdmin.Controllers.Api
 {
@@ -16,7 +16,7 @@ namespace Docomb.WebAdmin.Controllers.Api
 
 
 		[HttpGet("workspacePageInfo")]
-		public ActionResult<WorkspacePageInfo> WorkspacePageInfo(string url) => GetWorkspacePageInfo(url);
+		public ActionResult<WorkspacePageInfo> WorkspacePageInfo(string url, string query) => GetWorkspacePageInfo(url, query);
 
 
 		[HttpGet("workspaceContentTree")]

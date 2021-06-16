@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using static Docomb.WebAdmin.Workspaces.ContentManager;
+using static Docomb.WebAdmin.ContentManager.Info;
 
 namespace Docomb.WebAdmin.ContentManager
 {
@@ -77,6 +77,7 @@ namespace Docomb.WebAdmin.ContentManager
 
 		public void Load(ContentFile contentFile)
 		{
+			if (contentFile == null) return;
 			#region Basic information
 			{
 				Title = contentFile.Title;

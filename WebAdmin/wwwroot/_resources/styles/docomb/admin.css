@@ -327,7 +327,7 @@ html .sideBarItem.selected a:before {
     top: 50%;
     font-size: 20vmin;
     margin: -10vmin;
-    opacity: .2; }
+    opacity: .1; }
     .emptyPage .watermark i {
       width: 1em;
       height: 1em;
@@ -343,7 +343,8 @@ html .sideBarItem.selected a:before {
     overflow: auto;
     padding: 32px; }
   .contentFileDetails .metaInfo {
-    flex: 0 0 250px;
+    flex: 0 0 400px;
+    max-width: 40%;
     padding: 16px;
     height: 100%;
     overflow: auto;
@@ -364,6 +365,49 @@ html .sideBarItem.selected a:before {
         background: #eee; } }
     .contentFileDetails .metaInfo h2 i {
       vertical-align: middle; }
+    .contentFileDetails .metaInfo .item {
+      display: flex;
+      justify-content: flex-start;
+      align-items: flex-start; }
+      .contentFileDetails .metaInfo .item > b {
+        flex: 0 0 auto;
+        max-width: 40%;
+        margin-right: 8px; }
+      .contentFileDetails .metaInfo .item > span {
+        flex: 1 1 100;
+        overflow-wrap: anywhere; }
+      .contentFileDetails .metaInfo .item + .item {
+        margin-top: 8px; }
+
+.editTextFile {
+  display: flex;
+  width: 100%;
+  height: 100%; }
+  .editTextFile .editor {
+    flex: 1 1 50%;
+    overflow: hidden; }
+    .editTextFile .editor * {
+      width: 100%;
+      height: 100%;
+      margin: 0; }
+    .editTextFile .editor textarea {
+      padding: 32px;
+      font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", Inconsolata, "Courier New", monospace; }
+  .editTextFile .preview {
+    flex: 1 1 50%;
+    max-width: 50%;
+    overflow: auto;
+    padding: 32px;
+    border-left: 1px solid; }
+    html .editTextFile .preview {
+      border-color: #eee; }
+    .dark .editTextFile .preview {
+      border-color: #494949; }
+    @media (prefers-color-scheme: dark) {
+      html .editTextFile .preview {
+        border-color: #494949; }
+      .light .editTextFile .preview {
+        border-color: #eee; } }
 
 .articleContent blockquote {
   border-left: 4px solid;
@@ -386,7 +430,7 @@ html .sideBarItem.selected a:before {
       background: #eee; } }
 
 .articleContent pre, .articleContent code {
-  font-family: Consolas, Courier New, Courier, monospace;
+  font-family: Monaco, Menlo, Consolas, "Droid Sans Mono", Inconsolata, "Courier New", monospace;
   border: 1px solid;
   font-size: .9em; }
   html .articleContent pre, html .articleContent code {

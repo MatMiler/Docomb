@@ -1,4 +1,4 @@
-import { CommandBar, ContextualMenuItemType } from '@fluentui/react';
+import { CommandBar, ContextualMenuItemType, FontIcon } from '@fluentui/react';
 import React from 'react';
 import { Utils } from '../../Data/Utils';
 import { LayoutUtils } from '../../LayoutUtils';
@@ -18,6 +18,7 @@ const ContentDirectory = () => {
         },
         { key: "upload", text: "Upload", disabled: true, iconProps: { iconName: "Upload" } }
     ];
+    let isRoot = false;
     let directoryUrl = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
     if (!directoryUrl.startsWith("/"))
         directoryUrl = "/" + directoryUrl;
@@ -27,12 +28,18 @@ const ContentDirectory = () => {
         commandBarItems.push({ key: "rename", text: "Rename", disabled: true, iconProps: { iconName: "Rename" } });
         commandBarItems.push({ key: "delete", text: "Delete", disabled: true, iconProps: { iconName: "Delete" } });
     }
+    else {
+        isRoot = true;
+    }
     return (React.createElement("div", { className: "pageGrid" },
         React.createElement("div", { className: "pageTitle" },
             React.createElement(PageBreadcrumbs, null)),
         React.createElement("div", { className: "pageCommands" },
             React.createElement(CommandBar, { items: commandBarItems })),
-        React.createElement("div", { className: "pageContent" })));
+        React.createElement("div", { className: "pageContent" },
+            React.createElement("div", { className: "emptyPage" },
+                React.createElement("div", { className: "watermark" },
+                    React.createElement(FontIcon, { iconName: isRoot ? "ProjectCollection" : "OpenFolderHorizontal" }))))));
 };
 export default ContentDirectory;
 //# sourceMappingURL=ContentDirectory.js.map

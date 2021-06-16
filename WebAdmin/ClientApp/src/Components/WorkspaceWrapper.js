@@ -16,6 +16,7 @@ import { EventBus } from '../EventBus';
 import Home from './Workspace/Home';
 import ContentDirectory from './Workspace/ContentDirectory';
 import ContentFileInfo from './Workspace/ContentFileInfo';
+import EditTextFile from './Workspace/EditTextFile';
 export class WorkspaceWrapper extends Component {
     constructor(props) {
         super(props);
@@ -34,7 +35,9 @@ export class WorkspaceWrapper extends Component {
     componentDidUpdate(prevProps, prevState) {
         let prevLocation = Utils.TryGetString(prevProps, ["location", "pathname"]);
         let currentLocation = Utils.TryGetString(this.props, ["location", "pathname"]);
-        if (prevLocation != currentLocation) {
+        let prevSearch = Utils.TryGetString(prevProps, ["location", "search"]);
+        let currentSearch = Utils.TryGetString(this.props, ["location", "search"]);
+        if ((prevLocation != currentLocation) || (prevSearch != currentSearch)) {
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
             this.populateInfo();
         }
@@ -42,7 +45,7 @@ export class WorkspaceWrapper extends Component {
     onNav() {
     }
     render() {
-        var _a;
+        var _a, _b, _c;
         let content = null;
         if (this.state.loading == false) {
             if (Utils.TrimString((_a = this.state.pageInfo.contentItem) === null || _a === void 0 ? void 0 : _a.url, null) == null) {
@@ -52,7 +55,25 @@ export class WorkspaceWrapper extends Component {
                 content = React.createElement(ContentDirectory, null);
             }
             else {
-                content = React.createElement(ContentFileInfo, null);
+                if (this.state.pageInfo.action == Workspaces.ContentItemAction.Edit) {
+                    switch ((_c = (_b = this.state.pageInfo) === null || _b === void 0 ? void 0 : _b.details) === null || _c === void 0 ? void 0 : _c.type) {
+                        case Workspaces.FileType.Markdown:
+                        case Workspaces.FileType.Html:
+                        case Workspaces.FileType.PlainText:
+                            {
+                                content = React.createElement(EditTextFile, null);
+                                break;
+                            }
+                        default:
+                            {
+                                content = React.createElement(ContentFileInfo, null);
+                                break;
+                            }
+                    }
+                }
+                else {
+                    content = React.createElement(ContentFileInfo, null);
+                }
             }
         }
         return (React.createElement(Layout, { showMainNav: true }, content));
@@ -60,7 +81,7 @@ export class WorkspaceWrapper extends Component {
     populateInfo() {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let data = yield Workspaces.loadPageInfo(Utils.TryGet(this.props, ["match", "params", "itemPath"]));
+            let data = yield Workspaces.loadPageInfo(Utils.TryGetString(this.props, ["match", "params", "itemPath"]), Utils.TryGetString(this.props, ["location", "search"]));
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, (_a = data === null || data === void 0 ? void 0 : data.workspace) === null || _a === void 0 ? void 0 : _a.url);
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, data === null || data === void 0 ? void 0 : data.workspace);
             LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, data);

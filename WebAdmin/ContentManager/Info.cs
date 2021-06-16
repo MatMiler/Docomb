@@ -6,10 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Web;
 
-namespace Docomb.WebAdmin.Workspaces
+namespace Docomb.WebAdmin.ContentManager
 {
-	public static class ContentManager
+	public static class Info
 	{
 
 		public class WorkspaceSummary
@@ -67,6 +68,9 @@ namespace Docomb.WebAdmin.Workspaces
 			[JsonPropertyName("contentItem")]
 			public ContentItemSummary ContentItem { get; set; }
 
+			[JsonPropertyName("details")]
+			public FileDetails FileDetails { get; set; }
+
 			[JsonPropertyName("breadcrumbs")]
 			public List<ContentItemSummary> Breadcrumbs { get; set; }
 
@@ -74,12 +78,17 @@ namespace Docomb.WebAdmin.Workspaces
 			public ContentItemAction Action { get; set; }
 		}
 
-		public static WorkspacePageInfo GetWorkspacePageInfo(string url)
+		public static WorkspacePageInfo GetWorkspacePageInfo(string url, string query)
 		{
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
 			if ((workspace == null) || (remainingPath == null)) return null;
 			ContentItem item = workspace.Content.FindItem(remainingPath, MatchType.Physical);
+			System.Collections.Specialized.NameValueCollection queryParams = HttpUtility.ParseQueryString((query ?? "").TrimStart('?'));
+			ContentItemAction action = ContentItemAction.View;
+			ContentFile contentFile = item?.AsFile;
+			FileDetails details = (contentFile != null) ? new FileDetails(contentFile) : null;
 
+			#region Breadcrumbs / Parents
 			List<ContentItemSummary> breadcrumbs = new();
 			{
 				List<ContentStorage.ContentItemSummary> parents = workspace.Content.GetParents(remainingPath, MatchType.Physical, true);
@@ -94,12 +103,26 @@ namespace Docomb.WebAdmin.Workspaces
 					}
 				}
 			}
+			#endregion
+
+			#region Additional
+			{
+				if ((queryParams?.Get("action") ?? "").Trim().ToLower() == "edit")
+				{
+					switch (item?.AsFile?.FileType)
+					{
+						case FileType.Markdown: case FileType.Html: case FileType.PlainText: { action = ContentItemAction.Edit; break; }
+					}
+				}
+			}
+			#endregion
 
 			return new()
 			{
 				Workspace = new(workspace),
 				ContentItem = (item != null) ? new(item) : null,
-				Action = ContentItemAction.View,
+				FileDetails = details,
+				Action = action,
 				Breadcrumbs = breadcrumbs
 			};
 		}

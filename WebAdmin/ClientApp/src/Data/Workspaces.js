@@ -29,21 +29,18 @@ export var Workspaces;
         });
     }
     Workspaces.loadWorkspaceList = loadWorkspaceList;
-    function loadPageInfo(url) {
+    function loadPageInfo(url, query) {
         return __awaiter(this, void 0, void 0, function* () {
-            let data = yield Apis.fetchJsonAsync("api/general/workspacePageInfo?url=" + encodeURI(url), false);
+            let data = yield Apis.fetchJsonAsync("api/general/workspacePageInfo?url=" + encodeURI(url) + "&query=" + encodeURI(query), false);
             let item = new WorkspacePageInfo(data);
             return ((item != null) && (item.isValid())) ? item : null;
         });
     }
     Workspaces.loadPageInfo = loadPageInfo;
-    function loadFileDetails(url) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let data = yield Apis.fetchJsonAsync("api/content/fileDetails?url=" + encodeURI(url), false);
-            return FileDetails.create(data);
-        });
-    }
-    Workspaces.loadFileDetails = loadFileDetails;
+    //export async function loadFileDetails(url: string): Promise<FileDetails> {
+    //	let data: any = await Apis.fetchJsonAsync("api/content/fileDetails?url=" + encodeURI(url), false);
+    //	return FileDetails.create(data);
+    //}
     function loadTree(workspaceUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             let list = [];
@@ -140,6 +137,7 @@ export var Workspaces;
         constructor(source) {
             this.workspace = Workspace.create(Utils.TryGet(source, "workspace"));
             this.contentItem = ContentItem.create(Utils.TryGet(source, "contentItem"));
+            this.details = FileDetails.create(Utils.TryGet(source, "details"));
             this.breadcrumbs = Utils.MapArray(Utils.TryGet(source, "breadcrumbs"), x => ContentItem.create(x));
             this.action = Utils.TryGetEnum(source, "action", ContentItemAction, ContentItemAction.View);
         }

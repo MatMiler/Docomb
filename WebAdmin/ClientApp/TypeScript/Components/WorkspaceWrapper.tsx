@@ -7,6 +7,7 @@ import { EventBus } from '../EventBus';
 import Home from './Workspace/Home';
 import ContentDirectory from './Workspace/ContentDirectory';
 import ContentFileInfo from './Workspace/ContentFileInfo';
+import EditTextFile from './Workspace/EditTextFile';
 
 
 
@@ -35,7 +36,9 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 	componentDidUpdate(prevProps: any, prevState: any) {
 		let prevLocation = Utils.TryGetString(prevProps, ["location", "pathname"]);
 		let currentLocation = Utils.TryGetString(this.props, ["location", "pathname"]);
-		if (prevLocation != currentLocation) {
+		let prevSearch = Utils.TryGetString(prevProps, ["location", "search"]);
+		let currentSearch = Utils.TryGetString(this.props, ["location", "search"]);
+		if ((prevLocation != currentLocation) || (prevSearch != currentSearch)) {
 			LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
 			this.populateInfo();
 		}
@@ -54,7 +57,26 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 			} else if (this.state.pageInfo.contentItem.type == Workspaces.ContentItemType.Directory) {
 				content = <ContentDirectory />;
 			} else {
-				content = <ContentFileInfo />;
+				if (this.state.pageInfo.action == Workspaces.ContentItemAction.Edit) {
+					switch (this.state.pageInfo?.details?.type) {
+						case Workspaces.FileType.Markdown:
+						case Workspaces.FileType.Html:
+						case Workspaces.FileType.PlainText:
+							{
+								content = <EditTextFile />;
+								break;
+							}
+						default:
+							{
+								content = <ContentFileInfo />;
+								break;
+							}
+					}
+				}
+				else {
+					content = <ContentFileInfo />;
+				}
+
 			}
 		}
 
@@ -66,7 +88,7 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 	}
 
 	async populateInfo() {
-		let data: Workspaces.WorkspacePageInfo = await Workspaces.loadPageInfo(Utils.TryGet(this.props, ["match", "params", "itemPath"]));
+		let data: Workspaces.WorkspacePageInfo = await Workspaces.loadPageInfo(Utils.TryGetString(this.props, ["match", "params", "itemPath"]), Utils.TryGetString(this.props, ["location", "search"]));
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, data?.workspace?.url);
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, data?.workspace);
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, data);
@@ -75,4 +97,6 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 	}
 
 }
+
+
 

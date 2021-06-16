@@ -1,5 +1,6 @@
-﻿import { FontIcon, Spinner, SpinnerSize } from '@fluentui/react';
-import React, { FC, ReactElement, useEffect, useState } from 'react';
+﻿import { CommandBar, FontIcon, ICommandBarItemProps } from '@fluentui/react';
+import React, { FC, ReactElement } from 'react';
+import { useHistory } from "react-router-dom";
 import { Utils } from '../../Data/Utils';
 import { Workspaces } from '../../Data/Workspaces';
 import { LayoutUtils } from '../../LayoutUtils';
@@ -8,27 +9,17 @@ import $ from 'jquery';
 
 
 const ContentFileInfo: FC<{}> = (): ReactElement => {
-	const [loadedUrl, setLoadedUrl] = useState(null);
+	const history = useHistory();
+	function navigate(url: string) { history.push(url); }
 
-	function onDataChange() {
-		if (loadedUrl != ContentFileInfoController.fileDetails?.reactLocalUrl)
-			setLoadedUrl(ContentFileInfoController.fileDetails?.reactLocalUrl);
-	}
-
-	useEffect(() => {
-		ContentFileInfoController.callbackOnData = onDataChange;
-		ContentFileInfoController.loadData();
-		return () => { ContentFileInfoController.callbackOnData = null; };
-	});
+	ContentFileInfoController.prepData(navigate);
 
 	return (
 		<div className="pageGrid">
 			<div className="pageTitle"><PageBreadcrumbs /></div>
 			{ContentFileInfoController.getToolbar()}
-			{/*<div className="pageCommands">command bar</div>*/}
 			<div className="pageContent">
 				{ContentFileInfoController.getContentPanel()}
-				{/*Content file; is loaded: {loadedUrl}; {ContentFileInfoController.fileDetails?.title}*/}
 			</div>
 		</div>
 	);
@@ -40,49 +31,56 @@ export default ContentFileInfo;
 
 
 module ContentFileInfoController {
-	export let callbackOnData: () => void = null;
 
-	let pageInfo: Workspaces.WorkspacePageInfo = null;
+	export let pageInfo: Workspaces.WorkspacePageInfo = null;
 	export let fileDetails: Workspaces.FileDetails = null;
-	export let isLoaded: boolean = false;
+	export let navigateCallback: (url: string) => void = null;
 
-	export async function loadData(): Promise<void> {
-		let callback = callbackOnData;
+	export function prepData(navigateCallback: (url: string) => void): void {
 		let newPageInfo: Workspaces.WorkspacePageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
-		if (newPageInfo?.contentItem?.reactLocalUrl != pageInfo?.contentItem?.reactLocalUrl) {
-			isLoaded = false;
-		} else if (isLoaded) {
-			return;
-		}
-
 		pageInfo = newPageInfo;
-		fileDetails = await Workspaces.loadFileDetails(pageInfo.contentItem.reactLocalUrl);
-
-		isLoaded = true;
-
-		if (callback != null) callback();
-	}
-
-	function isReady(): boolean {
-		return (isLoaded) && (Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "reactLocalUrl"]) == pageInfo?.contentItem?.reactLocalUrl);
+		fileDetails = pageInfo?.details;
+		ContentFileInfoController.navigateCallback = navigateCallback;
 	}
 
 	export function getToolbar(): JSX.Element {
-		if (!isReady())
-			return null;
-		return null;
+		let commandBarItems: ICommandBarItemProps[] = [];
+		let hasRaw: boolean = false;
+
+		switch (fileDetails?.type) {
+			case Workspaces.FileType.Markdown: // { commandBarItems.push({ key: "editMarkdown", text: "Edit", onClick: gotoEditor, iconProps: { iconName: "Edit" } }); hasRaw = true; break; }
+			case Workspaces.FileType.Html: // { commandBarItems.push({ key: "editHtml", text: "Edit", onClick: gotoEditor, iconProps: { iconName: "Edit" } }); hasRaw = true; break; }
+			case Workspaces.FileType.PlainText: // { commandBarItems.push({ key: "editPlainText", text: "Edit", onClick: gotoEditor, iconProps: { iconName: "Edit" } }); hasRaw = true; break; }
+				{
+					commandBarItems.push({ key: "editPlainText", text: "Edit", onClick: gotoEditor, iconProps: { iconName: "Edit" } });
+					hasRaw = true;
+					break;
+				}
+		}
+
+		commandBarItems.push({ key: "rename", text: "Rename", disabled: true, iconProps: { iconName: "Rename" } });
+		commandBarItems.push({ key: "delete", text: "Delete", disabled: true, iconProps: { iconName: "Delete" } });
+
+		let farItems: ICommandBarItemProps[] = [
+			{ key: "toggleInfo", text: "Toggle file information", iconOnly: true, ariaLabel: "Toggle file information", iconProps: { iconName: "Info" }, onClick: toggleMetaDataPanel }
+		];
+
+		return (<div className="pageCommands"><CommandBar items={commandBarItems} farItems={farItems} /></div>);
+
+	}
+
+	function gotoEditor(): void {
+		if (navigateCallback != null)
+			navigateCallback("/workspace" + fileDetails?.reactLocalUrl + "?action=edit");
 	}
 
 	export function getContentPanel(): JSX.Element {
-		if (!isReady())
-			return (<div className="loadingSpinner"><Spinner label="Loading..." labelPosition="right" size={SpinnerSize.large} /></div>);
-
 
 		switch (fileDetails?.type) {
-			case Workspaces.FileType.Markdown: case Workspaces.FileType.Html: {
+			case Workspaces.FileType.Markdown: {
 				return (
 					<div className="contentFileDetails">
-						<div className="articleContent" dangerouslySetInnerHTML={{ __html: fixLocalLinksInHtml(fileDetails.contentHtml) }} />
+						<div className="articleContent" dangerouslySetInnerHTML={{ __html: LayoutUtils.fixLocalLinksInHtml(fileDetails.contentHtml, pageInfo?.workspace, pageInfo?.contentItem) }} />
 						{getFileMetaDataPanel()}
 					</div>
 				);
@@ -95,17 +93,21 @@ module ContentFileInfoController {
 					</div>
 				);
 			}
-			default: {
-				return (
-					<div className="contentFileDetails">
-						<div className="articleContent">Preview is not supported for this file type</div>
-						{getFileMetaDataPanel()}
-					</div>
-				);
-			}
 		}
 
-		return null;
+		return (
+			<div className="contentFileDetails">
+				<div className="articleContent">Preview is not supported for this file type</div>
+				{getFileMetaDataPanel()}
+			</div>
+		);
+	}
+
+
+	function toggleMetaDataPanel(): void {
+		let show = !Utils.TryGetBool(window, "showFileMetaDataPanel", true);
+		window["showFileMetaDataPanel"] = show;
+		$(".metaInfo").toggle(show);
 	}
 
 
@@ -117,52 +119,18 @@ module ContentFileInfoController {
 		if (Utils.TrimString(fileDetails.url, null) != null) items.push(<div className="item" key="metaUrl"><b>File:</b> <span className="value">{fileDetails.url}</span></div>);
 		if (Utils.TrimString(fileDetails.fileSizeDesc, null) != null) items.push(<div className="item" key="metaSize"><b>File size:</b> <span className="value">{fileDetails.fileSizeDesc}</span></div>);
 
+		let panelStyle: React.CSSProperties = {};
+		if (!Utils.TryGetBool(window, "showFileMetaDataPanel", true)) panelStyle.display = "none";
 
 		if (items.length > 0)
 			return (
-				<div className="metaInfo">
+				<div className="metaInfo" style={panelStyle}>
 					<h2><FontIcon iconName="Info" /> Information</h2>
 					{items}
 				</div>
 				);
 
 		return null;
-	}
-
-
-
-	export function fixLocalLinksInHtml(html: string): string {
-		try {
-			let container: JQuery<HTMLElement> = $("<div />").html(html);
-			let readerBasePath: string = Utils.TryGetString(window, "readerBasePath");
-			if (!readerBasePath.endsWith("/")) readerBasePath += "/";
-			readerBasePath += pageInfo?.workspace?.url;
-			if (!readerBasePath.endsWith("/")) readerBasePath += "/";
-			container.find("a").each((index: number, element: HTMLAnchorElement) => {
-				let a = $(element);
-				a.attr("target", "_blank");
-				let href = a.attr("href");
-				if (Utils.TrimString(href, null) != null) {
-					let slashPos = href.indexOf("/");
-					if (slashPos == 0) return;
-					let hashPos = href.indexOf("#");
-					let doubleSlashPos = href.indexOf("//");
-					let paramPos = href.indexOf("?");
-					if (hashPos < 0) hashPos = href.length;
-					if (doubleSlashPos < 0) doubleSlashPos = href.length;
-					if (paramPos < 0) paramPos = href.length;
-					if ((doubleSlashPos >= hashPos) && (doubleSlashPos >= paramPos)) {
-						href = readerBasePath + href;
-						a.attr("href", href);
-					}
-				}
-			});
-			html = container.html();
-		}
-		catch (e) {}
-
-
-		return html;
 	}
 
 

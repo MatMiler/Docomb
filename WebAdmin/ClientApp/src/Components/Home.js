@@ -12,7 +12,7 @@ export class Home extends Component {
         return (React.createElement(Layout, { showMainNav: false },
             React.createElement("div", { className: "adminHome emptyPage" },
                 React.createElement("div", { className: "watermark" },
-                    React.createElement(FontIcon, { iconName: "Documentation" })))));
+                    React.createElement(FontIcon, { iconName: "Library" })))));
     }
 }
 //# sourceMappingURL=Home.js.map

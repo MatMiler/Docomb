@@ -119,6 +119,14 @@ namespace Docomb.ContentStorage
 		private Dictionary<string, Dictionary<string, ContentItemSummary>> _itemSummariesByParentPath = new();
 		private Dictionary<string, List<ContentItemSummary>> _physicalItemSummariesByParentPath = new();
 
+		public void ClearCache()
+		{
+			_itemPhysicalSummaryByPath = new();
+			_itemLogicalSummaryByPath = new();
+			_itemSummariesByParentPath = new();
+			_physicalItemSummariesByParentPath = new();
+		}
+
 		public ContentItemSummary GetItemSummary(List<string> pathParts, MatchType matchType)
 		{
 			string path = (pathParts?.Count > 0) ? string.Join('/', pathParts) : "";
