@@ -1,4 +1,5 @@
-﻿using Docomb.WebAdmin.ContentManager;
+﻿using Docomb.CommonCore;
+using Docomb.WebAdmin.ContentManager;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -17,15 +18,30 @@ namespace Docomb.WebAdmin.Controllers.ApiControllers
 
 
 		[HttpPost("saveTextFile")]
-		public bool SaveTextFile(SaveRequest request) => ContentManager.Edit.Save(request);
+		public ActionStatus SaveTextFile(SaveRequest request)
+		{
+			ActionStatus status = ContentManager.Edit.Save(request) ?? new ActionStatus(ActionStatus.StatusCode.Error);
+			Response.StatusCode = status.GetHttpStatusCode();
+			return status;
+		}
 
 
 		[HttpPost("renameFile")]
-		public MoveResponse RenameFile([FromBody] MoveRequest request) => ContentManager.Edit.RenameFile(request);
+		public MoveResponse RenameFile([FromBody] MoveRequest request)
+		{
+			MoveResponse response = ContentManager.Edit.RenameFile(request);
+			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
+			return response;
+		}
 
 
 		[HttpPost("renameDirectory")]
-		public MoveResponse RenameDirectory([FromBody] MoveRequest request) => ContentManager.Edit.RenameDirectory(request);
+		public MoveResponse RenameDirectory([FromBody] MoveRequest request)
+		{
+			MoveResponse response = ContentManager.Edit.RenameDirectory(request);
+			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
+			return response;
+		}
 
 	}
 }

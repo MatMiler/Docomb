@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Docomb.CommonCore;
 
 namespace Docomb.ContentStorage
 {
@@ -140,17 +141,23 @@ namespace Docomb.ContentStorage
 		}
 
 
-		public bool Rename(string newName)
+		public ActionStatus Rename(string newName)
 		{
 			try
 			{
+				if (string.IsNullOrWhiteSpace(newName)) return new(ActionStatus.StatusCode.InvalidRequestData, "File name cannot be empty.");
+				if (Path.GetInvalidFileNameChars().Any(newName.Contains)) return new(ActionStatus.StatusCode.InvalidRequestData, $"New name '{newName}' contains invalid characters.");
 				string newPath = Path.Combine(Path.GetDirectoryName(FilePath), newName);
+				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"File '{newName}' already exists.");
+				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"Folder '{newName}' already exists.");
 				File.Move(FilePath, newPath);
 				Workspace.Content.ClearCache();
-				return true;
+				return new(ActionStatus.StatusCode.OK);
 			}
-			catch { }
-			return false;
+			catch (Exception e)
+			{
+				return new(ActionStatus.StatusCode.Error, exception: e);
+			}
 		}
 
 		#endregion

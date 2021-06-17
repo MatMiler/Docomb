@@ -1,5 +1,5 @@
-﻿import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, IDialogContentProps, IDialogProps, IModalProps, PrimaryButton, Spinner, SpinnerSize, TextField } from '@fluentui/react';
-import React, { FC, ReactElement } from 'react';
+﻿import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, IDialogContentProps, IDialogProps, IModalProps, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
+import React, { FC, ReactElement, useState } from 'react';
 import { useHistory } from "react-router-dom";
 import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
 import { Utils } from '../../Data/Utils';
@@ -15,11 +15,15 @@ const ContentFileInfo: FC<{}> = (): ReactElement => {
 	function navigate(url: string) { history.push(url); }
 
 	const [waitingIsVisible, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }] = useBoolean(false);
+	const [alertIsVisible, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert }] = useBoolean(false);
+	const [alertTitle, setAlertTitle] = useState("");
+	const [alertContent, setAlertContent] = useState("");
 	const [renameIsVisible, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }] = useBoolean(false);
 	const [moveIsVisible, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove }] = useBoolean(false);
 
 	ContentFileInfoController.prepData(navigate,
 		{ toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting },
+		{ toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent },
 		{ toggle: toggleRename, setTrue: showRename, setFalse: hideRename },
 		{ toggle: toggleMove, setTrue: showMove, setFalse: hideMove });
 
@@ -35,6 +39,13 @@ const ContentFileInfo: FC<{}> = (): ReactElement => {
 			</div>
 			<Dialog hidden={!waitingIsVisible} dialogContentProps={{ type: DialogType.normal, title: null, showCloseButton: false }} modalProps={{ isBlocking: true }} >
 				<DialogFooter><Spinner label="Please wait..." labelPosition="right" size={SpinnerSize.large} /></DialogFooter>
+			</Dialog>
+			<Dialog hidden={!alertIsVisible} dialogContentProps={{ type: DialogType.largeHeader, title: alertTitle }} modalProps={{ isBlocking: false }} onDismiss={hideAlert} >
+				<Stack horizontal verticalAlign="center">
+					<FontIcon iconName="Warning" className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
+					<div>{alertContent}</div>
+				</Stack>
+				<DialogFooter><PrimaryButton onClick={hideAlert} text="OK" /></DialogFooter>
 			</Dialog>
 			<Dialog
 				hidden={!renameIsVisible}
@@ -61,9 +72,15 @@ module ContentFileInfoController {
 
 	export let pageInfo: Workspaces.WorkspacePageInfo = null;
 	export let fileDetails: Workspaces.FileDetails = null;
-	let navigateCallback: (url: string) => void = null;
 
+	export interface IAlertDialogOptions extends IUseBooleanCallbacks {
+		setTitle: React.Dispatch<React.SetStateAction<string>>,
+		setContent: React.Dispatch<React.SetStateAction<string>>
+	}
+
+	let navigateCallback: (url: string) => void = null;
 	let waitingDialogCallbacks: IUseBooleanCallbacks = null;
+	let alertDialogCallbacks: IAlertDialogOptions = null;
 	let renameDialogCallbacks: IUseBooleanCallbacks = null;
 	let moveDialogCallbacks: IUseBooleanCallbacks = null;
 
@@ -71,6 +88,7 @@ module ContentFileInfoController {
 	export function prepData(
 		navigate: (url: string) => void,
 		waitingDialog: IUseBooleanCallbacks,
+		alertDialog: IAlertDialogOptions,
 		renameDialog: IUseBooleanCallbacks,
 		moveDialog: IUseBooleanCallbacks
 	): void {
@@ -81,6 +99,7 @@ module ContentFileInfoController {
 		// UI & React callbacks
 		navigateCallback = navigate;
 		waitingDialogCallbacks = waitingDialog;
+		alertDialogCallbacks = alertDialog;
 		renameDialogCallbacks = renameDialog;
 		moveDialogCallbacks = moveDialog;
 	}
@@ -188,14 +207,20 @@ module ContentFileInfoController {
 			renameDialogCallbacks.setFalse();
 			waitingDialogCallbacks.setTrue();
 			let response: Workspaces.RenameResponse = await Workspaces.renameFile(fileDetails?.reactLocalUrl, fileName);
-			if (response?.success == true) {
+			waitingDialogCallbacks.setFalse();
+			if (response?.actionStatus?.isOk == true) {
 				let newUrl: string = Utils.trimString(response?.newUrl, "");
 				if (!newUrl.startsWith("/")) newUrl = "/" + newUrl;
 				Workspaces.clearTreeCache();
 				EventBus.dispatch("fileStructChanged");
 				navigateCallback("/workspace" + newUrl);
+			} else {
+				let title = "Can't rename file";
+				let desc = response.actionStatus.getDialogMessage();
+				alertDialogCallbacks.setTrue();
+				alertDialogCallbacks.setTitle(title);
+				alertDialogCallbacks.setContent(desc);
 			}
-			waitingDialogCallbacks.setFalse();
 		}
 
 		export function cancel(): void {
@@ -217,6 +242,7 @@ module ContentFileInfoController {
 			moveDialogCallbacks.setFalse();
 		}
 	}
+
 
 }
 

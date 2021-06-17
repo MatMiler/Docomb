@@ -214,12 +214,13 @@ export module Workspaces {
 
 
 	export class RenameResponse {
-		public success: boolean;
+		//public success: boolean;
+		public actionStatus: Apis.ActionStatus;
 		public oldUrl: string;
 		public newUrl: string;
 
 		public constructor(source: any) {
-			this.success = Utils.tryGetBool(source, "success");
+			this.actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
 			this.oldUrl = Utils.tryGetString(source, "oldUrl");
 			this.newUrl = Utils.tryGetString(source, "newUrl");
 		}

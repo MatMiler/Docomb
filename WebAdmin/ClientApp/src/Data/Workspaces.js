@@ -186,7 +186,7 @@ export var Workspaces;
     Workspaces.FileDetails = FileDetails;
     class RenameResponse {
         constructor(source) {
-            this.success = Utils.tryGetBool(source, "success");
+            this.actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
             this.oldUrl = Utils.tryGetString(source, "oldUrl");
             this.newUrl = Utils.tryGetString(source, "newUrl");
         }

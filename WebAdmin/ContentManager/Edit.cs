@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Docomb.CommonCore;
 
 namespace Docomb.WebAdmin.ContentManager
 {
@@ -23,11 +24,11 @@ namespace Docomb.WebAdmin.ContentManager
 		}
 
 
-		public static bool Save(SaveRequest request)
+		public static ActionStatus Save(SaveRequest request)
 		{
-			if (request == null) return false;
+			if (request == null) return new ActionStatus(ActionStatus.StatusCode.MissingRequestData);
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request.Url);
-			if ((workspace == null) || (remainingPath == null)) return false;
+			if ((workspace == null) || (remainingPath == null)) return new ActionStatus(ActionStatus.StatusCode.NotFound);
 			ContentItem item = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical);
 			ContentFile contentFile = item?.AsFile;
 
@@ -35,10 +36,17 @@ namespace Docomb.WebAdmin.ContentManager
 
 			if (contentFile != null)
 			{
-				success = contentFile.SaveTextFile(request.TextContent);
+				try
+				{
+					success = contentFile.SaveTextFile(request.TextContent);
+				}
+				catch (Exception e)
+				{
+					return new ActionStatus(ActionStatus.StatusCode.Error, exception: e);
+				}
 			}
 
-			return success;
+			return new ActionStatus(success ? ActionStatus.StatusCode.OK : ActionStatus.StatusCode.Error);
 		}
 
 
@@ -60,8 +68,11 @@ namespace Docomb.WebAdmin.ContentManager
 
 		public class MoveResponse
 		{
-			[JsonPropertyName("success")]
-			public bool Success { get; set; }
+			[JsonPropertyName("actionStatus")]
+			public ActionStatus ActionStatus { get; set; }
+
+			//[JsonPropertyName("success")]
+			//public bool Success { get; set; }
 
 			[JsonPropertyName("oldUrl")]
 			public string OldUrl { get; set; }
@@ -75,15 +86,15 @@ namespace Docomb.WebAdmin.ContentManager
 		public static MoveResponse RenameFile(string url, string newName)
 		{
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
-			if ((workspace == null) || (remainingPath == null)) return new() { Success = false };
+			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 			ContentItem item = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical);
 			ContentFile contentFile = item?.AsFile;
-			if (contentFile == null) return new() { Success = false };
+			if (contentFile == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 
-			bool success = contentFile.Rename(newName);
+			ActionStatus status = contentFile.Rename(newName) ?? new(ActionStatus.StatusCode.Error);
 			string newUrl = null;
 
-			if (success)
+			if (status.IsOk == true)
 			{
 				try
 				{
@@ -94,7 +105,7 @@ namespace Docomb.WebAdmin.ContentManager
 				catch { }
 			}
 
-			return new() { OldUrl = url, NewUrl = newUrl, Success = success };
+			return new() { ActionStatus = status, OldUrl = url, NewUrl = newUrl };
 		}
 
 
@@ -103,15 +114,15 @@ namespace Docomb.WebAdmin.ContentManager
 		public static MoveResponse RenameDirectory(string url, string newName)
 		{
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
-			if ((workspace == null) || (remainingPath == null)) return new() { Success = false };
+			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 			ContentItem item = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical);
 			ContentDirectory contentDirectory = item?.AsDirectory;
-			if (contentDirectory == null) return new() { Success = false };
+			if (contentDirectory == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 
-			bool success = contentDirectory.Rename(newName);
+			ActionStatus status = contentDirectory.Rename(newName) ?? new(ActionStatus.StatusCode.Error);
 			string newUrl = null;
 
-			if (success)
+			if (status.IsOk == true)
 			{
 				try
 				{
@@ -122,7 +133,7 @@ namespace Docomb.WebAdmin.ContentManager
 				catch { }
 			}
 
-			return new() { OldUrl = url, NewUrl = newUrl, Success = success };
+			return new() { ActionStatus = status, OldUrl = url, NewUrl = newUrl };
 		}
 
 
