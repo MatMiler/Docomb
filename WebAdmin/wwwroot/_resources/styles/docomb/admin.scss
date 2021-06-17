@@ -131,7 +131,7 @@ html { @include lightPreset; }
 
 
 .emptyPage { position: relative; width: 100%; height: 100%; overflow: hidden;
-	.watermark { position: absolute; left: 50%; top: 50%; font-size: 20vmin; margin: -10vmin; opacity: .1;
+	.watermark { position: absolute; left: 50%; top: 50%; font-size: 20vmin; margin: -10vmin; opacity: .1; user-select: none;
 		i { width: 1em; height: 1em; margin: 0; padding: 0; }
 	}
 }

@@ -1,6 +1,7 @@
-import { CommandBar, TextField } from "@fluentui/react";
+import { CommandBar, Dialog, DialogFooter, DialogType, Spinner, SpinnerSize, TextField } from "@fluentui/react";
 import React from "react";
 import { useHistory } from "react-router-dom";
+import { useBoolean } from '@fluentui/react-hooks';
 import { Utils } from "../../Data/Utils";
 import { Workspaces } from "../../Data/Workspaces";
 import { LayoutUtils } from "../../LayoutUtils";
@@ -9,12 +10,17 @@ import $ from 'jquery';
 const EditTextFile = () => {
     const history = useHistory();
     function navigate(url) { history.push(url); }
-    EditTextFileController.prepData(navigate);
-    return (React.createElement("div", { className: "pageGrid" },
-        React.createElement("div", { className: "pageTitle" },
-            React.createElement(PageBreadcrumbs, null)),
-        EditTextFileController.getToolbar(),
-        React.createElement("div", { className: "pageContent" }, EditTextFileController.getContentPanel())));
+    const [waitingIsVisible, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }] = useBoolean(false);
+    EditTextFileController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting });
+    return (React.createElement(React.Fragment, null,
+        React.createElement("div", { className: "pageGrid" },
+            React.createElement("div", { className: "pageTitle" },
+                React.createElement(PageBreadcrumbs, null)),
+            EditTextFileController.getToolbar(),
+            React.createElement("div", { className: "pageContent" }, EditTextFileController.getContentPanel())),
+        React.createElement(Dialog, { hidden: !waitingIsVisible, dialogContentProps: { type: DialogType.normal, title: null, showCloseButton: false }, modalProps: { isBlocking: true } },
+            React.createElement(DialogFooter, null,
+                React.createElement(Spinner, { label: "Please wait...", labelPosition: "right", size: SpinnerSize.large })))));
 };
 export default EditTextFile;
 var EditTextFileController;
@@ -23,12 +29,14 @@ var EditTextFileController;
     EditTextFileController.fileDetails = null;
     EditTextFileController.navigateCallback = null;
     let content = null;
-    function prepData(navigateCallback) {
+    let waitingDialogCallbacks = null;
+    function prepData(navigate, waitingDialog) {
         let newPageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
         EditTextFileController.pageInfo = newPageInfo;
         EditTextFileController.fileDetails = EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.details;
         content = EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText;
-        EditTextFileController.navigateCallback = navigateCallback;
+        EditTextFileController.navigateCallback = navigate;
+        waitingDialogCallbacks = waitingDialog;
     }
     EditTextFileController.prepData = prepData;
     function getToolbar() {
@@ -61,18 +69,22 @@ var EditTextFileController;
             EditTextFileController.navigateCallback("/workspace" + (EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.reactLocalUrl));
     }
     function save() {
+        waitingDialogCallbacks.setTrue();
+        let c = Utils.parseString($("#editorInput").val(), content);
         $.ajax({
             url: "api/content/saveTextFile",
             type: "POST",
-            data: { url: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.reactLocalUrl, textContent: content },
+            data: { url: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.reactLocalUrl, textContent: c },
             success: onSaveSuccess,
             error: onSaveError
         });
     }
     function onSaveSuccess(response) {
         gotoInfo();
+        waitingDialogCallbacks.setFalse();
     }
     function onSaveError() {
+        waitingDialogCallbacks.setFalse();
     }
     function getContentPanel() {
         let previewStyle = {};
@@ -82,13 +94,13 @@ var EditTextFileController;
             case Workspaces.FileType.Markdown: {
                 return (React.createElement("div", { className: "editTextFile" },
                     React.createElement("div", { className: "editor" },
-                        React.createElement(TextField, { defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, borderless: true, onChange: onEditorChange }))));
+                        React.createElement(TextField, { id: "editorInput", defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, borderless: true, onChange: onEditorChange }))));
             }
             case Workspaces.FileType.Html:
             case Workspaces.FileType.PlainText: {
                 return (React.createElement("div", { className: "editTextFile" },
                     React.createElement("div", { className: "editor" },
-                        React.createElement(TextField, { defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, borderless: true, onChange: onEditorChange }))));
+                        React.createElement(TextField, { id: "editorInput", defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, borderless: true, onChange: onEditorChange }))));
             }
         }
         return (React.createElement("div", { className: "editTextFile" },

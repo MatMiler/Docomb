@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, FontIcon, PrimaryButton, TextField } from '@fluentui/react';
+import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, FontIcon, PrimaryButton, Spinner, SpinnerSize, TextField } from '@fluentui/react';
 import React from 'react';
 import { useHistory } from "react-router-dom";
 import { useBoolean } from '@fluentui/react-hooks';
@@ -21,21 +21,20 @@ const ContentFileInfo = () => {
     var _a;
     const history = useHistory();
     function navigate(url) { history.push(url); }
-    const [showRenameDialog, { toggle: toggleRenameDialog }] = useBoolean(false);
-    const [showMoveDialog, { toggle: toggleMoveDialog }] = useBoolean(false);
-    ContentFileInfoController.prepData(navigate, toggleRenameDialog, toggleMoveDialog);
-    let renameDialogContent = {
-        type: DialogType.largeHeader,
-        title: "Rename file"
-    };
-    let renameDialogModal = { isBlocking: false };
+    const [waitingIsVisible, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }] = useBoolean(false);
+    const [renameIsVisible, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }] = useBoolean(false);
+    const [moveIsVisible, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove }] = useBoolean(false);
+    ContentFileInfoController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove });
     return (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "pageGrid" },
             React.createElement("div", { className: "pageTitle" },
                 React.createElement(PageBreadcrumbs, null)),
             ContentFileInfoController.getToolbar(),
             React.createElement("div", { className: "pageContent" }, ContentFileInfoController.getContentPanel())),
-        React.createElement(Dialog, { hidden: !showRenameDialog, onDismiss: toggleRenameDialog, dialogContentProps: renameDialogContent, modalProps: renameDialogModal },
+        React.createElement(Dialog, { hidden: !waitingIsVisible, dialogContentProps: { type: DialogType.normal, title: null, showCloseButton: false }, modalProps: { isBlocking: true } },
+            React.createElement(DialogFooter, null,
+                React.createElement(Spinner, { label: "Please wait...", labelPosition: "right", size: SpinnerSize.large }))),
+        React.createElement(Dialog, { hidden: !renameIsVisible, onDismiss: hideRename, dialogContentProps: { type: DialogType.largeHeader, title: "Rename file" }, modalProps: { isBlocking: false } },
             React.createElement(TextField, { label: "New file name", id: "renameInput", defaultValue: (_a = ContentFileInfoController === null || ContentFileInfoController === void 0 ? void 0 : ContentFileInfoController.fileDetails) === null || _a === void 0 ? void 0 : _a.fileName }),
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: ContentFileInfoController.Rename.finish, text: "Rename" }),
@@ -47,15 +46,18 @@ var ContentFileInfoController;
     ContentFileInfoController.pageInfo = null;
     ContentFileInfoController.fileDetails = null;
     let navigateCallback = null;
-    let toggleRenameDialogCallback = null;
-    let toggleMoveDialogCallback = null;
-    function prepData(navigate, toggleRenameDialog, toggleMoveDialog) {
+    let waitingDialogCallbacks = null;
+    let renameDialogCallbacks = null;
+    let moveDialogCallbacks = null;
+    function prepData(navigate, waitingDialog, renameDialog, moveDialog) {
         let newPageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
         ContentFileInfoController.pageInfo = newPageInfo;
         ContentFileInfoController.fileDetails = ContentFileInfoController.pageInfo === null || ContentFileInfoController.pageInfo === void 0 ? void 0 : ContentFileInfoController.pageInfo.details;
+        // UI & React callbacks
         navigateCallback = navigate;
-        toggleRenameDialogCallback = toggleRenameDialog;
-        toggleMoveDialogCallback = toggleMoveDialog;
+        waitingDialogCallbacks = waitingDialog;
+        renameDialogCallbacks = renameDialog;
+        moveDialogCallbacks = moveDialog;
     }
     ContentFileInfoController.prepData = prepData;
     function getToolbar() {
@@ -143,13 +145,14 @@ var ContentFileInfoController;
     let Rename;
     (function (Rename) {
         function show() {
-            toggleRenameDialogCallback();
+            renameDialogCallbacks.setTrue();
         }
         Rename.show = show;
         function finish() {
             return __awaiter(this, void 0, void 0, function* () {
                 let fileName = Utils.trimString($("#renameInput", "").val());
-                toggleRenameDialogCallback();
+                renameDialogCallbacks.setFalse();
+                waitingDialogCallbacks.setTrue();
                 let response = yield Workspaces.renameFile(ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.reactLocalUrl, fileName);
                 if ((response === null || response === void 0 ? void 0 : response.success) == true) {
                     let newUrl = Utils.trimString(response === null || response === void 0 ? void 0 : response.newUrl, "");
@@ -159,26 +162,27 @@ var ContentFileInfoController;
                     EventBus.dispatch("fileStructChanged");
                     navigateCallback("/workspace" + newUrl);
                 }
+                waitingDialogCallbacks.setFalse();
             });
         }
         Rename.finish = finish;
         function cancel() {
-            toggleRenameDialogCallback();
+            renameDialogCallbacks.setFalse();
         }
         Rename.cancel = cancel;
     })(Rename = ContentFileInfoController.Rename || (ContentFileInfoController.Rename = {}));
     let Move;
     (function (Move) {
         function show() {
-            toggleMoveDialogCallback();
+            moveDialogCallbacks.setTrue();
         }
         Move.show = show;
         function finish() {
-            toggleMoveDialogCallback();
+            moveDialogCallbacks.setFalse();
         }
         Move.finish = finish;
         function cancel() {
-            toggleMoveDialogCallback();
+            moveDialogCallbacks.setFalse();
         }
         Move.cancel = cancel;
     })(Move = ContentFileInfoController.Move || (ContentFileInfoController.Move = {}));

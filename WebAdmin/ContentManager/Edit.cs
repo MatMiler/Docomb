@@ -36,7 +36,6 @@ namespace Docomb.WebAdmin.ContentManager
 			if (contentFile != null)
 			{
 				success = contentFile.SaveTextFile(request.TextContent);
-				//contentFile.Workspace.Content.ClearCache();
 			}
 
 			return success;

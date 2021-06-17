@@ -1,6 +1,7 @@
-﻿import { CommandBar, ICommandBarItemProps, TextField } from "@fluentui/react";
+﻿import { CommandBar, Dialog, DialogFooter, DialogType, ICommandBarItemProps, Spinner, SpinnerSize, TextField } from "@fluentui/react";
 import React, { FC, ReactElement } from "react";
 import { useHistory } from "react-router-dom";
+import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
 import { Utils } from "../../Data/Utils";
 import { Workspaces } from "../../Data/Workspaces";
 import { LayoutUtils } from "../../LayoutUtils";
@@ -12,16 +13,23 @@ const EditTextFile: FC<{}> = (): ReactElement => {
 	const history = useHistory();
 	function navigate(url: string) { history.push(url); }
 
-	EditTextFileController.prepData(navigate);
+	const [waitingIsVisible, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }] = useBoolean(false);
+
+	EditTextFileController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting });
 
 	return (
-		<div className="pageGrid">
-			<div className="pageTitle"><PageBreadcrumbs /></div>
-			{EditTextFileController.getToolbar()}
-			<div className="pageContent">
-				{EditTextFileController.getContentPanel()}
+		<>
+			<div className="pageGrid">
+				<div className="pageTitle"><PageBreadcrumbs /></div>
+				{EditTextFileController.getToolbar()}
+				<div className="pageContent">
+					{EditTextFileController.getContentPanel()}
+				</div>
 			</div>
-		</div>
+			<Dialog hidden={!waitingIsVisible} dialogContentProps={{ type: DialogType.normal, title: null, showCloseButton: false }} modalProps={{ isBlocking: true }} >
+				<DialogFooter><Spinner label="Please wait..." labelPosition="right" size={SpinnerSize.large} /></DialogFooter>
+			</Dialog>
+		</>
 	);
 };
 
@@ -35,12 +43,16 @@ module EditTextFileController {
 	export let navigateCallback: (url: string) => void = null;
 	let content: string = null;
 
-	export function prepData(navigateCallback: (url: string) => void): void {
+	let waitingDialogCallbacks: IUseBooleanCallbacks = null;
+
+	export function prepData(navigate: (url: string) => void, waitingDialog: IUseBooleanCallbacks): void {
 		let newPageInfo: Workspaces.WorkspacePageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
 		pageInfo = newPageInfo;
 		fileDetails = pageInfo?.details;
 		content = fileDetails?.contentText;
-		EditTextFileController.navigateCallback = navigateCallback;
+
+		EditTextFileController.navigateCallback = navigate;
+		waitingDialogCallbacks = waitingDialog;
 	}
 
 
@@ -74,11 +86,13 @@ module EditTextFileController {
 	}
 
 	function save(): void {
+		waitingDialogCallbacks.setTrue();
+		let c = Utils.parseString($("#editorInput").val(), content);
 		$.ajax(
 			{
 				url: "api/content/saveTextFile",
 				type: "POST",
-				data: { url: fileDetails?.reactLocalUrl, textContent: content },
+				data: { url: fileDetails?.reactLocalUrl, textContent: c },
 				success: onSaveSuccess,
 				error: onSaveError
 			});
@@ -86,10 +100,11 @@ module EditTextFileController {
 
 	function onSaveSuccess(response: any): void {
 		gotoInfo();
+		waitingDialogCallbacks.setFalse();
 	}
 
 	function onSaveError(): void {
-
+		waitingDialogCallbacks.setFalse();
 	}
 
 	export function getContentPanel(): JSX.Element {
@@ -100,7 +115,7 @@ module EditTextFileController {
 			case Workspaces.FileType.Markdown: {
 				return (
 					<div className="editTextFile">
-						<div className="editor"><TextField defaultValue={fileDetails?.contentText} multiline resizable={false} borderless onChange={onEditorChange} /></div>
+						<div className="editor"><TextField id="editorInput" defaultValue={fileDetails?.contentText} multiline resizable={false} borderless onChange={onEditorChange} /></div>
 					{/*	<div className="preview">*/}
 					{/*		<div id="previewContainer" className="articleContent" style={previewStyle}*/}
 					{/*			dangerouslySetInnerHTML={{ __html: LayoutUtils.fixLocalLinksInHtml(fileDetails.contentHtml, pageInfo?.workspace, pageInfo?.contentItem) }} />*/}
@@ -111,7 +126,7 @@ module EditTextFileController {
 			case Workspaces.FileType.Html: case Workspaces.FileType.PlainText: {
 				return (
 					<div className="editTextFile">
-						<div className="editor"><TextField defaultValue={fileDetails?.contentText} multiline resizable={false} borderless onChange={onEditorChange} /></div>
+						<div className="editor"><TextField id="editorInput" defaultValue={fileDetails?.contentText} multiline resizable={false} borderless onChange={onEditorChange} /></div>
 					</div>
 				);
 			}

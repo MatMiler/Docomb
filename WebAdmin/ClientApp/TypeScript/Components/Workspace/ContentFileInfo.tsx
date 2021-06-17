@@ -1,7 +1,7 @@
-﻿import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, IDialogContentProps, IDialogProps, IModalProps, PrimaryButton, TextField } from '@fluentui/react';
+﻿import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, IDialogContentProps, IDialogProps, IModalProps, PrimaryButton, Spinner, SpinnerSize, TextField } from '@fluentui/react';
 import React, { FC, ReactElement } from 'react';
 import { useHistory } from "react-router-dom";
-import { useBoolean } from '@fluentui/react-hooks';
+import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
 import { Utils } from '../../Data/Utils';
 import { Workspaces } from '../../Data/Workspaces';
 import { LayoutUtils } from '../../LayoutUtils';
@@ -14,16 +14,15 @@ const ContentFileInfo: FC<{}> = (): ReactElement => {
 	const history = useHistory();
 	function navigate(url: string) { history.push(url); }
 
-	const [showRenameDialog, { toggle: toggleRenameDialog }] = useBoolean(false);
-	const [showMoveDialog, { toggle: toggleMoveDialog }] = useBoolean(false);
+	const [waitingIsVisible, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }] = useBoolean(false);
+	const [renameIsVisible, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }] = useBoolean(false);
+	const [moveIsVisible, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove }] = useBoolean(false);
 
-	ContentFileInfoController.prepData(navigate, toggleRenameDialog, toggleMoveDialog);
+	ContentFileInfoController.prepData(navigate,
+		{ toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting },
+		{ toggle: toggleRename, setTrue: showRename, setFalse: hideRename },
+		{ toggle: toggleMove, setTrue: showMove, setFalse: hideMove });
 
-	let renameDialogContent: IDialogContentProps = {
-		type: DialogType.largeHeader,
-		title: "Rename file"
-	};
-	let renameDialogModal: IModalProps = { isBlocking: false };
 
 	return (
 		<>
@@ -34,11 +33,14 @@ const ContentFileInfo: FC<{}> = (): ReactElement => {
 					{ContentFileInfoController.getContentPanel()}
 				</div>
 			</div>
+			<Dialog hidden={!waitingIsVisible} dialogContentProps={{ type: DialogType.normal, title: null, showCloseButton: false }} modalProps={{ isBlocking: true }} >
+				<DialogFooter><Spinner label="Please wait..." labelPosition="right" size={SpinnerSize.large} /></DialogFooter>
+			</Dialog>
 			<Dialog
-				hidden={!showRenameDialog}
-				onDismiss={toggleRenameDialog}
-				dialogContentProps={renameDialogContent}
-				modalProps={renameDialogModal}
+				hidden={!renameIsVisible}
+				onDismiss={hideRename}
+				dialogContentProps={{ type: DialogType.largeHeader, title: "Rename file" }}
+				modalProps={{ isBlocking: false }}
 			>
 				<TextField label="New file name" id="renameInput" defaultValue={ContentFileInfoController?.fileDetails?.fileName} />
 				<DialogFooter>
@@ -60,21 +62,27 @@ module ContentFileInfoController {
 	export let pageInfo: Workspaces.WorkspacePageInfo = null;
 	export let fileDetails: Workspaces.FileDetails = null;
 	let navigateCallback: (url: string) => void = null;
-	let toggleRenameDialogCallback: () => void = null;
-	let toggleMoveDialogCallback: () => void = null;
+
+	let waitingDialogCallbacks: IUseBooleanCallbacks = null;
+	let renameDialogCallbacks: IUseBooleanCallbacks = null;
+	let moveDialogCallbacks: IUseBooleanCallbacks = null;
 
 
-
-	export function prepData(navigate: (
-		url: string) => void,
-		toggleRenameDialog: () => void,
-		toggleMoveDialog: () => void): void {
+	export function prepData(
+		navigate: (url: string) => void,
+		waitingDialog: IUseBooleanCallbacks,
+		renameDialog: IUseBooleanCallbacks,
+		moveDialog: IUseBooleanCallbacks
+	): void {
 		let newPageInfo: Workspaces.WorkspacePageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
 		pageInfo = newPageInfo;
 		fileDetails = pageInfo?.details;
+
+		// UI & React callbacks
 		navigateCallback = navigate;
-		toggleRenameDialogCallback = toggleRenameDialog;
-		toggleMoveDialogCallback = toggleMoveDialog;
+		waitingDialogCallbacks = waitingDialog;
+		renameDialogCallbacks = renameDialog;
+		moveDialogCallbacks = moveDialog;
 	}
 
 	export function getToolbar(): JSX.Element {
@@ -172,12 +180,13 @@ module ContentFileInfoController {
 
 	export module Rename {
 		export function show(): void {
-			toggleRenameDialogCallback();
+			renameDialogCallbacks.setTrue();
 		}
 
 		export async function finish(): Promise<void> {
 			let fileName: string = Utils.trimString($("#renameInput", "").val());
-			toggleRenameDialogCallback();
+			renameDialogCallbacks.setFalse();
+			waitingDialogCallbacks.setTrue();
 			let response: Workspaces.RenameResponse = await Workspaces.renameFile(fileDetails?.reactLocalUrl, fileName);
 			if (response?.success == true) {
 				let newUrl: string = Utils.trimString(response?.newUrl, "");
@@ -186,25 +195,26 @@ module ContentFileInfoController {
 				EventBus.dispatch("fileStructChanged");
 				navigateCallback("/workspace" + newUrl);
 			}
+			waitingDialogCallbacks.setFalse();
 		}
 
 		export function cancel(): void {
-			toggleRenameDialogCallback();
+			renameDialogCallbacks.setFalse();
 		}
 	}
 
 
 	export module Move {
 		export function show(): void {
-			toggleMoveDialogCallback();
+			moveDialogCallbacks.setTrue();
 		}
 
 		export function finish(): void {
-			toggleMoveDialogCallback();
+			moveDialogCallbacks.setFalse();
 		}
 
 		export function cancel(): void {
-			toggleMoveDialogCallback();
+			moveDialogCallbacks.setFalse();
 		}
 	}
 

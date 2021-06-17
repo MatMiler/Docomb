@@ -327,7 +327,8 @@ html .sideBarItem.selected a:before {
     top: 50%;
     font-size: 20vmin;
     margin: -10vmin;
-    opacity: .1; }
+    opacity: .1;
+    user-select: none; }
     .emptyPage .watermark i {
       width: 1em;
       height: 1em;
