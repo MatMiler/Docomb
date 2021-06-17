@@ -250,7 +250,7 @@ namespace Docomb.ContentStorage
 		}
 
 
-		public List<ContentItemSummary> GetPhysicalChildren(List<string> parentPathParts)
+		public List<ContentItemSummary> GetPhysicalChildren(List<string> parentPathParts, bool includeFiles = true, bool includeDirectories = true)
 		{
 			string parentPath = string.Join('/', parentPathParts);
 			if (_physicalItemSummariesByParentPath.TryGetValue(parentPath, out List<ContentItemSummary> cachedList))
@@ -261,6 +261,7 @@ namespace Docomb.ContentStorage
 			if (!Directory.Exists(path)) return list;
 
 			#region Directories
+			if (includeDirectories)
 			{
 				string[] directoryPaths = Directory.GetDirectories(path);
 				if (directoryPaths?.Length > 0)
@@ -276,6 +277,7 @@ namespace Docomb.ContentStorage
 			#endregion
 
 			#region Files
+			if (includeFiles)
 			{
 				string[] filePaths = Directory.GetFiles(path);
 				if (filePaths?.Length > 0)

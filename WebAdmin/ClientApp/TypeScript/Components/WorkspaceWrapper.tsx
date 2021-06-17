@@ -34,10 +34,10 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 	}
 
 	componentDidUpdate(prevProps: any, prevState: any) {
-		let prevLocation = Utils.TryGetString(prevProps, ["location", "pathname"]);
-		let currentLocation = Utils.TryGetString(this.props, ["location", "pathname"]);
-		let prevSearch = Utils.TryGetString(prevProps, ["location", "search"]);
-		let currentSearch = Utils.TryGetString(this.props, ["location", "search"]);
+		let prevLocation = Utils.tryGetString(prevProps, ["location", "pathname"]);
+		let currentLocation = Utils.tryGetString(this.props, ["location", "pathname"]);
+		let prevSearch = Utils.tryGetString(prevProps, ["location", "search"]);
+		let currentSearch = Utils.tryGetString(this.props, ["location", "search"]);
 		if ((prevLocation != currentLocation) || (prevSearch != currentSearch)) {
 			LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
 			this.populateInfo();
@@ -52,7 +52,7 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 	render() {
 		let content: JSX.Element = null;
 		if (this.state.loading == false) {
-			if (Utils.TrimString(this.state.pageInfo.contentItem?.url, null) == null) {
+			if (Utils.trimString(this.state.pageInfo.contentItem?.url, null) == null) {
 				content = <Home />;
 			} else if (this.state.pageInfo.contentItem.type == Workspaces.ContentItemType.Directory) {
 				content = <ContentDirectory />;
@@ -88,7 +88,7 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 	}
 
 	async populateInfo() {
-		let data: Workspaces.WorkspacePageInfo = await Workspaces.loadPageInfo(Utils.TryGetString(this.props, ["match", "params", "itemPath"]), Utils.TryGetString(this.props, ["location", "search"]));
+		let data: Workspaces.WorkspacePageInfo = await Workspaces.loadPageInfo(Utils.tryGetString(this.props, ["match", "params", "itemPath"]), Utils.tryGetString(this.props, ["location", "search"]));
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, data?.workspace?.url);
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, data?.workspace);
 		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, data);

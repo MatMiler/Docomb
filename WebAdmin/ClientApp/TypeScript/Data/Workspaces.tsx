@@ -8,7 +8,7 @@ export module Workspaces {
 	export async function loadWorkspaceList(): Promise<Array<Workspace>> {
 		let list: Array<Workspace> = [];
 		let data = await Apis.fetchJsonAsync("api/general/workspaces", true);
-		if (Utils.ArrayHasValues(data)) {
+		if (Utils.arrayHasValues(data)) {
 			for (let x = 0; x < data.length; x++) {
 				let item: Workspace = new Workspace(data[x]);
 				if ((item != null) && (item.isValid() == true))
@@ -46,7 +46,7 @@ export module Workspaces {
 			LayoutUtils.WindowData.set("workspaceTreeTimestamp-" + encodeURI(workspaceUrl), Date.now());
 		}
 
-		if (Utils.ArrayHasValues(data)) {
+		if (Utils.arrayHasValues(data)) {
 			for (let x = 0; x < data.length; x++) {
 				let item: ContentItem = new ContentItem(data[x]);
 				if ((item != null) && (item.isValid() == true))
@@ -54,6 +54,15 @@ export module Workspaces {
 			}
 		}
 		return list;
+	}
+
+
+	export function clearTreeCache(workspaceUrl?: string): void {
+		if (workspaceUrl == null) {
+			workspaceUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
+		}
+		let url = "api/general/workspaceContentTree?workspaceUrl=" + encodeURI(workspaceUrl);
+		SessionCache.remove(url);
 	}
 
 
@@ -76,11 +85,11 @@ export module Workspaces {
 		}
 
 		public constructor(source: any) {
-			this.name = Utils.TryGetString(source, "name");
-			this.url = Utils.TryGetString(source, "url");
-			this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
-			this.initials = Utils.TryGetString(source, "initials");
-			this.icon = Utils.TryGetString(source, "icon");
+			this.name = Utils.tryGetString(source, "name");
+			this.url = Utils.tryGetString(source, "url");
+			this.reactLocalUrl = Utils.tryGetString(source, "reactLocalUrl");
+			this.initials = Utils.tryGetString(source, "initials");
+			this.icon = Utils.tryGetString(source, "icon");
 		}
 
 		public static create(source: any): Workspace {
@@ -108,17 +117,17 @@ export module Workspaces {
 		}
 
 		public constructor(source: any) {
-			this.type = Utils.TryGetEnum(source, "type", ContentItemType);
-			this.name = Utils.TryGetString(source, "name");
-			this.url = Utils.TryGetString(source, "url");
-			this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
+			this.type = Utils.tryGetEnum(source, "type", ContentItemType);
+			this.name = Utils.tryGetString(source, "name");
+			this.url = Utils.tryGetString(source, "url");
+			this.reactLocalUrl = Utils.tryGetString(source, "reactLocalUrl");
 
-			if ((Utils.TrimString(this.name, null) == null) && ((this.url == "/") || (this.url == "") || (this.url == null)))
+			if ((Utils.trimString(this.name, null) == null) && ((this.url == "/") || (this.url == "") || (this.url == null)))
 				this.name = "/";
 
-			let sourceChildren = Utils.TryGet(source, "children");
+			let sourceChildren = Utils.tryGet(source, "children");
 			let children: Array<ContentItem> = [];
-			if (Utils.ArrayHasValues(sourceChildren)) {
+			if (Utils.arrayHasValues(sourceChildren)) {
 				for (let x = 0; x < sourceChildren.length; x++) {
 					let item: ContentItem = new ContentItem(sourceChildren[x]);
 					if ((item != null) && (item.isValid() == true))
@@ -150,11 +159,11 @@ export module Workspaces {
 		}
 
 		public constructor(source: any) {
-			this.workspace = Workspace.create(Utils.TryGet(source, "workspace"));
-			this.contentItem = ContentItem.create(Utils.TryGet(source, "contentItem"));
-			this.details = FileDetails.create(Utils.TryGet(source, "details"));
-			this.breadcrumbs = Utils.MapArray<ContentItem>(Utils.TryGet(source, "breadcrumbs"), x => ContentItem.create(x));
-			this.action = Utils.TryGetEnum(source, "action", ContentItemAction, ContentItemAction.View);
+			this.workspace = Workspace.create(Utils.tryGet(source, "workspace"));
+			this.contentItem = ContentItem.create(Utils.tryGet(source, "contentItem"));
+			this.details = FileDetails.create(Utils.tryGet(source, "details"));
+			this.breadcrumbs = Utils.mapArray<ContentItem>(Utils.tryGet(source, "breadcrumbs"), x => ContentItem.create(x));
+			this.action = Utils.tryGetEnum(source, "action", ContentItemAction, ContentItemAction.View);
 		}
 	}
 
@@ -183,23 +192,51 @@ export module Workspaces {
 		}
 
 		public constructor(source: any) {
-			this.title = Utils.TryGetString(source, "title");
-			this.fileName = Utils.TryGetString(source, "fileName");
-			this.url = Utils.TryGetString(source, "url");
-			this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
-			this.type = Utils.TryGetEnum(source, "type", FileType, FileType.File);
-			this.workspace = Workspace.create(Utils.TryGet(source, "workspace"));
-			this.fileSize = Utils.TryGetNumber(source, "fileSize");
-			this.fileSizeDesc = Utils.TryGetString(source, "fileSizeDesc");
-			this.lastModifiedDate = Utils.TryGetDate(source, "lastModifiedDate");
-			this.contentText = Utils.TryGetString(source, "contentText");
-			this.contentHtml = Utils.TryGetString(source, "contentHtml");
+			this.title = Utils.tryGetString(source, "title");
+			this.fileName = Utils.tryGetString(source, "fileName");
+			this.url = Utils.tryGetString(source, "url");
+			this.reactLocalUrl = Utils.tryGetString(source, "reactLocalUrl");
+			this.type = Utils.tryGetEnum(source, "type", FileType, FileType.File);
+			this.workspace = Workspace.create(Utils.tryGet(source, "workspace"));
+			this.fileSize = Utils.tryGetNumber(source, "fileSize");
+			this.fileSizeDesc = Utils.tryGetString(source, "fileSizeDesc");
+			this.lastModifiedDate = Utils.tryGetDate(source, "lastModifiedDate");
+			this.contentText = Utils.tryGetString(source, "contentText");
+			this.contentHtml = Utils.tryGetString(source, "contentHtml");
 		}
 
 		public static create(source: any): FileDetails {
 			let item = new FileDetails(source);
 			return (item?.isValid() == true) ? item : null;
 		}
+	}
+
+
+
+	export class RenameResponse {
+		public success: boolean;
+		public oldUrl: string;
+		public newUrl: string;
+
+		public constructor(source: any) {
+			this.success = Utils.tryGetBool(source, "success");
+			this.oldUrl = Utils.tryGetString(source, "oldUrl");
+			this.newUrl = Utils.tryGetString(source, "newUrl");
+		}
+	}
+
+
+	export async function renameFile(url: string, newName: string): Promise<RenameResponse> {
+		let data = null;
+		data = await Apis.postJsonAsync("api/content/renameFile", { url: url, fileName: newName });
+		return new RenameResponse(data);
+	}
+
+
+	export async function renameDirectory(url: string, newName: string): Promise<RenameResponse> {
+		let data = null;
+		data = await Apis.postJsonAsync("api/content/renameDirectory", { url: url, fileName: newName });
+		return new RenameResponse(data);
 	}
 
 }

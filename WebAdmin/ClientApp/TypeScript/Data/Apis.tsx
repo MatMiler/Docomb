@@ -17,7 +17,7 @@ export module Apis {
 	 * @param cacheOptions Caching options
 	 */
 	export async function fetchJsonAsync(url: string, cache: boolean = false, cacheOptions: CacheOptions = null): Promise<any> {
-		let cacheKey: string = Utils.TryGetString(cacheOptions, "key", url);
+		let cacheKey: string = Utils.tryGetString(cacheOptions, "key", url);
 		if (cache == true) {
 			let storedItem: SessionCache.Item = SessionCache.getItem(cacheKey);
 			if (storedItem != null) return storedItem.value;
@@ -25,7 +25,7 @@ export module Apis {
 		let response: Response = await fetch(url);
 		let data: any = await response.json();
 		if (cache == true) {
-			SessionCache.save(cacheKey, data, Utils.TryGetNumber(cacheOptions, "expiry", null));
+			SessionCache.save(cacheKey, data, Utils.tryGetNumber(cacheOptions, "expiry", null));
 		}
 		return data;
 	}
@@ -40,6 +40,18 @@ export module Apis {
 	export async function fetchJson<T>(url: string, cache: boolean = false, cacheOptions: CacheOptions = null, returnCall: (any) => void): Promise<void> {
 
 		returnCall(await fetchJsonAsync(url, cache, cacheOptions));
+	}
+
+	/**
+	 * Post an object to the URL and return its response (JSON)
+	 * @param url URL to which the data is to be sent
+	 * @param data Data to send
+	 */
+	export async function postJsonAsync(url: string, data: any): Promise<any> {
+		let fetchData: RequestInit = { method: "POST", body: JSON.stringify(data), headers: { "Content-type": "application/json; charset=UTF-8" } };
+		let response: Response = await fetch(url, fetchData);
+		let receivedData: any = await response.json();
+		return receivedData;
 	}
 
 }

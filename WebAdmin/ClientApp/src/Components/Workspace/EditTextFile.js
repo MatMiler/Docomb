@@ -76,7 +76,7 @@ var EditTextFileController;
     }
     function getContentPanel() {
         let previewStyle = {};
-        if (!Utils.TryGetBool(window, "showFileMetaDataPanel", true))
+        if (!Utils.tryGetBool(window, "showFileMetaDataPanel", true))
             previewStyle.display = "none";
         switch (EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.type) {
             case Workspaces.FileType.Markdown: {
@@ -88,7 +88,7 @@ var EditTextFileController;
             case Workspaces.FileType.PlainText: {
                 return (React.createElement("div", { className: "editTextFile" },
                     React.createElement("div", { className: "editor" },
-                        React.createElement(TextField, { defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true }))));
+                        React.createElement(TextField, { defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, borderless: true, onChange: onEditorChange }))));
             }
         }
         return (React.createElement("div", { className: "editTextFile" },
@@ -96,7 +96,7 @@ var EditTextFileController;
     }
     EditTextFileController.getContentPanel = getContentPanel;
     //function togglePreviewPanel(): void {
-    //	let show = !Utils.TryGetBool(window, "showPreviewPanel", true);
+    //	let show = !Utils.tryGetBool(window, "showPreviewPanel", true);
     //	window["showPreviewPanel"] = show;
     //	$(".preview").toggle(show);
     //}

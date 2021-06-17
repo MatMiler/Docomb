@@ -6,7 +6,7 @@ export var Utils;
      * @param value Value to convert
      * @param defaultValue Default value to return if result would be null or empty
      */
-    function ParseString(value, defaultValue = "") {
+    function parseString(value, defaultValue = "") {
         if (typeof value == "string")
             return value;
         if ((value == null) || (value == undefined))
@@ -19,13 +19,13 @@ export var Utils;
         catch (e) { }
         return defaultValue;
     }
-    Utils.ParseString = ParseString;
+    Utils.parseString = parseString;
     /**
      * Convert a value to number
      * @param value Value to convert
      * @param defaultValue Default value to return if null or can't be converted
      */
-    function ParseNum(value, defaultValue) {
+    function parseNum(value, defaultValue) {
         if (defaultValue === undefined)
             defaultValue = 0;
         if ((typeof value == "number") && (!isNaN(value)))
@@ -33,13 +33,13 @@ export var Utils;
         value = parseFloat(value);
         return ((typeof value == "number") && (!isNaN(value))) ? value : defaultValue;
     }
-    Utils.ParseNum = ParseNum;
+    Utils.parseNum = parseNum;
     /**
      * Convert a value to boolean
      * @param value Value to convert
      * @param defaultValue Default value to return if null or can't be converted
      */
-    function ParseBool(value, defaultValue) {
+    function parseBool(value, defaultValue) {
         switch (value) {
             case true:
             case "true":
@@ -54,33 +54,33 @@ export var Utils;
         }
         return defaultValue;
     }
-    Utils.ParseBool = ParseBool;
+    Utils.parseBool = parseBool;
     /**
      * Convert a value to enumerator
      * @param value Value to convert
      * @param set Set of all available values / Reference to the enumerator
      * @param defaultValue Default value if searched value is not present in the set
      */
-    function ParseEnum(value, set, defaultValue) {
-        if (GetObjectValues(set).includes(value))
+    function parseEnum(value, set, defaultValue) {
+        if (getObjectValues(set).includes(value))
             return value;
         return defaultValue;
     }
-    Utils.ParseEnum = ParseEnum;
+    Utils.parseEnum = parseEnum;
     /**
      * Convert a value to date
      * @param value Value to convert
      * @param defaultValue Default value to return if null or can't be converted
      */
-    function ParseDate(value, defaultValue) {
+    function parseDate(value, defaultValue) {
         try {
             let date = new Date(value);
-            return (IsNumeric(date.getTime())) ? date : defaultValue;
+            return (isNumeric(date.getTime())) ? date : defaultValue;
         }
         catch (e) { }
         return defaultValue;
     }
-    Utils.ParseDate = ParseDate;
+    Utils.parseDate = parseDate;
     //#endregion
     //#region Type checks
     /**
@@ -88,7 +88,7 @@ export var Utils;
      * @param value Value to check
      * @param type Type to check
      */
-    function IsType(value, type) {
+    function isType(value, type) {
         if (value === null)
             return ((type === "null") || (type === null));
         if (value === undefined)
@@ -99,17 +99,17 @@ export var Utils;
             return (value instanceof type);
         return false;
     }
-    Utils.IsType = IsType;
+    Utils.isType = isType;
     /**
      * Check whether a value is of any of the specified types
      * @param value Value to check
      * @param types Types to check
      */
     function IsAnyType(value, ...types) {
-        if ((types == null) || (!IsType(types, Array)))
+        if ((types == null) || (!isType(types, Array)))
             return false;
         for (let x = 0; x < types.length; x++) {
-            if (IsType(value, types[x]))
+            if (isType(value, types[x]))
                 return true;
         }
         return false;
@@ -121,20 +121,20 @@ export var Utils;
      * @param type Type to check
      * @param defaultValue Default value if "main" value isn't of the right type
      */
-    function IfTypeOrDefault(value, type, defaultValue = null) {
-        return (IsType(value, type)) ? value : defaultValue;
+    function ifTypeOrDefault(value, type, defaultValue = null) {
+        return (isType(value, type)) ? value : defaultValue;
     }
-    Utils.IfTypeOrDefault = IfTypeOrDefault;
+    Utils.ifTypeOrDefault = ifTypeOrDefault;
     /**
      * Check whether a value is a valid number; null, undefined and NaN will return false
      * @param value Value to check
      */
-    function IsNumeric(value) {
+    function isNumeric(value) {
         if ((value == null) || (value == undefined) || (isNaN(value)))
             return false;
         return (typeof value == "number");
     }
-    Utils.IsNumeric = IsNumeric;
+    Utils.isNumeric = isNumeric;
     //#endregion
     //#region String utils
     /**
@@ -142,7 +142,7 @@ export var Utils;
      * @param value Value to trim
      * @param defaultValue Default value to return if null or empty
      */
-    function TrimString(value, defaultValue) {
+    function trimString(value, defaultValue) {
         if (defaultValue === undefined)
             defaultValue = "";
         if (typeof value == "string") {
@@ -156,17 +156,31 @@ export var Utils;
         catch (e) { }
         return defaultValue;
     }
-    Utils.TrimString = TrimString;
+    Utils.trimString = trimString;
+    function firstStringPart(value, separator) {
+        if ((value == null) || (value == "") || (separator == null) || (separator == ""))
+            return value;
+        let pos = value.indexOf(separator);
+        return (pos > 0) ? value.substring(0, pos) : (pos == 0) ? "" : value;
+    }
+    Utils.firstStringPart = firstStringPart;
+    function lastStringPart(value, separator) {
+        if ((value == null) || (value == "") || (separator == null) || (separator == ""))
+            return value;
+        let pos = value.lastIndexOf(separator);
+        return (pos >= 0) ? value.substring(pos + separator.length) : value;
+    }
+    Utils.lastStringPart = lastStringPart;
     //#endregion
     //#region Arrays & Objects
     /**
      * Check whether a value is an array and has any values
      * @param array Value to check
      */
-    function ArrayHasValues(array) {
-        return (IsType(array, Array)) && (array.length > 0);
+    function arrayHasValues(array) {
+        return (isType(array, Array)) && (array.length > 0);
     }
-    Utils.ArrayHasValues = ArrayHasValues;
+    Utils.arrayHasValues = arrayHasValues;
     /**
      * Converts an array of values to another type and validates each new value
      * @param data Array of data to convert
@@ -174,8 +188,8 @@ export var Utils;
      * @param validation Function with which to validate the new item
      * @param includeNull Should null values be included in the new array
      */
-    function MapArray(data, conversion, validation = null, includeNull = false) {
-        if (!ArrayHasValues(data))
+    function mapArray(data, conversion, validation = null, includeNull = false) {
+        if (!arrayHasValues(data))
             return null;
         let list = [];
         for (let x = 0; x < data.length; x++) {
@@ -191,55 +205,55 @@ export var Utils;
         }
         return list;
     }
-    Utils.MapArray = MapArray;
+    Utils.mapArray = mapArray;
     /**
      * Get array of all keys in an object
      * @param object Object from which to extract keys
      */
-    function GetObjectKeys(object) {
+    function getObjectKeys(object) {
         var list = [];
         for (var key in object)
             if (object.hasOwnProperty(key))
                 list.push(key);
         return list;
     }
-    Utils.GetObjectKeys = GetObjectKeys;
+    Utils.getObjectKeys = getObjectKeys;
     /**
      * Get array of all values in an object
      * @param object Object from which to extract values
      */
-    function GetObjectValues(object) {
+    function getObjectValues(object) {
         var list = [];
         for (var value in object)
             list.push(object[value]);
         return list;
     }
-    Utils.GetObjectValues = GetObjectValues;
+    Utils.getObjectValues = getObjectValues;
     /**
      * Check whether the object has the specified key
      * @param object Object in which to check for key
      * @param key Key to look for
      */
-    function HasObjectKey(object, key) {
+    function hasObjectKey(object, key) {
         for (var s in object)
             if (s == key)
                 return true;
         return false;
     }
-    Utils.HasObjectKey = HasObjectKey;
+    Utils.hasObjectKey = hasObjectKey;
     //#endregion
     //#region Try get property
     /**
      * Try to return a property or index of an object
      * Examples:
-     * - TryGet({ a: "Value 1" }, "a") => "Value 1"
-     * - TryGet(["Value 1", "Value 2"], 0) => "Value 1"
-     * - TryGet([{ a: "Value 1"}, { a: "Value 2" }], [1, "a"]) => "Value 2"
+     * - tryGet({ a: "Value 1" }, "a") => "Value 1"
+     * - tryGet(["Value 1", "Value 2"], 0) => "Value 1"
+     * - tryGet([{ a: "Value 1"}, { a: "Value 2" }], [1, "a"]) => "Value 2"
      * @param container Container object in which to look for the property/index
      * @param property Property or index (or array of properties/indexes) to find
      * @param defaultValue Default value if property/index is not found
      */
-    function TryGet(container, property, defaultValue) {
+    function tryGet(container, property, defaultValue) {
         if (defaultValue == undefined)
             defaultValue = null;
         if ((container == null) || (container == undefined))
@@ -276,7 +290,7 @@ export var Utils;
         }
         return defaultValue;
     }
-    Utils.TryGet = TryGet;
+    Utils.tryGet = tryGet;
     /**
      * Try to get a given property of each of the items in an array
      * @param array Container array
@@ -284,74 +298,74 @@ export var Utils;
      * @param defaultValue Default value if property/index is not found
      * @param ignoreNull Whether to remove or include null values
      */
-    function TryGetArray(array, property, defaultValue, ignoreNull = true) {
+    function tryGetArray(array, property, defaultValue, ignoreNull = true) {
         if ((array == null) || !(array.length > 0))
             return [];
         let list = [];
         for (let x = 0; x < array.length; x++) {
-            let value = TryGet(array[x], property, defaultValue);
+            let value = tryGet(array[x], property, defaultValue);
             if ((!ignoreNull) || (value != null))
                 list.push(value);
         }
         return list;
     }
-    Utils.TryGetArray = TryGetArray;
+    Utils.tryGetArray = tryGetArray;
     /**
      * Try to return a string in a property or index of an object. If found value isn't a string, it will be converted
      * Examples:
-     * - TryGetString({ a: "Value 1" }, "a") => "Value 1"
-     * - TryGetString(["Value 1", "Value 2"], 0) => "Value 1"
-     * - TryGetString([{ a: "Value 1"}, { a: "Value 2" }], [1, "a"]) => "Value 2"
+     * - tryGetString({ a: "Value 1" }, "a") => "Value 1"
+     * - tryGetString(["Value 1", "Value 2"], 0) => "Value 1"
+     * - tryGetString([{ a: "Value 1"}, { a: "Value 2" }], [1, "a"]) => "Value 2"
      * @param container Container object in which to look for the property/index
      * @param property Property or index (or array of properties/indexes) to find
      * @param defaultValue Default value if property/index is not found or is null or empty
      */
-    function TryGetString(container, property, defaultValue) {
-        return ParseString(TryGet(container, property, defaultValue), defaultValue);
+    function tryGetString(container, property, defaultValue) {
+        return parseString(tryGet(container, property, defaultValue), defaultValue);
     }
-    Utils.TryGetString = TryGetString;
+    Utils.tryGetString = tryGetString;
     /**
      * Try to return a trimmed string in a property or index of an object. If found value isn't a string, it will be converted
      * Examples:
-     * - TryGetString({ a: "Value 1" }, "a") => "Value 1"
-     * - TryGetString(["Value 1", "Value 2"], 0) => "Value 1"
-     * - TryGetString([{ a: "Value 1"}, { a: "Value 2" }], [1, "a"]) => "Value 2"
+     * - tryGetString({ a: "Value 1" }, "a") => "Value 1"
+     * - tryGetString(["Value 1", "Value 2"], 0) => "Value 1"
+     * - tryGetString([{ a: "Value 1"}, { a: "Value 2" }], [1, "a"]) => "Value 2"
      * @param container Container object in which to look for the property/index
      * @param property Property or index (or array of properties/indexes) to find
      * @param defaultValue Default value if property/index is not found or is null or empty
      */
-    function TryGetTrimmedString(container, property, defaultValue = null) {
-        return TrimString(TryGet(container, property, defaultValue), defaultValue);
+    function tryGetTrimmedString(container, property, defaultValue = null) {
+        return trimString(tryGet(container, property, defaultValue), defaultValue);
     }
-    Utils.TryGetTrimmedString = TryGetTrimmedString;
+    Utils.tryGetTrimmedString = tryGetTrimmedString;
     /**
      * Try to return a number in a property or index of an object. If found value isn't a number, it will be converted
      * Examples:
-     * - TryGetNumber({ a: 1 }, "a") => 1
-     * - TryGetNumber([1, 2, 3], 2) => 3
-     * - TryGetNumber([{ a: 1}, { a: 2 }], [1, "a"]) => 2
+     * - tryGetNumber({ a: 1 }, "a") => 1
+     * - tryGetNumber([1, 2, 3], 2) => 3
+     * - tryGetNumber([{ a: 1}, { a: 2 }], [1, "a"]) => 2
      * @param container Container object in which to look for the property/index
      * @param property Property or index (or array of properties/indexes) to find
      * @param defaultValue Default value if property/index is not found, is null, or can't be converted into a number
      */
-    function TryGetNumber(container, property, defaultValue) {
-        return ParseNum(TryGet(container, property, defaultValue), defaultValue);
+    function tryGetNumber(container, property, defaultValue) {
+        return parseNum(tryGet(container, property, defaultValue), defaultValue);
     }
-    Utils.TryGetNumber = TryGetNumber;
+    Utils.tryGetNumber = tryGetNumber;
     /**
      * Try to return a boolean in a property or index of an object. If found value isn't a boolean, it will be converted
      * Examples:
-     * - TryGetNumber({ a: true }, "a") => true
-     * - TryGetNumber([false, true, false], 2) => false
-     * - TryGetNumber([{ a: false}, { a: true }], [1, "a"]) => true
+     * - tryGetNumber({ a: true }, "a") => true
+     * - tryGetNumber([false, true, false], 2) => false
+     * - tryGetNumber([{ a: false}, { a: true }], [1, "a"]) => true
      * @param container Container object in which to look for the property/index
      * @param property Property or index (or array of properties/indexes) to find
      * @param defaultValue Default value if property/index is not found, is null, or can't be converted into a boolean
      */
-    function TryGetBool(container, property, defaultValue) {
-        return ParseBool(TryGet(container, property, defaultValue), defaultValue);
+    function tryGetBool(container, property, defaultValue) {
+        return parseBool(tryGet(container, property, defaultValue), defaultValue);
     }
-    Utils.TryGetBool = TryGetBool;
+    Utils.tryGetBool = tryGetBool;
     /**
      * Try to return an enumerator value in a property or index of an object. If the value isn't found, the default value will be returned
      * @param container Container object in which to look for the property/index
@@ -359,20 +373,20 @@ export var Utils;
      * @param set Set of all available values / Reference to the enumerator
      * @param defaultValue Default value if property/index is not found, is null, or can't be converted into a boolean
      */
-    function TryGetEnum(container, property, set, defaultValue) {
-        return ParseEnum(TryGet(container, property, defaultValue), set, defaultValue);
+    function tryGetEnum(container, property, set, defaultValue) {
+        return parseEnum(tryGet(container, property, defaultValue), set, defaultValue);
     }
-    Utils.TryGetEnum = TryGetEnum;
+    Utils.tryGetEnum = tryGetEnum;
     /**
      * Try to return a date in a property or index of an object. If found value isn't a date, it will be converted
      * @param container Container object in which to look for the property/index
      * @param property Property or index (or array of properties/indexes) to find
      * @param defaultValue Default value if property/index is not found, is null, or can't be converted into a date
      */
-    function TryGetDate(container, property, defaultValue) {
-        return ParseDate(TryGet(container, property, defaultValue), defaultValue);
+    function tryGetDate(container, property, defaultValue) {
+        return parseDate(tryGet(container, property, defaultValue), defaultValue);
     }
-    Utils.TryGetDate = TryGetDate;
+    Utils.tryGetDate = tryGetDate;
     //#endregion
 })(Utils || (Utils = {}));
 //# sourceMappingURL=Utils.js.map

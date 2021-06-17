@@ -18,7 +18,7 @@ export var Workspaces;
         return __awaiter(this, void 0, void 0, function* () {
             let list = [];
             let data = yield Apis.fetchJsonAsync("api/general/workspaces", true);
-            if (Utils.ArrayHasValues(data)) {
+            if (Utils.arrayHasValues(data)) {
                 for (let x = 0; x < data.length; x++) {
                     let item = new Workspace(data[x]);
                     if ((item != null) && (item.isValid() == true))
@@ -54,7 +54,7 @@ export var Workspaces;
                 data = yield Apis.fetchJsonAsync(url, true);
                 LayoutUtils.WindowData.set("workspaceTreeTimestamp-" + encodeURI(workspaceUrl), Date.now());
             }
-            if (Utils.ArrayHasValues(data)) {
+            if (Utils.arrayHasValues(data)) {
                 for (let x = 0; x < data.length; x++) {
                     let item = new ContentItem(data[x]);
                     if ((item != null) && (item.isValid() == true))
@@ -65,6 +65,14 @@ export var Workspaces;
         });
     }
     Workspaces.loadTree = loadTree;
+    function clearTreeCache(workspaceUrl) {
+        if (workspaceUrl == null) {
+            workspaceUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
+        }
+        let url = "api/general/workspaceContentTree?workspaceUrl=" + encodeURI(workspaceUrl);
+        SessionCache.remove(url);
+    }
+    Workspaces.clearTreeCache = clearTreeCache;
     /** Workspace information */
     class Workspace {
         constructor(source) {
@@ -78,11 +86,11 @@ export var Workspaces;
             this.initials = null;
             /** Representation of the workspace */
             this.icon = null;
-            this.name = Utils.TryGetString(source, "name");
-            this.url = Utils.TryGetString(source, "url");
-            this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
-            this.initials = Utils.TryGetString(source, "initials");
-            this.icon = Utils.TryGetString(source, "icon");
+            this.name = Utils.tryGetString(source, "name");
+            this.url = Utils.tryGetString(source, "url");
+            this.reactLocalUrl = Utils.tryGetString(source, "reactLocalUrl");
+            this.initials = Utils.tryGetString(source, "initials");
+            this.icon = Utils.tryGetString(source, "icon");
         }
         /** Quick check if data is valid */
         isValid() {
@@ -101,15 +109,15 @@ export var Workspaces;
     })(ContentItemType = Workspaces.ContentItemType || (Workspaces.ContentItemType = {}));
     class ContentItem {
         constructor(source) {
-            this.type = Utils.TryGetEnum(source, "type", ContentItemType);
-            this.name = Utils.TryGetString(source, "name");
-            this.url = Utils.TryGetString(source, "url");
-            this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
-            if ((Utils.TrimString(this.name, null) == null) && ((this.url == "/") || (this.url == "") || (this.url == null)))
+            this.type = Utils.tryGetEnum(source, "type", ContentItemType);
+            this.name = Utils.tryGetString(source, "name");
+            this.url = Utils.tryGetString(source, "url");
+            this.reactLocalUrl = Utils.tryGetString(source, "reactLocalUrl");
+            if ((Utils.trimString(this.name, null) == null) && ((this.url == "/") || (this.url == "") || (this.url == null)))
                 this.name = "/";
-            let sourceChildren = Utils.TryGet(source, "children");
+            let sourceChildren = Utils.tryGet(source, "children");
             let children = [];
-            if (Utils.ArrayHasValues(sourceChildren)) {
+            if (Utils.arrayHasValues(sourceChildren)) {
                 for (let x = 0; x < sourceChildren.length; x++) {
                     let item = new ContentItem(sourceChildren[x]);
                     if ((item != null) && (item.isValid() == true))
@@ -135,11 +143,11 @@ export var Workspaces;
     })(ContentItemAction = Workspaces.ContentItemAction || (Workspaces.ContentItemAction = {}));
     class WorkspacePageInfo {
         constructor(source) {
-            this.workspace = Workspace.create(Utils.TryGet(source, "workspace"));
-            this.contentItem = ContentItem.create(Utils.TryGet(source, "contentItem"));
-            this.details = FileDetails.create(Utils.TryGet(source, "details"));
-            this.breadcrumbs = Utils.MapArray(Utils.TryGet(source, "breadcrumbs"), x => ContentItem.create(x));
-            this.action = Utils.TryGetEnum(source, "action", ContentItemAction, ContentItemAction.View);
+            this.workspace = Workspace.create(Utils.tryGet(source, "workspace"));
+            this.contentItem = ContentItem.create(Utils.tryGet(source, "contentItem"));
+            this.details = FileDetails.create(Utils.tryGet(source, "details"));
+            this.breadcrumbs = Utils.mapArray(Utils.tryGet(source, "breadcrumbs"), x => ContentItem.create(x));
+            this.action = Utils.tryGetEnum(source, "action", ContentItemAction, ContentItemAction.View);
         }
         isValid() {
             return ((this.workspace != null) && (this.workspace.isValid()) && (this.contentItem != null) && (this.contentItem.isValid()));
@@ -155,17 +163,17 @@ export var Workspaces;
     })(FileType = Workspaces.FileType || (Workspaces.FileType = {}));
     class FileDetails {
         constructor(source) {
-            this.title = Utils.TryGetString(source, "title");
-            this.fileName = Utils.TryGetString(source, "fileName");
-            this.url = Utils.TryGetString(source, "url");
-            this.reactLocalUrl = Utils.TryGetString(source, "reactLocalUrl");
-            this.type = Utils.TryGetEnum(source, "type", FileType, FileType.File);
-            this.workspace = Workspace.create(Utils.TryGet(source, "workspace"));
-            this.fileSize = Utils.TryGetNumber(source, "fileSize");
-            this.fileSizeDesc = Utils.TryGetString(source, "fileSizeDesc");
-            this.lastModifiedDate = Utils.TryGetDate(source, "lastModifiedDate");
-            this.contentText = Utils.TryGetString(source, "contentText");
-            this.contentHtml = Utils.TryGetString(source, "contentHtml");
+            this.title = Utils.tryGetString(source, "title");
+            this.fileName = Utils.tryGetString(source, "fileName");
+            this.url = Utils.tryGetString(source, "url");
+            this.reactLocalUrl = Utils.tryGetString(source, "reactLocalUrl");
+            this.type = Utils.tryGetEnum(source, "type", FileType, FileType.File);
+            this.workspace = Workspace.create(Utils.tryGet(source, "workspace"));
+            this.fileSize = Utils.tryGetNumber(source, "fileSize");
+            this.fileSizeDesc = Utils.tryGetString(source, "fileSizeDesc");
+            this.lastModifiedDate = Utils.tryGetDate(source, "lastModifiedDate");
+            this.contentText = Utils.tryGetString(source, "contentText");
+            this.contentHtml = Utils.tryGetString(source, "contentHtml");
         }
         isValid() {
             return ((typeof this.fileName == "string") && (this.fileName.length > 0) && (typeof this.type == "string") && (this.type.length > 0));
@@ -176,5 +184,29 @@ export var Workspaces;
         }
     }
     Workspaces.FileDetails = FileDetails;
+    class RenameResponse {
+        constructor(source) {
+            this.success = Utils.tryGetBool(source, "success");
+            this.oldUrl = Utils.tryGetString(source, "oldUrl");
+            this.newUrl = Utils.tryGetString(source, "newUrl");
+        }
+    }
+    Workspaces.RenameResponse = RenameResponse;
+    function renameFile(url, newName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data = null;
+            data = yield Apis.postJsonAsync("api/content/renameFile", { url: url, fileName: newName });
+            return new RenameResponse(data);
+        });
+    }
+    Workspaces.renameFile = renameFile;
+    function renameDirectory(url, newName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data = null;
+            data = yield Apis.postJsonAsync("api/content/renameDirectory", { url: url, fileName: newName });
+            return new RenameResponse(data);
+        });
+    }
+    Workspaces.renameDirectory = renameDirectory;
 })(Workspaces || (Workspaces = {}));
 //# sourceMappingURL=Workspaces.js.map

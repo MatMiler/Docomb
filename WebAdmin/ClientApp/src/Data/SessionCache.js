@@ -25,11 +25,11 @@ export var SessionCache;
                 let data = JSON.parse(s);
                 if (data == null)
                     return null;
-                let key = Utils.TryGetString(data, "key");
-                let value = Utils.TryGet(data, "value");
-                let timestamp = Utils.TryGetNumber(data, "value", null);
-                let expiry = Utils.TryGetNumber(data, "expiry", null);
-                let hash = Utils.TryGetNumber(data, "hash", null);
+                let key = Utils.tryGetString(data, "key");
+                let value = Utils.tryGet(data, "value");
+                let timestamp = Utils.tryGetNumber(data, "value", null);
+                let expiry = Utils.tryGetNumber(data, "expiry", null);
+                let hash = Utils.tryGetNumber(data, "hash", null);
                 if ((expiry != null) && (expiry <= Date.now()))
                     return null; // Expired
                 let item = new Item(key, value, expiry);
@@ -90,6 +90,10 @@ export var SessionCache;
         window.sessionStorage.setItem(SessionCache.keyPrefix + key, item.serialize());
     }
     SessionCache.save = save;
+    function remove(key) {
+        window.sessionStorage.removeItem(SessionCache.keyPrefix + key);
+    }
+    SessionCache.remove = remove;
     /**
      * Generate a hash code from an object
      * @param o Object from which to generate hash code

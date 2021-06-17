@@ -19,7 +19,7 @@ const PageBreadcrumbs: FC<{}> = (): ReactElement => {
 	}
 
 	let breadcrumbs: IBreadcrumbItem[] = [];
-	if (Utils.ArrayHasValues(pageInfo?.breadcrumbs)) {
+	if (Utils.arrayHasValues(pageInfo?.breadcrumbs)) {
 		for (let x = 0; x < pageInfo.breadcrumbs.length; x++) {
 			let item = pageInfo.breadcrumbs[x];
 			let isCurrent: boolean = (x == pageInfo.breadcrumbs.length - 1);

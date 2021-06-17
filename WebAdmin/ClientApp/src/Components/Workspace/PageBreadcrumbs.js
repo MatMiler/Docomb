@@ -13,7 +13,7 @@ const PageBreadcrumbs = () => {
         EventBus.dispatch("navChange");
     }
     let breadcrumbs = [];
-    if (Utils.ArrayHasValues(pageInfo === null || pageInfo === void 0 ? void 0 : pageInfo.breadcrumbs)) {
+    if (Utils.arrayHasValues(pageInfo === null || pageInfo === void 0 ? void 0 : pageInfo.breadcrumbs)) {
         for (let x = 0; x < pageInfo.breadcrumbs.length; x++) {
             let item = pageInfo.breadcrumbs[x];
             let isCurrent = (x == pageInfo.breadcrumbs.length - 1);

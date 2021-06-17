@@ -133,9 +133,24 @@ namespace Docomb.ContentStorage
 				fileStream.Write(content);
 				fileStream.Flush();
 				fileStream.Close();
+				Workspace.Content.ClearCache();
 				return true;
 			}
 			catch { return false; }
+		}
+
+
+		public bool Rename(string newName)
+		{
+			try
+			{
+				string newPath = Path.Combine(Path.GetDirectoryName(FilePath), newName);
+				File.Move(FilePath, newPath);
+				Workspace.Content.ClearCache();
+				return true;
+			}
+			catch { }
+			return false;
 		}
 
 		#endregion

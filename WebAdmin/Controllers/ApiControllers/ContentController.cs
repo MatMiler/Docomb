@@ -17,10 +17,15 @@ namespace Docomb.WebAdmin.Controllers.ApiControllers
 
 
 		[HttpPost("saveTextFile")]
-		public bool SaveTextFile(SaveRequest request)
-		{
-			return ContentManager.Edit.Save(request);
-		}
+		public bool SaveTextFile(SaveRequest request) => ContentManager.Edit.Save(request);
+
+
+		[HttpPost("renameFile")]
+		public MoveResponse RenameFile([FromBody] MoveRequest request) => ContentManager.Edit.RenameFile(request);
+
+
+		[HttpPost("renameDirectory")]
+		public MoveResponse RenameDirectory([FromBody] MoveRequest request) => ContentManager.Edit.RenameDirectory(request);
 
 	}
 }

@@ -94,7 +94,7 @@ module EditTextFileController {
 
 	export function getContentPanel(): JSX.Element {
 		let previewStyle: React.CSSProperties = {};
-		if (!Utils.TryGetBool(window, "showFileMetaDataPanel", true)) previewStyle.display = "none";
+		if (!Utils.tryGetBool(window, "showFileMetaDataPanel", true)) previewStyle.display = "none";
 
 		switch (fileDetails?.type) {
 			case Workspaces.FileType.Markdown: {
@@ -111,7 +111,7 @@ module EditTextFileController {
 			case Workspaces.FileType.Html: case Workspaces.FileType.PlainText: {
 				return (
 					<div className="editTextFile">
-						<div className="editor"><TextField defaultValue={fileDetails?.contentText} multiline /></div>
+						<div className="editor"><TextField defaultValue={fileDetails?.contentText} multiline resizable={false} borderless onChange={onEditorChange} /></div>
 					</div>
 				);
 			}
@@ -125,7 +125,7 @@ module EditTextFileController {
 	}
 
 	//function togglePreviewPanel(): void {
-	//	let show = !Utils.TryGetBool(window, "showPreviewPanel", true);
+	//	let show = !Utils.tryGetBool(window, "showPreviewPanel", true);
 	//	window["showPreviewPanel"] = show;
 	//	$(".preview").toggle(show);
 	//}

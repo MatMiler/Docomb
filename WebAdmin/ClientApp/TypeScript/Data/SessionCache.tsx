@@ -37,11 +37,11 @@ export module SessionCache {
 			try {
 				let data = JSON.parse(s);
 				if (data == null) return null;
-				let key: string = Utils.TryGetString(data, "key");
-				let value: any = Utils.TryGet(data, "value");
-				let timestamp: number = Utils.TryGetNumber(data, "value", null);
-				let expiry: number = Utils.TryGetNumber(data, "expiry", null);
-				let hash: number = Utils.TryGetNumber(data, "hash", null);
+				let key: string = Utils.tryGetString(data, "key");
+				let value: any = Utils.tryGet(data, "value");
+				let timestamp: number = Utils.tryGetNumber(data, "value", null);
+				let expiry: number = Utils.tryGetNumber(data, "expiry", null);
+				let hash: number = Utils.tryGetNumber(data, "hash", null);
 				if ((expiry != null) && (expiry <= Date.now())) return null; // Expired
 				let item: Item = new Item(key, value, expiry);
 				item.timestamp = timestamp;
@@ -99,6 +99,10 @@ export module SessionCache {
 		if ((key == null) || (key == "")) return; // No key specified
 		let item: Item = new Item(key, value, expiry);
 		window.sessionStorage.setItem(keyPrefix + key, item.serialize());
+	}
+
+	export function remove(key: string): void {
+		window.sessionStorage.removeItem(keyPrefix + key);
 	}
 
 	/**

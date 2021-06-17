@@ -19,19 +19,22 @@ type MainNavState = {
 export class MainNav extends Component<{}, MainNavState> {
 	constructor(props) {
 		super(props);
-		let workspaceUrl = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
-		let selectedKey: string = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
+		let workspaceUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
+		let selectedKey: string = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
 		this.state = { loading: true, lastLoadedTimestamp: LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl)), currentWorkspaceUrl: workspaceUrl, selectedKey: selectedKey };
 	}
 
-	instanceData: { treeData: Array<Workspaces.ContentItem> } = {
-		treeData: null
+	instanceData: { treeData: Array<Workspaces.ContentItem>, forceRefresh: boolean } = {
+		treeData: null,
+		forceRefresh: false
 	};
 
 	componentDidMount() {
 		this.populateContent();
 		this.navUpdateCall = this.onNavUpdate.bind(this);
 		EventBus.on("navUpdate", this.navUpdateCall);
+		this.fileStructChangedCall = this.fileStructChanged.bind(this);
+		EventBus.on("fileStructChanged", this.fileStructChangedCall);
 	}
 
 	componentWillUnmount() {
@@ -39,7 +42,8 @@ export class MainNav extends Component<{}, MainNavState> {
 	}
 
 	shouldComponentUpdate(nextProps, nextState: MainNavState) {
-		let currentWorkspaceUrl: string = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
+		if (this.instanceData.forceRefresh) return true;
+		let currentWorkspaceUrl: string = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
 		if ((currentWorkspaceUrl != this.state.currentWorkspaceUrl)
 			|| (this.state.loading != nextState.loading)
 			|| (this.state.lastLoadedTimestamp != LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(currentWorkspaceUrl)))
@@ -50,9 +54,9 @@ export class MainNav extends Component<{}, MainNavState> {
 
 	navUpdateCall = null;
 	onNavUpdate() {
-		let workspaceUrl = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
+		let workspaceUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
 		let lastLoadedTimestamp = LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl));
-		let selectedKey: string = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
+		let selectedKey: string = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
 		if ((workspaceUrl != this.state.currentWorkspaceUrl) || (lastLoadedTimestamp != this.state.lastLoadedTimestamp)) {
 			this.instanceData.treeData = null;
 			this.setState({ loading: true, selectedKey: selectedKey });
@@ -61,6 +65,13 @@ export class MainNav extends Component<{}, MainNavState> {
 		else if (selectedKey != this.state.selectedKey) {
 			this.setState({ selectedKey: selectedKey });
 		}
+	}
+
+	fileStructChangedCall = null;
+	fileStructChanged() {
+		//this.instanceData.treeData = null;
+		this.instanceData.forceRefresh = true;
+		this.populateContent();
 	}
 
 
@@ -81,12 +92,13 @@ export class MainNav extends Component<{}, MainNavState> {
 
 
 
+		this.instanceData.forceRefresh = false;
 		return (
 			<Pivot>
 				<PivotItem headerText="Content" >
 					{content}
 				</PivotItem>
-				<PivotItem headerText="Options" >
+				<PivotItem headerText="Options" hidden={true} >
 					Workspace options
 				</PivotItem>
 			</Pivot>
@@ -95,12 +107,12 @@ export class MainNav extends Component<{}, MainNavState> {
 
 
 	static itemChildrenToLinks(items: Array<Workspaces.ContentItem>, currentUrl: string): Array<INavLink> {
-		if (!Utils.ArrayHasValues(items)) return null;
+		if (!Utils.arrayHasValues(items)) return null;
 		let links: Array<INavLink> = [];
 		for (let x = 0; x < items.length; x++) {
 			let item = items[x];
 			let link = this.itemToNavLink(item, currentUrl);
-			if (Utils.ArrayHasValues(item.children)) {
+			if (Utils.arrayHasValues(item.children)) {
 				link.links = this.itemChildrenToLinks(item.children, currentUrl);
 				link.icon = null;
 			}
@@ -125,13 +137,13 @@ export class MainNav extends Component<{}, MainNavState> {
 
 	onLinkClick(ev?: React.MouseEvent<HTMLElement>, item?: INavLink) {
 		ev.preventDefault();
-		Utils.TryGet(this.props, "history").push("/" + item.url);
+		Utils.tryGet(this.props, "history").push("/" + item.url);
 		EventBus.dispatch("navChange");
 	}
 
 
 	async populateContent() {
-		let workspaceUrl = Utils.TryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
+		let workspaceUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
 		if ((workspaceUrl == null) || (workspaceUrl == "")) return;
 		let data: Array<Workspaces.ContentItem> = await Workspaces.loadTree(workspaceUrl);
 		this.instanceData.treeData = data;

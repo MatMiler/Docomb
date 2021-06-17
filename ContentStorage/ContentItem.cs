@@ -14,7 +14,8 @@ namespace Docomb.ContentStorage
 		public string FilePath { get; protected set; }
 
 		//public string FullUrl { get; protected set; }
-		public string Url { get; protected set; }
+		public string Url { get => _url ??= string.Join('/', UrlParts) + (NeedsTrailingSlash ? '/' : null); protected set => _url = value; }
+		private string _url = null;
 
 		public abstract bool NeedsTrailingSlash { get; }
 
@@ -40,7 +41,7 @@ namespace Docomb.ContentStorage
 			Workspace = workspace;
 			FilePath = filePath;
 			UrlParts = urlParts;
-			Url = string.Join('/', urlParts) + (NeedsTrailingSlash ? '/' : null);
+			_url = null;
 		}
 
 		public ContentFile AsFile => (this is ContentFile file) ? file : null;

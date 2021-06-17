@@ -24,7 +24,7 @@ export var LayoutUtils;
             ItemKey["ContentItemData"] = "contentItemData";
         })(ItemKey = WindowData.ItemKey || (WindowData.ItemKey = {}));
         function get(key) {
-            return Utils.TryGet(window, [WindowData.windowProperty, key]);
+            return Utils.tryGet(window, [WindowData.windowProperty, key]);
         }
         WindowData.get = get;
         function set(key, value) {
@@ -37,7 +37,7 @@ export var LayoutUtils;
     function fixLocalLinksInHtml(html, workspace, contentItem) {
         try {
             let container = $("<div />").html(html);
-            let readerBasePath = Utils.TryGetString(window, "readerBasePath");
+            let readerBasePath = Utils.tryGetString(window, "readerBasePath");
             if (!readerBasePath.endsWith("/"))
                 readerBasePath += "/";
             readerBasePath += workspace === null || workspace === void 0 ? void 0 : workspace.url;
@@ -47,7 +47,7 @@ export var LayoutUtils;
                 let a = $(element);
                 a.attr("target", "_blank");
                 let href = a.attr("href");
-                if (Utils.TrimString(href, null) != null) {
+                if (Utils.trimString(href, null) != null) {
                     let slashPos = href.indexOf("/");
                     if (slashPos == 0)
                         return;
