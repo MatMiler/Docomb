@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Docomb.WebAdmin.ContentManager.Info;
+using static Docomb.WebAdmin.Api.ContentManager.Info;
 
-namespace Docomb.WebAdmin.Controllers.Api
+namespace Docomb.WebAdmin.Api
 {
 	[Route(AdminConfig.UrlPathPrefix + "/api/general")]
 	public class GeneralController : Controller

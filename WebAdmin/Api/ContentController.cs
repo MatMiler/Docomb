@@ -1,13 +1,13 @@
 ﻿using Docomb.CommonCore;
-using Docomb.WebAdmin.ContentManager;
+using Docomb.WebAdmin.Api.ContentManager;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using static Docomb.WebAdmin.ContentManager.Edit;
+using static Docomb.WebAdmin.Api.ContentManager.Edit;
 
-namespace Docomb.WebAdmin.Controllers.ApiControllers
+namespace Docomb.WebAdmin.Api
 {
 	[Route(AdminConfig.UrlPathPrefix + "/api/content")]
 	public class ContentController : Controller
@@ -18,7 +18,7 @@ namespace Docomb.WebAdmin.Controllers.ApiControllers
 
 
 		[HttpPost("saveTextFile")]
-		public ActionStatus SaveTextFile(SaveRequest request)
+		public ActionStatus SaveTextFile([FromBody] SaveRequest request)
 		{
 			ActionStatus status = ContentManager.Edit.Save(request) ?? new ActionStatus(ActionStatus.StatusCode.Error);
 			Response.StatusCode = status.GetHttpStatusCode();

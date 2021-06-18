@@ -1,5 +1,5 @@
-﻿import { CommandBar, Dialog, DialogFooter, DialogType, ICommandBarItemProps, Spinner, SpinnerSize, TextField } from "@fluentui/react";
-import React, { FC, ReactElement } from "react";
+﻿import { CommandBar, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from "@fluentui/react";
+import React, { FC, ReactElement, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
 import { Utils } from "../../Data/Utils";
@@ -7,6 +7,7 @@ import { Workspaces } from "../../Data/Workspaces";
 import { LayoutUtils } from "../../LayoutUtils";
 import PageBreadcrumbs from "./PageBreadcrumbs";
 import $ from 'jquery';
+import { Apis } from "../../Data/Apis";
 
 
 const EditTextFile: FC<{}> = (): ReactElement => {
@@ -14,8 +15,13 @@ const EditTextFile: FC<{}> = (): ReactElement => {
 	function navigate(url: string) { history.push(url); }
 
 	const [waitingIsVisible, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }] = useBoolean(false);
+	const [alertIsVisible, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert }] = useBoolean(false);
+	const [alertTitle, setAlertTitle] = useState("");
+	const [alertContent, setAlertContent] = useState("");
 
-	EditTextFileController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting });
+	EditTextFileController.prepData(navigate,
+		{ toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting },
+		{ toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent });
 
 	return (
 		<>
@@ -29,6 +35,13 @@ const EditTextFile: FC<{}> = (): ReactElement => {
 			<Dialog hidden={!waitingIsVisible} dialogContentProps={{ type: DialogType.normal, title: null, showCloseButton: false }} modalProps={{ isBlocking: true }} >
 				<DialogFooter><Spinner label="Please wait..." labelPosition="right" size={SpinnerSize.large} /></DialogFooter>
 			</Dialog>
+			<Dialog hidden={!alertIsVisible} dialogContentProps={{ type: DialogType.largeHeader, title: alertTitle }} modalProps={{ isBlocking: false }} onDismiss={hideAlert} >
+				<Stack horizontal verticalAlign="center">
+					<FontIcon iconName="Warning" className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
+					<div>{alertContent}</div>
+				</Stack>
+				<DialogFooter><PrimaryButton onClick={hideAlert} text="OK" /></DialogFooter>
+			</Dialog>
 		</>
 	);
 };
@@ -40,12 +53,22 @@ module EditTextFileController {
 
 	export let pageInfo: Workspaces.WorkspacePageInfo = null;
 	export let fileDetails: Workspaces.FileDetails = null;
-	export let navigateCallback: (url: string) => void = null;
 	let content: string = null;
 
-	let waitingDialogCallbacks: IUseBooleanCallbacks = null;
+	export interface IAlertDialogOptions extends IUseBooleanCallbacks {
+		setTitle: React.Dispatch<React.SetStateAction<string>>,
+		setContent: React.Dispatch<React.SetStateAction<string>>
+	}
 
-	export function prepData(navigate: (url: string) => void, waitingDialog: IUseBooleanCallbacks): void {
+	export let navigateCallback: (url: string) => void = null;
+	let waitingDialogCallbacks: IUseBooleanCallbacks = null;
+	let alertDialogCallbacks: IAlertDialogOptions = null;
+
+	export function prepData(
+		navigate: (url: string) => void,
+		waitingDialog: IUseBooleanCallbacks,
+		alertDialog: IAlertDialogOptions
+	): void {
 		let newPageInfo: Workspaces.WorkspacePageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
 		pageInfo = newPageInfo;
 		fileDetails = pageInfo?.details;
@@ -53,6 +76,7 @@ module EditTextFileController {
 
 		EditTextFileController.navigateCallback = navigate;
 		waitingDialogCallbacks = waitingDialog;
+		alertDialogCallbacks = alertDialog;
 	}
 
 
@@ -85,17 +109,23 @@ module EditTextFileController {
 			navigateCallback("/workspace" + fileDetails?.reactLocalUrl);
 	}
 
-	function save(): void {
+	function save(): void { saveAsync(); }
+	async function saveAsync(): Promise<void> {
 		waitingDialogCallbacks.setTrue();
 		let c = Utils.parseString($("#editorInput").val(), content);
-		$.ajax(
-			{
-				url: "api/content/saveTextFile",
-				type: "POST",
-				data: { url: fileDetails?.reactLocalUrl, textContent: c },
-				success: onSaveSuccess,
-				error: onSaveError
-			});
+		let response = null;
+		response = await Apis.postJsonAsync("api/content/saveTextFile", { url: fileDetails?.reactLocalUrl, textContent: c });
+		waitingDialogCallbacks.setFalse();
+		let status = new Apis.ActionStatus(response);
+		if (status?.isOk == true) {
+			gotoInfo();
+		} else {
+			let title = "Can't save changes";
+			let desc = status.getDialogMessage();
+			alertDialogCallbacks.setTrue();
+			alertDialogCallbacks.setTitle(title);
+			alertDialogCallbacks.setContent(desc);
+		}
 	}
 
 	function onSaveSuccess(response: any): void {

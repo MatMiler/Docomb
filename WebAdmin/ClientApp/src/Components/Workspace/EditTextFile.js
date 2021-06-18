@@ -1,5 +1,14 @@
-import { CommandBar, Dialog, DialogFooter, DialogType, Spinner, SpinnerSize, TextField } from "@fluentui/react";
-import React from "react";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import { CommandBar, Dialog, DialogFooter, DialogType, FontIcon, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from "@fluentui/react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useBoolean } from '@fluentui/react-hooks';
 import { Utils } from "../../Data/Utils";
@@ -7,11 +16,15 @@ import { Workspaces } from "../../Data/Workspaces";
 import { LayoutUtils } from "../../LayoutUtils";
 import PageBreadcrumbs from "./PageBreadcrumbs";
 import $ from 'jquery';
+import { Apis } from "../../Data/Apis";
 const EditTextFile = () => {
     const history = useHistory();
     function navigate(url) { history.push(url); }
     const [waitingIsVisible, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }] = useBoolean(false);
-    EditTextFileController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting });
+    const [alertIsVisible, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert }] = useBoolean(false);
+    const [alertTitle, setAlertTitle] = useState("");
+    const [alertContent, setAlertContent] = useState("");
+    EditTextFileController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent });
     return (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "pageGrid" },
             React.createElement("div", { className: "pageTitle" },
@@ -20,23 +33,31 @@ const EditTextFile = () => {
             React.createElement("div", { className: "pageContent" }, EditTextFileController.getContentPanel())),
         React.createElement(Dialog, { hidden: !waitingIsVisible, dialogContentProps: { type: DialogType.normal, title: null, showCloseButton: false }, modalProps: { isBlocking: true } },
             React.createElement(DialogFooter, null,
-                React.createElement(Spinner, { label: "Please wait...", labelPosition: "right", size: SpinnerSize.large })))));
+                React.createElement(Spinner, { label: "Please wait...", labelPosition: "right", size: SpinnerSize.large }))),
+        React.createElement(Dialog, { hidden: !alertIsVisible, dialogContentProps: { type: DialogType.largeHeader, title: alertTitle }, modalProps: { isBlocking: false }, onDismiss: hideAlert },
+            React.createElement(Stack, { horizontal: true, verticalAlign: "center" },
+                React.createElement(FontIcon, { iconName: "Warning", className: mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" }) }),
+                React.createElement("div", null, alertContent)),
+            React.createElement(DialogFooter, null,
+                React.createElement(PrimaryButton, { onClick: hideAlert, text: "OK" })))));
 };
 export default EditTextFile;
 var EditTextFileController;
 (function (EditTextFileController) {
     EditTextFileController.pageInfo = null;
     EditTextFileController.fileDetails = null;
-    EditTextFileController.navigateCallback = null;
     let content = null;
+    EditTextFileController.navigateCallback = null;
     let waitingDialogCallbacks = null;
-    function prepData(navigate, waitingDialog) {
+    let alertDialogCallbacks = null;
+    function prepData(navigate, waitingDialog, alertDialog) {
         let newPageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
         EditTextFileController.pageInfo = newPageInfo;
         EditTextFileController.fileDetails = EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.details;
         content = EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText;
         EditTextFileController.navigateCallback = navigate;
         waitingDialogCallbacks = waitingDialog;
+        alertDialogCallbacks = alertDialog;
     }
     EditTextFileController.prepData = prepData;
     function getToolbar() {
@@ -68,15 +89,25 @@ var EditTextFileController;
         if (EditTextFileController.navigateCallback != null)
             EditTextFileController.navigateCallback("/workspace" + (EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.reactLocalUrl));
     }
-    function save() {
-        waitingDialogCallbacks.setTrue();
-        let c = Utils.parseString($("#editorInput").val(), content);
-        $.ajax({
-            url: "api/content/saveTextFile",
-            type: "POST",
-            data: { url: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.reactLocalUrl, textContent: c },
-            success: onSaveSuccess,
-            error: onSaveError
+    function save() { saveAsync(); }
+    function saveAsync() {
+        return __awaiter(this, void 0, void 0, function* () {
+            waitingDialogCallbacks.setTrue();
+            let c = Utils.parseString($("#editorInput").val(), content);
+            let response = null;
+            response = yield Apis.postJsonAsync("api/content/saveTextFile", { url: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.reactLocalUrl, textContent: c });
+            waitingDialogCallbacks.setFalse();
+            let status = new Apis.ActionStatus(response);
+            if ((status === null || status === void 0 ? void 0 : status.isOk) == true) {
+                gotoInfo();
+            }
+            else {
+                let title = "Can't save changes";
+                let desc = status.getDialogMessage();
+                alertDialogCallbacks.setTrue();
+                alertDialogCallbacks.setTitle(title);
+                alertDialogCallbacks.setContent(desc);
+            }
         });
     }
     function onSaveSuccess(response) {

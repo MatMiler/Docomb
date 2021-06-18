@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Docomb.CommonCore;
 
-namespace Docomb.WebAdmin.ContentManager
+namespace Docomb.WebAdmin.Api.ContentManager
 {
 	public static class Edit
 	{

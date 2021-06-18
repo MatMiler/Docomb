@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Web;
 
-namespace Docomb.WebAdmin.ContentManager
+namespace Docomb.WebAdmin.Api.ContentManager
 {
 	public static class Info
 	{
@@ -135,7 +135,7 @@ namespace Docomb.WebAdmin.ContentManager
 			return GetTree(workspace, new());
 		}
 
-		public static List<ContentItemSummary> GetTree(Workspace workspace, List<string> parentPathParts, int depth = 0)
+		private static List<ContentItemSummary> GetTree(Workspace workspace, List<string> parentPathParts, int depth = 0)
 		{
 			if (depth > 50) return null;
 			List<ContentStorage.ContentItemSummary> children = workspace.Content.GetPhysicalChildren(parentPathParts);
@@ -154,6 +154,31 @@ namespace Docomb.WebAdmin.ContentManager
 
 			return items;
 		}
+
+
+
+		public static List<string> GetDirectoryPaths(string workspaceUrl)
+		{
+			(Workspace workspace, _) = WebCore.Configurations.WorkspacesConfig.FindFromPath(workspaceUrl);
+			if (workspace == null) return null;
+			List<string> list = new();
+
+
+
+			return list;
+		}
+
+		private static List<string> GetChildDirectoryPaths(Workspace workspace, List<string> parentPathParts, int depth = 0)
+		{
+			List<string> list = new();
+
+
+
+			return list;
+		}
+
+
+
 
 	}
 }
