@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Docomb.WebAdmin.Api
 {
-	class ResponseWithStatus<T>
+	public class ResponseWithStatus<T>
 	{
 		[JsonPropertyName("actionStatus")]
 		public ActionStatus ActionStatus { get; set; }

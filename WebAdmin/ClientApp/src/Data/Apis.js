@@ -102,5 +102,12 @@ export var Apis;
         }
     }
     Apis.ActionStatus = ActionStatus;
+    class ResponseWithStatus {
+        constructor(actionStatus, data) {
+            this.actionStatus = actionStatus;
+            this.data = data;
+        }
+    }
+    Apis.ResponseWithStatus = ResponseWithStatus;
 })(Apis || (Apis = {}));
 //# sourceMappingURL=Apis.js.map

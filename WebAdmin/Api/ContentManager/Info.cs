@@ -157,22 +157,36 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 
 
-		public static List<string> GetDirectoryPaths(string workspaceUrl)
+		public static ResponseWithStatus<List<string>> GetDirectoryPaths(string workspaceUrl)
 		{
 			(Workspace workspace, _) = WebCore.Configurations.WorkspacesConfig.FindFromPath(workspaceUrl);
-			if (workspace == null) return null;
-			List<string> list = new();
-
-
-
-			return list;
+			if (workspace == null) return new(new ActionStatus(ActionStatus.StatusCode.NotFound), null);
+			try
+			{
+				List<string> list = GetChildDirectoryPaths(workspace, new());
+				return new(new ActionStatus(ActionStatus.StatusCode.OK), list);
+			}
+			catch (Exception e)
+			{
+				return new(new ActionStatus(ActionStatus.StatusCode.Error, exception: e), null);
+			}
 		}
+
 
 		private static List<string> GetChildDirectoryPaths(Workspace workspace, List<string> parentPathParts, int depth = 0)
 		{
 			List<string> list = new();
 
+			List<ContentStorage.ContentItemSummary> children = workspace.Content.GetPhysicalChildren(parentPathParts, false, true);
+			if ((children == null) || (children.Count <= 0)) return new();
 
+			List<ContentItemSummary> items = new();
+			foreach (ContentStorage.ContentItemSummary child in children)
+			{
+				if (child?.Type != ContentItemType.Directory) continue;
+				list.Add(child.Url);
+				list.AddRange(GetChildDirectoryPaths(workspace, child.UrlParts, depth + 1));
+			}
 
 			return list;
 		}

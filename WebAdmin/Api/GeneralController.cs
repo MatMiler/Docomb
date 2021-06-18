@@ -23,6 +23,14 @@ namespace Docomb.WebAdmin.Api
 		public ActionResult<List<ContentItemSummary>> WorkspaceContentTree(string workspaceUrl) => GetTree(workspaceUrl);
 
 
+		[HttpGet("workspeceDirectoryPaths")]
+		public ResponseWithStatus<List<string>> WorkspaceDirectoryPaths(string workspaceUrl)
+		{
+			ResponseWithStatus<List<string>> data = GetDirectoryPaths(workspaceUrl);
+			if (data?.ActionStatus != null) Response.StatusCode = data.ActionStatus.GetHttpStatusCode();
+			return data;
+		}
+
 	}
 
 

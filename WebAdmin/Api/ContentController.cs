@@ -35,6 +35,15 @@ namespace Docomb.WebAdmin.Api
 		}
 
 
+		[HttpPost("moveFile")]
+		public MoveResponse MoveFile([FromBody] MoveRequest request)
+		{
+			MoveResponse response = ContentManager.Edit.MoveFile(request);
+			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
+			return response;
+		}
+
+
 		[HttpPost("renameDirectory")]
 		public MoveResponse RenameDirectory([FromBody] MoveRequest request)
 		{

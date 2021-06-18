@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, FontIcon, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
+import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, FontIcon, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
 import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
 import { useBoolean } from '@fluentui/react-hooks';
@@ -27,7 +27,10 @@ const ContentFileInfo = () => {
     const [alertContent, setAlertContent] = useState("");
     const [renameIsVisible, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }] = useBoolean(false);
     const [moveIsVisible, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove }] = useBoolean(false);
-    ContentFileInfoController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent }, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove });
+    //const [moveCurrentDirectory, setMoveCurrentDirectory] = useState<IDropdownOption>();
+    const [moveDirectories, setMoveDirectories] = useState([]);
+    ContentFileInfoController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent }, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories });
+    //const [moveSelection, setMoveSelection] = useState<string>(ContentFileInfoController.pageInfo.contentItem.getParentPath());
     return (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "pageGrid" },
             React.createElement("div", { className: "pageTitle" },
@@ -47,7 +50,12 @@ const ContentFileInfo = () => {
             React.createElement(TextField, { label: "New file name", id: "renameInput", defaultValue: (_a = ContentFileInfoController === null || ContentFileInfoController === void 0 ? void 0 : ContentFileInfoController.fileDetails) === null || _a === void 0 ? void 0 : _a.fileName }),
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: ContentFileInfoController.Rename.finish, text: "Rename" }),
-                React.createElement(DefaultButton, { onClick: ContentFileInfoController.Rename.cancel, text: "Cancel" })))));
+                React.createElement(DefaultButton, { onClick: ContentFileInfoController.Rename.cancel, text: "Cancel" }))),
+        React.createElement(Dialog, { hidden: !moveIsVisible, onDismiss: hideMove, dialogContentProps: { type: DialogType.largeHeader, title: "Move file" }, modalProps: { isBlocking: false } },
+            React.createElement(Dropdown, { id: "moveInput", placeholder: "Select a folder", label: "Move to folder", defaultSelectedKey: ContentFileInfoController.pageInfo.contentItem.getParentPath(), options: moveDirectories, onChange: ContentFileInfoController.Move.onSelectionChange }),
+            React.createElement(DialogFooter, null,
+                React.createElement(PrimaryButton, { onClick: ContentFileInfoController.Move.finish, text: "Move" }),
+                React.createElement(DefaultButton, { onClick: ContentFileInfoController.Move.cancel, text: "Cancel" })))));
 };
 export default ContentFileInfo;
 var ContentFileInfoController;
@@ -85,7 +93,7 @@ var ContentFileInfoController;
                 }
         }
         commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
-        commandBarItems.push({ key: "move", text: "Move", disabled: true, iconProps: { iconName: "MoveToFolder" } });
+        commandBarItems.push({ key: "move", text: "Move", onClick: Move.show, iconProps: { iconName: "MoveToFolder" } });
         commandBarItems.push({ key: "delete", text: "Delete", disabled: true, iconProps: { iconName: "Delete" } });
         let farItems = [
             { key: "toggleInfo", text: "Toggle file information", iconOnly: true, ariaLabel: "Toggle file information", iconProps: { iconName: "Info" }, onClick: toggleMetaDataPanel }
@@ -192,18 +200,77 @@ var ContentFileInfoController;
     })(Rename = ContentFileInfoController.Rename || (ContentFileInfoController.Rename = {}));
     let Move;
     (function (Move) {
-        function show() {
-            moveDialogCallbacks.setTrue();
-        }
+        let pathOptions = null;
+        let currentSelection = null;
+        function show() { showAsync(); }
         Move.show = show;
+        function showAsync() {
+            var _a;
+            return __awaiter(this, void 0, void 0, function* () {
+                //#region Get path list options
+                if (pathOptions == null) {
+                    waitingDialogCallbacks.setTrue();
+                    let response = yield Workspaces.directoryPaths(ContentFileInfoController.pageInfo.workspace.url);
+                    if (((_a = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _a === void 0 ? void 0 : _a.isOk) != true) {
+                        waitingDialogCallbacks.setFalse();
+                        let title = "Can't get folder list";
+                        let desc = response.actionStatus.getDialogMessage();
+                        alertDialogCallbacks.setTrue();
+                        alertDialogCallbacks.setTitle(title);
+                        alertDialogCallbacks.setContent(desc);
+                        return;
+                    }
+                    let options = [{ key: "/", text: "/" }];
+                    if (Utils.arrayHasValues(response === null || response === void 0 ? void 0 : response.data)) {
+                        for (let x = 0; x < response.data.length; x++) {
+                            let path = response.data[x];
+                            options.push({ key: path, text: path });
+                        }
+                    }
+                    pathOptions = options;
+                    waitingDialogCallbacks.setFalse();
+                }
+                //#endregion
+                moveDialogCallbacks.setDirectories(pathOptions);
+                currentSelection = ContentFileInfoController.pageInfo.contentItem.getParentPath();
+                moveDialogCallbacks.setTrue();
+            });
+        }
+        Move.showAsync = showAsync;
         function finish() {
-            moveDialogCallbacks.setFalse();
+            var _a;
+            return __awaiter(this, void 0, void 0, function* () {
+                let newParent = currentSelection;
+                moveDialogCallbacks.setFalse();
+                waitingDialogCallbacks.setTrue();
+                let response = yield Workspaces.moveFile(ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.reactLocalUrl, newParent);
+                waitingDialogCallbacks.setFalse();
+                if (((_a = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _a === void 0 ? void 0 : _a.isOk) == true) {
+                    let newUrl = Utils.trimString(response === null || response === void 0 ? void 0 : response.newUrl, "");
+                    if (!newUrl.startsWith("/"))
+                        newUrl = "/" + newUrl;
+                    Workspaces.clearTreeCache();
+                    EventBus.dispatch("fileStructChanged");
+                    navigateCallback("/workspace" + newUrl);
+                }
+                else {
+                    let title = "Can't move file";
+                    let desc = response.actionStatus.getDialogMessage();
+                    alertDialogCallbacks.setTrue();
+                    alertDialogCallbacks.setTitle(title);
+                    alertDialogCallbacks.setContent(desc);
+                }
+            });
         }
         Move.finish = finish;
         function cancel() {
             moveDialogCallbacks.setFalse();
         }
         Move.cancel = cancel;
+        function onSelectionChange(event, option, index) {
+            currentSelection = Utils.parseString(option === null || option === void 0 ? void 0 : option.key);
+        }
+        Move.onSelectionChange = onSelectionChange;
     })(Move = ContentFileInfoController.Move || (ContentFileInfoController.Move = {}));
 })(ContentFileInfoController || (ContentFileInfoController = {}));
 //# sourceMappingURL=ContentFileInfo.js.map

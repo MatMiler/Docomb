@@ -141,6 +141,19 @@ export module Workspaces {
 			let item = new ContentItem(source);
 			return (item?.isValid() == true) ? item : null;
 		}
+
+		public getParentPath(): string {
+			if ((this.url == null) || (this.url?.length <= 0)) return "/";
+			let parts: string[] = this.url.split("/");
+			if (Utils.arrayHasValues(parts)) {
+				let parentPaths: string[] = [];
+				for (let x = 0; x < parts.length - 1; x++) {
+					parentPaths.push(parts[x]);
+				}
+				return parentPaths.join("/") + "/";
+			}
+			return "/";
+		}
 	}
 
 	export enum ContentItemAction {
@@ -213,7 +226,7 @@ export module Workspaces {
 
 
 
-	export class RenameResponse {
+	export class MoveResponse {
 		//public success: boolean;
 		public actionStatus: Apis.ActionStatus;
 		public oldUrl: string;
@@ -227,17 +240,34 @@ export module Workspaces {
 	}
 
 
-	export async function renameFile(url: string, newName: string): Promise<RenameResponse> {
+	export async function renameFile(url: string, newName: string): Promise<MoveResponse> {
 		let data = null;
 		data = await Apis.postJsonAsync("api/content/renameFile", { url: url, fileName: newName });
-		return new RenameResponse(data);
+		return new MoveResponse(data);
 	}
 
 
-	export async function renameDirectory(url: string, newName: string): Promise<RenameResponse> {
+	export async function moveFile(url: string, newParent: string): Promise<MoveResponse> {
+		let data = null;
+		data = await Apis.postJsonAsync("api/content/moveFile", { url: url, parent: newParent });
+		return new MoveResponse(data);
+	}
+
+
+	export async function renameDirectory(url: string, newName: string): Promise<MoveResponse> {
 		let data = null;
 		data = await Apis.postJsonAsync("api/content/renameDirectory", { url: url, fileName: newName });
-		return new RenameResponse(data);
+		return new MoveResponse(data);
+	}
+
+
+	export async function directoryPaths(workspaceUrl: string): Promise<Apis.ResponseWithStatus<string[]>> {
+		let source: any = await Apis.fetchJsonAsync("api/general/workspeceDirectoryPaths?workspaceUrl=" + encodeURI(workspaceUrl), false);
+		let actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
+		let list: string[] = null;
+		if (actionStatus?.isOk == true) 
+			list = Utils.mapArray(Utils.tryGet(source, "data"), x => Utils.trimString(x, null), x => (x != null));
+		return new Apis.ResponseWithStatus(actionStatus, list);
 	}
 
 }

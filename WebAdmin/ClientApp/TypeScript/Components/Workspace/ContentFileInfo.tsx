@@ -1,4 +1,4 @@
-﻿import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, IDialogContentProps, IDialogProps, IModalProps, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
+﻿import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, FontIcon, ICommandBarItemProps, IDialogContentProps, IDialogProps, IDropdown, IDropdownOption, IModalProps, IRefObject, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
 import React, { FC, ReactElement, useState } from 'react';
 import { useHistory } from "react-router-dom";
 import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
@@ -20,13 +20,13 @@ const ContentFileInfo: FC<{}> = (): ReactElement => {
 	const [alertContent, setAlertContent] = useState("");
 	const [renameIsVisible, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }] = useBoolean(false);
 	const [moveIsVisible, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove }] = useBoolean(false);
+	const [moveDirectories, setMoveDirectories] = useState<IDropdownOption[]>([]);
 
 	ContentFileInfoController.prepData(navigate,
 		{ toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting },
 		{ toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent },
 		{ toggle: toggleRename, setTrue: showRename, setFalse: hideRename },
-		{ toggle: toggleMove, setTrue: showMove, setFalse: hideMove });
-
+		{ toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories });
 
 	return (
 		<>
@@ -59,6 +59,18 @@ const ContentFileInfo: FC<{}> = (): ReactElement => {
 					<DefaultButton onClick={ContentFileInfoController.Rename.cancel} text="Cancel" />
 				</DialogFooter>
 			</Dialog>
+			<Dialog
+				hidden={!moveIsVisible}
+				onDismiss={hideMove}
+				dialogContentProps={{ type: DialogType.largeHeader, title: "Move file" }}
+				modalProps={{ isBlocking: false }}
+			>
+				<Dropdown id="moveInput" placeholder="Select a folder" label="Move to folder" defaultSelectedKey={ContentFileInfoController.pageInfo.contentItem.getParentPath()} options={moveDirectories} onChange={ContentFileInfoController.Move.onSelectionChange} />
+				<DialogFooter>
+					<PrimaryButton onClick={ContentFileInfoController.Move.finish} text="Move" />
+					<DefaultButton onClick={ContentFileInfoController.Move.cancel} text="Cancel" />
+				</DialogFooter>
+			</Dialog>
 		</>
 	);
 };
@@ -77,12 +89,15 @@ module ContentFileInfoController {
 		setTitle: React.Dispatch<React.SetStateAction<string>>,
 		setContent: React.Dispatch<React.SetStateAction<string>>
 	}
+	export interface IMoveDialogOptions extends IUseBooleanCallbacks {
+		setDirectories: React.Dispatch<React.SetStateAction<IDropdownOption[]>>
+	}
 
 	let navigateCallback: (url: string) => void = null;
 	let waitingDialogCallbacks: IUseBooleanCallbacks = null;
 	let alertDialogCallbacks: IAlertDialogOptions = null;
 	let renameDialogCallbacks: IUseBooleanCallbacks = null;
-	let moveDialogCallbacks: IUseBooleanCallbacks = null;
+	let moveDialogCallbacks: IMoveDialogOptions = null;
 
 
 	export function prepData(
@@ -90,7 +105,7 @@ module ContentFileInfoController {
 		waitingDialog: IUseBooleanCallbacks,
 		alertDialog: IAlertDialogOptions,
 		renameDialog: IUseBooleanCallbacks,
-		moveDialog: IUseBooleanCallbacks
+		moveDialog: IMoveDialogOptions
 	): void {
 		let newPageInfo: Workspaces.WorkspacePageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
 		pageInfo = newPageInfo;
@@ -120,7 +135,7 @@ module ContentFileInfoController {
 		}
 
 		commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
-		commandBarItems.push({ key: "move", text: "Move", disabled: true, iconProps: { iconName: "MoveToFolder" } });
+		commandBarItems.push({ key: "move", text: "Move", onClick: Move.show, iconProps: { iconName: "MoveToFolder" } });
 		commandBarItems.push({ key: "delete", text: "Delete", disabled: true, iconProps: { iconName: "Delete" } });
 
 		let farItems: ICommandBarItemProps[] = [
@@ -206,7 +221,7 @@ module ContentFileInfoController {
 			let fileName: string = Utils.trimString($("#renameInput", "").val());
 			renameDialogCallbacks.setFalse();
 			waitingDialogCallbacks.setTrue();
-			let response: Workspaces.RenameResponse = await Workspaces.renameFile(fileDetails?.reactLocalUrl, fileName);
+			let response: Workspaces.MoveResponse = await Workspaces.renameFile(fileDetails?.reactLocalUrl, fileName);
 			waitingDialogCallbacks.setFalse();
 			if (response?.actionStatus?.isOk == true) {
 				let newUrl: string = Utils.trimString(response?.newUrl, "");
@@ -230,21 +245,74 @@ module ContentFileInfoController {
 
 
 	export module Move {
-		export function show(): void {
+
+		let pathOptions: IDropdownOption[] = null;
+		let currentSelection: string = null;
+
+		export function show(): void { showAsync(); }
+		export async function showAsync(): Promise<void> {
+
+			//#region Get path list options
+			if (pathOptions == null) {
+				waitingDialogCallbacks.setTrue();
+				let response = await Workspaces.directoryPaths(pageInfo.workspace.url);
+				if (response?.actionStatus?.isOk != true) {
+					waitingDialogCallbacks.setFalse();
+					let title = "Can't get folder list";
+					let desc = response.actionStatus.getDialogMessage();
+					alertDialogCallbacks.setTrue();
+					alertDialogCallbacks.setTitle(title);
+					alertDialogCallbacks.setContent(desc);
+					return;
+				}
+				let options: IDropdownOption[] = [{ key: "/", text: "/" }];
+				if (Utils.arrayHasValues(response?.data)) {
+					for (let x = 0; x < response.data.length; x++) {
+						let path = response.data[x];
+						options.push({ key: path, text: path });
+					}
+				}
+				pathOptions = options;
+				waitingDialogCallbacks.setFalse();
+			}
+			//#endregion
+
+			moveDialogCallbacks.setDirectories(pathOptions);
+			currentSelection = pageInfo.contentItem.getParentPath();
 			moveDialogCallbacks.setTrue();
 		}
 
-		export function finish(): void {
+		export async function finish(): Promise<void> {
+			let newParent: string = currentSelection;
 			moveDialogCallbacks.setFalse();
+			waitingDialogCallbacks.setTrue();
+			let response: Workspaces.MoveResponse = await Workspaces.moveFile(fileDetails?.reactLocalUrl, newParent);
+			waitingDialogCallbacks.setFalse();
+			if (response?.actionStatus?.isOk == true) {
+				let newUrl: string = Utils.trimString(response?.newUrl, "");
+				if (!newUrl.startsWith("/")) newUrl = "/" + newUrl;
+				Workspaces.clearTreeCache();
+				EventBus.dispatch("fileStructChanged");
+				navigateCallback("/workspace" + newUrl);
+			} else {
+				let title = "Can't move file";
+				let desc = response.actionStatus.getDialogMessage();
+				alertDialogCallbacks.setTrue();
+				alertDialogCallbacks.setTitle(title);
+				alertDialogCallbacks.setContent(desc);
+			}
 		}
 
 		export function cancel(): void {
 			moveDialogCallbacks.setFalse();
 		}
+
+		export function onSelectionChange(event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void {
+			currentSelection = Utils.parseString(option?.key);
+		}
 	}
 
 
 }
-
 
 

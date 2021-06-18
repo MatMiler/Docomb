@@ -22,8 +22,12 @@ export module Apis {
 			let storedItem: SessionCache.Item = SessionCache.getItem(cacheKey);
 			if (storedItem != null) return storedItem.value;
 		}
-		let response: Response = await fetch(url);
-		let data: any = await response.json();
+		let data: any = null;
+		try {
+			let response: Response = await fetch(url);
+			data = await response.json();
+		}
+		catch (e) {}
 		if (cache == true) {
 			SessionCache.save(cacheKey, data, Utils.tryGetNumber(cacheOptions, "expiry", null));
 		}
@@ -49,8 +53,12 @@ export module Apis {
 	 */
 	export async function postJsonAsync(url: string, data: any): Promise<any> {
 		let fetchData: RequestInit = { method: "POST", body: JSON.stringify(data), headers: { "Content-type": "application/json; charset=UTF-8" } };
-		let response: Response = await fetch(url, fetchData);
-		let receivedData: any = await response.json();
+		let receivedData: any = null;
+		try {
+			let response: Response = await fetch(url, fetchData);
+			receivedData = await response.json();
+		}
+		catch (e) { }
 		return receivedData;
 	}
 
@@ -96,6 +104,15 @@ export module Apis {
 				case ActionStatusCode.Conflict: return "There's a conflict preventing the action.";
 			}
 			return "A problem has occurred.";
+		}
+	}
+
+	export class ResponseWithStatus<T> {
+		public actionStatus: ActionStatus;
+		public data: T;
+		public constructor(actionStatus: ActionStatus, data: T) {
+			this.actionStatus = actionStatus;
+			this.data = data;
 		}
 	}
 

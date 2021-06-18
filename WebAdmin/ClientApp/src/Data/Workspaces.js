@@ -134,6 +134,20 @@ export var Workspaces;
             let item = new ContentItem(source);
             return ((item === null || item === void 0 ? void 0 : item.isValid()) == true) ? item : null;
         }
+        getParentPath() {
+            var _a;
+            if ((this.url == null) || (((_a = this.url) === null || _a === void 0 ? void 0 : _a.length) <= 0))
+                return "/";
+            let parts = this.url.split("/");
+            if (Utils.arrayHasValues(parts)) {
+                let parentPaths = [];
+                for (let x = 0; x < parts.length - 1; x++) {
+                    parentPaths.push(parts[x]);
+                }
+                return parentPaths.join("/") + "/";
+            }
+            return "/";
+        }
     }
     Workspaces.ContentItem = ContentItem;
     let ContentItemAction;
@@ -184,29 +198,48 @@ export var Workspaces;
         }
     }
     Workspaces.FileDetails = FileDetails;
-    class RenameResponse {
+    class MoveResponse {
         constructor(source) {
             this.actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
             this.oldUrl = Utils.tryGetString(source, "oldUrl");
             this.newUrl = Utils.tryGetString(source, "newUrl");
         }
     }
-    Workspaces.RenameResponse = RenameResponse;
+    Workspaces.MoveResponse = MoveResponse;
     function renameFile(url, newName) {
         return __awaiter(this, void 0, void 0, function* () {
             let data = null;
             data = yield Apis.postJsonAsync("api/content/renameFile", { url: url, fileName: newName });
-            return new RenameResponse(data);
+            return new MoveResponse(data);
         });
     }
     Workspaces.renameFile = renameFile;
+    function moveFile(url, newParent) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data = null;
+            data = yield Apis.postJsonAsync("api/content/moveFile", { url: url, parent: newParent });
+            return new MoveResponse(data);
+        });
+    }
+    Workspaces.moveFile = moveFile;
     function renameDirectory(url, newName) {
         return __awaiter(this, void 0, void 0, function* () {
             let data = null;
             data = yield Apis.postJsonAsync("api/content/renameDirectory", { url: url, fileName: newName });
-            return new RenameResponse(data);
+            return new MoveResponse(data);
         });
     }
     Workspaces.renameDirectory = renameDirectory;
+    function directoryPaths(workspaceUrl) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let source = yield Apis.fetchJsonAsync("api/general/workspeceDirectoryPaths?workspaceUrl=" + encodeURI(workspaceUrl), false);
+            let actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
+            let list = null;
+            if ((actionStatus === null || actionStatus === void 0 ? void 0 : actionStatus.isOk) == true)
+                list = Utils.mapArray(Utils.tryGet(source, "data"), x => Utils.trimString(x, null), x => (x != null));
+            return new Apis.ResponseWithStatus(actionStatus, list);
+        });
+    }
+    Workspaces.directoryPaths = directoryPaths;
 })(Workspaces || (Workspaces = {}));
 //# sourceMappingURL=Workspaces.js.map
