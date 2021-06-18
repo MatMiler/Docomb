@@ -164,5 +164,31 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 
 
+		public static MoveResponse MoveDirectory(MoveRequest request) => MoveDirectory(request?.Url, request?.Parent);
+		public static MoveResponse MoveDirectory(string url, string newParentPath)
+		{
+			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
+			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
+			ContentItem item = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical);
+			ContentDirectory contentdirectory = item?.AsDirectory;
+			if (contentdirectory == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
+
+			ActionStatus status = contentdirectory.Move(newParentPath) ?? new(ActionStatus.StatusCode.Error);
+			string newUrl = null;
+
+			if (status.IsOk == true)
+			{
+				try
+				{
+					newUrl = CombineUrlPaths("", CombineUrlPaths(workspace.UrlPath, CombineUrlPaths(newParentPath, CombineUrlPaths(contentdirectory.UrlParts.LastOrDefault(), ""))));
+				}
+				catch { }
+			}
+
+			return new() { ActionStatus = status, OldUrl = url, NewUrl = newUrl };
+		}
+
+
+
 	}
 }

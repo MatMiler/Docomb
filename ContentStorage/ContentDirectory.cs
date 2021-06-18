@@ -38,6 +38,26 @@ namespace Docomb.ContentStorage
 			}
 		}
 
+		public ActionStatus Move(string newParentPath)
+		{
+			try
+			{
+				ContentDirectory parent = Workspace.Content.FindItem(newParentPath, MatchType.Physical)?.AsDirectory;
+				if (parent == null) return new(ActionStatus.StatusCode.NotFound, $"Target path '{newParentPath}' doesn't exist.");
+				string newPath = Path.Combine(parent.FilePath, UrlParts.LastOrDefault());
+				if (newPath == FilePath) return new(ActionStatus.StatusCode.InvalidRequestData, $"The folder is already in '{newParentPath}'");
+				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"A file with the same name already exists in '{newParentPath}'.");
+				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"A folder with the same name already exists in '{newParentPath}'.");
+				Directory.Move(FilePath, newPath);
+				Workspace.Content.ClearCache();
+				return new(ActionStatus.StatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return new(ActionStatus.StatusCode.Error, exception: e);
+			}
+		}
+
 
 	}
 }

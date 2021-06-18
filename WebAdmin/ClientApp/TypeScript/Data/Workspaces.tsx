@@ -144,7 +144,7 @@ export module Workspaces {
 
 		public getParentPath(): string {
 			if ((this.url == null) || (this.url?.length <= 0)) return "/";
-			let parts: string[] = this.url.split("/");
+			let parts: string[] = Utils.mapArray(this.url.split("/"), x => Utils.trimString(x, null), null, false);
 			if (Utils.arrayHasValues(parts)) {
 				let parentPaths: string[] = [];
 				for (let x = 0; x < parts.length - 1; x++) {
@@ -257,6 +257,13 @@ export module Workspaces {
 	export async function renameDirectory(url: string, newName: string): Promise<MoveResponse> {
 		let data = null;
 		data = await Apis.postJsonAsync("api/content/renameDirectory", { url: url, fileName: newName });
+		return new MoveResponse(data);
+	}
+
+
+	export async function moveDirectory(url: string, newParent: string): Promise<MoveResponse> {
+		let data = null;
+		data = await Apis.postJsonAsync("api/content/moveDirectory", { url: url, parent: newParent });
 		return new MoveResponse(data);
 	}
 

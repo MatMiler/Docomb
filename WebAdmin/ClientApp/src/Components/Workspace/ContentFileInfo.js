@@ -27,10 +27,8 @@ const ContentFileInfo = () => {
     const [alertContent, setAlertContent] = useState("");
     const [renameIsVisible, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }] = useBoolean(false);
     const [moveIsVisible, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove }] = useBoolean(false);
-    //const [moveCurrentDirectory, setMoveCurrentDirectory] = useState<IDropdownOption>();
     const [moveDirectories, setMoveDirectories] = useState([]);
     ContentFileInfoController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent }, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories });
-    //const [moveSelection, setMoveSelection] = useState<string>(ContentFileInfoController.pageInfo.contentItem.getParentPath());
     return (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "pageGrid" },
             React.createElement("div", { className: "pageTitle" },

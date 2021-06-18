@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { CommandBar, ContextualMenuItemType, DefaultButton, Dialog, DialogFooter, DialogType, FontIcon, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
+import { CommandBar, ContextualMenuItemType, DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, FontIcon, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
 import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
 import { useBoolean } from '@fluentui/react-hooks';
@@ -27,7 +27,8 @@ const ContentDirectory = () => {
     const [alertContent, setAlertContent] = useState("");
     const [renameIsVisible, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }] = useBoolean(false);
     const [moveIsVisible, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove }] = useBoolean(false);
-    ContentDirectoryController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent }, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove });
+    const [moveDirectories, setMoveDirectories] = useState([]);
+    ContentDirectoryController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent }, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories });
     let renameDialogContent = {
         type: DialogType.largeHeader,
         title: "Rename folder"
@@ -55,7 +56,12 @@ const ContentDirectory = () => {
             React.createElement(TextField, { label: "New folder name", id: "renameInput", defaultValue: (_b = (_a = ContentDirectoryController === null || ContentDirectoryController === void 0 ? void 0 : ContentDirectoryController.pageInfo) === null || _a === void 0 ? void 0 : _a.contentItem) === null || _b === void 0 ? void 0 : _b.name }),
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: ContentDirectoryController.Rename.finish, text: "Rename" }),
-                React.createElement(DefaultButton, { onClick: ContentDirectoryController.Rename.cancel, text: "Cancel" })))));
+                React.createElement(DefaultButton, { onClick: ContentDirectoryController.Rename.cancel, text: "Cancel" }))),
+        React.createElement(Dialog, { hidden: !moveIsVisible, onDismiss: hideMove, dialogContentProps: { type: DialogType.largeHeader, title: "Move file" }, modalProps: { isBlocking: false } },
+            React.createElement(Dropdown, { id: "moveInput", placeholder: "Select a folder", label: "Move to folder", defaultSelectedKey: ContentDirectoryController.pageInfo.contentItem.getParentPath(), options: moveDirectories, onChange: ContentDirectoryController.Move.onSelectionChange }),
+            React.createElement(DialogFooter, null,
+                React.createElement(PrimaryButton, { onClick: ContentDirectoryController.Move.finish, text: "Move" }),
+                React.createElement(DefaultButton, { onClick: ContentDirectoryController.Move.cancel, text: "Cancel" })))));
 };
 export default ContentDirectory;
 var ContentDirectoryController;
@@ -101,7 +107,7 @@ var ContentDirectoryController;
         ];
         if (!ContentDirectoryController.isRoot) {
             commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
-            commandBarItems.push({ key: "move", text: "Move", disabled: true, iconProps: { iconName: "MoveToFolder" } });
+            commandBarItems.push({ key: "move", text: "Move", onClick: Move.show, iconProps: { iconName: "MoveToFolder" } });
             commandBarItems.push({ key: "delete", text: "Delete", disabled: true, iconProps: { iconName: "Delete" } });
         }
         return (React.createElement("div", { className: "pageCommands" },
@@ -147,18 +153,82 @@ var ContentDirectoryController;
     })(Rename = ContentDirectoryController.Rename || (ContentDirectoryController.Rename = {}));
     let Move;
     (function (Move) {
-        function show() {
-            moveDialogCallbacks.setTrue();
-        }
+        let pathOptions = null;
+        let currentSelection = null;
+        function show() { showAsync(); }
         Move.show = show;
+        function showAsync() {
+            var _a, _b;
+            return __awaiter(this, void 0, void 0, function* () {
+                //#region Get path list options
+                if (pathOptions == null) {
+                    waitingDialogCallbacks.setTrue();
+                    let response = yield Workspaces.directoryPaths(ContentDirectoryController.pageInfo.workspace.url);
+                    if (((_a = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _a === void 0 ? void 0 : _a.isOk) != true) {
+                        waitingDialogCallbacks.setFalse();
+                        let title = "Can't get folder list";
+                        let desc = response.actionStatus.getDialogMessage();
+                        alertDialogCallbacks.setTrue();
+                        alertDialogCallbacks.setTitle(title);
+                        alertDialogCallbacks.setContent(desc);
+                        return;
+                    }
+                    let options = [{ key: "/", text: "/" }];
+                    let thisPath = (_b = ContentDirectoryController.pageInfo === null || ContentDirectoryController.pageInfo === void 0 ? void 0 : ContentDirectoryController.pageInfo.contentItem) === null || _b === void 0 ? void 0 : _b.url;
+                    if (!thisPath.endsWith("/"))
+                        thisPath += "/";
+                    if (Utils.arrayHasValues(response === null || response === void 0 ? void 0 : response.data)) {
+                        for (let x = 0; x < response.data.length; x++) {
+                            let path = response.data[x];
+                            if ((path.startsWith(thisPath)) || (path == thisPath))
+                                continue;
+                            options.push({ key: path, text: path });
+                        }
+                    }
+                    pathOptions = options;
+                    waitingDialogCallbacks.setFalse();
+                }
+                //#endregion
+                moveDialogCallbacks.setDirectories(pathOptions);
+                currentSelection = ContentDirectoryController.pageInfo.contentItem.getParentPath();
+                moveDialogCallbacks.setTrue();
+            });
+        }
+        Move.showAsync = showAsync;
         function finish() {
-            moveDialogCallbacks.setFalse();
+            var _a, _b;
+            return __awaiter(this, void 0, void 0, function* () {
+                let newParent = currentSelection;
+                moveDialogCallbacks.setFalse();
+                waitingDialogCallbacks.setTrue();
+                let response = yield Workspaces.moveDirectory((_a = ContentDirectoryController.pageInfo === null || ContentDirectoryController.pageInfo === void 0 ? void 0 : ContentDirectoryController.pageInfo.contentItem) === null || _a === void 0 ? void 0 : _a.reactLocalUrl, newParent);
+                waitingDialogCallbacks.setFalse();
+                if (((_b = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _b === void 0 ? void 0 : _b.isOk) == true) {
+                    let newUrl = Utils.trimString(response === null || response === void 0 ? void 0 : response.newUrl, "");
+                    if (!newUrl.startsWith("/"))
+                        newUrl = "/" + newUrl;
+                    Workspaces.clearTreeCache();
+                    EventBus.dispatch("fileStructChanged");
+                    navigateCallback("/workspace" + newUrl);
+                }
+                else {
+                    let title = "Can't move folder";
+                    let desc = response.actionStatus.getDialogMessage();
+                    alertDialogCallbacks.setTrue();
+                    alertDialogCallbacks.setTitle(title);
+                    alertDialogCallbacks.setContent(desc);
+                }
+            });
         }
         Move.finish = finish;
         function cancel() {
             moveDialogCallbacks.setFalse();
         }
         Move.cancel = cancel;
+        function onSelectionChange(event, option, index) {
+            currentSelection = Utils.parseString(option === null || option === void 0 ? void 0 : option.key);
+        }
+        Move.onSelectionChange = onSelectionChange;
     })(Move = ContentDirectoryController.Move || (ContentDirectoryController.Move = {}));
 })(ContentDirectoryController || (ContentDirectoryController = {}));
 //# sourceMappingURL=ContentDirectory.js.map

@@ -138,7 +138,7 @@ export var Workspaces;
             var _a;
             if ((this.url == null) || (((_a = this.url) === null || _a === void 0 ? void 0 : _a.length) <= 0))
                 return "/";
-            let parts = this.url.split("/");
+            let parts = Utils.mapArray(this.url.split("/"), x => Utils.trimString(x, null), null, false);
             if (Utils.arrayHasValues(parts)) {
                 let parentPaths = [];
                 for (let x = 0; x < parts.length - 1; x++) {
@@ -230,6 +230,14 @@ export var Workspaces;
         });
     }
     Workspaces.renameDirectory = renameDirectory;
+    function moveDirectory(url, newParent) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data = null;
+            data = yield Apis.postJsonAsync("api/content/moveDirectory", { url: url, parent: newParent });
+            return new MoveResponse(data);
+        });
+    }
+    Workspaces.moveDirectory = moveDirectory;
     function directoryPaths(workspaceUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             let source = yield Apis.fetchJsonAsync("api/general/workspeceDirectoryPaths?workspaceUrl=" + encodeURI(workspaceUrl), false);
