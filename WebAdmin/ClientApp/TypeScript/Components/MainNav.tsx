@@ -69,7 +69,6 @@ export class MainNav extends Component<{}, MainNavState> {
 
 	fileStructChangedCall = null;
 	fileStructChanged() {
-		//this.instanceData.treeData = null;
 		this.instanceData.forceRefresh = true;
 		this.populateContent();
 	}

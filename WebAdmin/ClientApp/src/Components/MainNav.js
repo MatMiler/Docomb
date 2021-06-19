@@ -62,7 +62,6 @@ export class MainNav extends Component {
         }
     }
     fileStructChanged() {
-        //this.instanceData.treeData = null;
         this.instanceData.forceRefresh = true;
         this.populateContent();
     }

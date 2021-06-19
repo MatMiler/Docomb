@@ -4,99 +4,148 @@ import { Utils } from '../Data/Utils';
 import { Workspaces } from '../Data/Workspaces';
 import { LayoutUtils } from '../LayoutUtils';
 import { EventBus } from '../EventBus';
-import Home from './Workspace/Home';
 import ContentDirectory from './Workspace/ContentDirectory';
 import ContentFileInfo from './Workspace/ContentFileInfo';
 import EditTextFile from './Workspace/EditTextFile';
+import { NotFound } from './NotFound';
 
 
 
 type WorkspaceWrapperState = {
-	pageInfo: Workspaces.WorkspacePageInfo,
-	loading: boolean
+	hash: string
 };
 
 export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 	constructor(props) {
 		super(props);
-		this.state = { pageInfo: null, loading: true };
+		this.state = { hash: null };
 	}
 
 	componentDidMount() {
-		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
-		this.populateInfo();
-		this.navCall = this.onNav.bind(this);
-		EventBus.on("navChange", this.navCall);
+		WorkspaceWrapperController.prep(this);
+		this.onLocationChangeCall = this.onLocationChange.bind(this);
+		EventBus.on(WorkspaceWrapperController.locationChangeEventName, this.onLocationChangeCall);
 	}
 
 	componentWillUnmount() {
-		EventBus.remove("navChange", this.navCall);
+		EventBus.remove(WorkspaceWrapperController.locationChangeEventName, this.onLocationChangeCall);
 	}
 
 	componentDidUpdate(prevProps: any, prevState: any) {
-		let prevLocation = Utils.tryGetString(prevProps, ["location", "pathname"]);
-		let currentLocation = Utils.tryGetString(this.props, ["location", "pathname"]);
-		let prevSearch = Utils.tryGetString(prevProps, ["location", "search"]);
-		let currentSearch = Utils.tryGetString(this.props, ["location", "search"]);
-		if ((prevLocation != currentLocation) || (prevSearch != currentSearch)) {
-			LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
-			this.populateInfo();
-		}
+		WorkspaceWrapperController.onComponentUpdate();
 	}
 
-	navCall = null;
-	onNav() {
+	onLocationChangeCall = null;
+	onLocationChange(): void {
+		this.setState({ hash: WorkspaceWrapperController.stateHash });
 	}
-
 
 	render() {
-		let content: JSX.Element = null;
-		if (this.state.loading == false) {
-			if (Utils.trimString(this.state.pageInfo.contentItem?.url, null) == null) {
-				content = <Home />;
-			} else if (this.state.pageInfo.contentItem.type == Workspaces.ContentItemType.Directory) {
-				content = <ContentDirectory />;
-			} else {
-				if (this.state.pageInfo.action == Workspaces.ContentItemAction.Edit) {
-					switch (this.state.pageInfo?.details?.type) {
-						case Workspaces.FileType.Markdown:
-						case Workspaces.FileType.Html:
-						case Workspaces.FileType.PlainText:
-							{
-								content = <EditTextFile />;
-								break;
-							}
-						default:
-							{
-								content = <ContentFileInfo />;
-								break;
-							}
-					}
-				}
-				else {
-					content = <ContentFileInfo />;
-				}
-
-			}
-		}
-
 		return (
 			<Layout showMainNav={true}>
-				{content}
+				{WorkspaceWrapperController.getContent()}
 			</Layout>
 		);
 	}
 
-	async populateInfo() {
-		let data: Workspaces.WorkspacePageInfo = await Workspaces.loadPageInfo(Utils.tryGetString(this.props, ["match", "params", "itemPath"]), Utils.tryGetString(this.props, ["location", "search"]));
-		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, data?.workspace?.url);
-		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, data?.workspace);
-		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, data);
-		this.setState({ pageInfo: data, loading: false });
+}
+
+
+module WorkspaceWrapperController {
+
+	export const locationChangeEventName = "workspaceWrapper-locationChange";
+
+	export let requestedPath: string = null;
+	export let requestedQuery: string = null;
+
+	export let isLoading: boolean = true;
+	export let selectedSideBarItem: string = null;
+	export let workspace: Workspaces.Workspace = null;
+	export let pageInfo: Workspaces.WorkspacePageInfo = null;
+	export let instance: WorkspaceWrapper = null;
+
+	export let stateHash: string = null;
+
+	export function prep(
+		componentInstance: WorkspaceWrapper
+	): void {
+		instance = componentInstance;
+		instance["test"] = Utils.tryGet(instance, "test", Math.random());
+
+		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, null);
+		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
+		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, null);
+
+
+		loadData();
+	}
+
+	export async function loadData(): Promise<void> {
+		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
+		requestedPath = getInstancePath();
+		requestedQuery = getInstanceQuery();
+		isLoading = true;
+		let data: Workspaces.WorkspacePageInfo = await Workspaces.loadPageInfo(requestedPath, requestedQuery);
+
+		pageInfo = data;
+		workspace = data?.workspace;
+		selectedSideBarItem = workspace?.url;
+
+		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.SelectedSideBarItem, selectedSideBarItem);
+		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, workspace);
+		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo, pageInfo);
+		isLoading = false;
+
+		stateHash = getStateHash();
+		EventBus.dispatch(WorkspaceWrapperController.locationChangeEventName);
 		EventBus.dispatch("navUpdate");
 	}
 
-}
+	export function getStateHash(path?: string, query?: string): string {
+		if (path === undefined) path = requestedPath;
+		if (query === undefined) query = requestedQuery;
+		return path + "|" + query;
+	}
 
+	export function getInstancePath(): string { return Utils.tryGetString(instance, ["props", "match", "params", "itemPath"]); }
+	export function getInstanceQuery(): string { return Utils.tryGetString(instance, ["props", "location", "search"]); }
+
+
+	export function onComponentUpdate(): void {
+		let newHash = getStateHash(getInstancePath(), getInstanceQuery());
+		if (newHash != stateHash) {
+			loadData();
+		}
+	}
+
+
+	export function getContent(): JSX.Element {
+		if (isLoading) return null;
+
+		if (pageInfo?.contentItem?.type == Workspaces.ContentItemType.Directory) {
+			return (<ContentDirectory />);
+		}
+
+		if (pageInfo?.contentItem?.type == Workspaces.ContentItemType.File) {
+
+			if (pageInfo.action == Workspaces.ContentItemAction.Edit) {
+				switch (WorkspaceWrapperController.pageInfo?.details?.type) {
+					case Workspaces.FileType.Markdown:
+					case Workspaces.FileType.Html:
+					case Workspaces.FileType.PlainText:
+						{
+							return (<EditTextFile />);
+						}
+				}
+			}
+
+			return (<ContentFileInfo />);
+		}
+
+
+		return (<NotFound />);
+	}
+
+}
 
 

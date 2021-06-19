@@ -335,6 +335,38 @@ html .sideBarItem.selected a:before {
       margin: 0;
       padding: 0; }
 
+.errorPage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; }
+  .errorPage .codeWatermark {
+    z-index: 1;
+    font-size: 20vmin;
+    height: 1.4em;
+    line-height: 1.4em;
+    margin: -.75em 0 -.65em 0;
+    opacity: .1;
+    font-weight: bold; }
+  .errorPage .message {
+    z-index: 2;
+    font-size: 5vmin;
+    height: 1.4em;
+    line-height: 1.4em;
+    margin: -.7em 0;
+    font-weight: bold;
+    text-transform: uppercase; }
+  .errorPage .codeWatermark, .errorPage .message {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1.4em;
+    line-height: 1.4em;
+    text-align: center;
+    overflow: hidden;
+    user-select: none; }
+
 .contentFileDetails {
   display: flex;
   width: 100%;

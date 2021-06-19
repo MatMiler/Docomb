@@ -25,8 +25,12 @@ export var Apis;
                 if (storedItem != null)
                     return storedItem.value;
             }
-            let response = yield fetch(url);
-            let data = yield response.json();
+            let data = null;
+            try {
+                let response = yield fetch(url);
+                data = yield response.json();
+            }
+            catch (e) { }
             if (cache == true) {
                 SessionCache.save(cacheKey, data, Utils.tryGetNumber(cacheOptions, "expiry", null));
             }
@@ -55,8 +59,12 @@ export var Apis;
     function postJsonAsync(url, data) {
         return __awaiter(this, void 0, void 0, function* () {
             let fetchData = { method: "POST", body: JSON.stringify(data), headers: { "Content-type": "application/json; charset=UTF-8" } };
-            let response = yield fetch(url, fetchData);
-            let receivedData = yield response.json();
+            let receivedData = null;
+            try {
+                let response = yield fetch(url, fetchData);
+                receivedData = yield response.json();
+            }
+            catch (e) { }
             return receivedData;
         });
     }
