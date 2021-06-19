@@ -26,13 +26,15 @@ const ContentDirectory: FC<{}> = (): ReactElement => {
 	const [createLabel, setCreateLabel] = useState("");
 	const [createSuffix, setCreateSuffix] = useState("");
 	const [createContent, setCreateContent] = useState<IDialogContentProps>({  });
+	const [deleteIsVisible, { toggle: toggleDelete, setTrue: showDelete, setFalse: hideDelete }] = useBoolean(false);
 
 	ContentDirectoryController.prepData(navigate,
 		{ toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting },
 		{ toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent },
 		{ toggle: toggleRename, setTrue: showRename, setFalse: hideRename },
 		{ toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories },
-		{ toggle: toggleCreate, setTrue: showCreate, setFalse: hideCreate, setLabel: setCreateLabel, setSuffix: setCreateSuffix, setContent: setCreateContent });
+		{ toggle: toggleCreate, setTrue: showCreate, setFalse: hideCreate, setLabel: setCreateLabel, setSuffix: setCreateSuffix, setContent: setCreateContent },
+		{ toggle: toggleDelete, setTrue: showDelete, setFalse: hideDelete });
 
 
 	return (
@@ -92,6 +94,17 @@ const ContentDirectory: FC<{}> = (): ReactElement => {
 					<DefaultButton onClick={ContentDirectoryController.NewItem.cancel} text="Cancel" />
 				</DialogFooter>
 			</Dialog>
+			<Dialog
+				hidden={!deleteIsVisible}
+				onDismiss={hideDelete}
+				dialogContentProps={{ type: DialogType.largeHeader, title: "Delete folder", subText: "Delete this folder?" }}
+				modalProps={{ isBlocking: false }}
+			>
+				<DialogFooter>
+					<PrimaryButton onClick={ContentDirectoryController.Delete.finish} text="Delete" />
+					<DefaultButton onClick={ContentDirectoryController.Delete.cancel} text="Cancel" />
+				</DialogFooter>
+			</Dialog>
 		</>
 	);
 };
@@ -126,7 +139,7 @@ module ContentDirectoryController {
 	let renameDialogCallbacks: IUseBooleanCallbacks = null;
 	let moveDialogCallbacks: IMoveDialogOptions = null;
 	let createDialogCallbacks: ICreateDialogOptions = null;
-
+	let deleteDialogCallbacks: IUseBooleanCallbacks = null;
 
 
 	export function prepData(
@@ -135,7 +148,8 @@ module ContentDirectoryController {
 		alertDialog: IAlertDialogOptions,
 		renameDialog: IUseBooleanCallbacks,
 		moveDialog: IMoveDialogOptions,
-		createDialog: ICreateDialogOptions
+		createDialog: ICreateDialogOptions,
+		deleteDialog: IUseBooleanCallbacks
 	): void {
 		let newPageInfo: Workspaces.WorkspacePageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
 		pageInfo = newPageInfo;
@@ -147,6 +161,7 @@ module ContentDirectoryController {
 		renameDialogCallbacks = renameDialog;
 		moveDialogCallbacks = moveDialog;
 		createDialogCallbacks = createDialog;
+		deleteDialogCallbacks = deleteDialog;
 
 		let directoryUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
 		if (!directoryUrl.startsWith("/")) directoryUrl = "/" + directoryUrl;
@@ -177,7 +192,7 @@ module ContentDirectoryController {
 		if (!isRoot) {
 			commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
 			commandBarItems.push({ key: "move", text: "Move", onClick: Move.show, iconProps: { iconName: "MoveToFolder" } });
-			commandBarItems.push({ key: "delete", text: "Delete", disabled: true, iconProps: { iconName: "Delete" } });
+			commandBarItems.push({ key: "delete", text: "Delete", onClick: Delete.show, iconProps: { iconName: "Delete" } });
 		}
 
 		return (<div className="pageCommands"><CommandBar items={commandBarItems} /></div>);
@@ -359,6 +374,38 @@ module ContentDirectoryController {
 			createDialogCallbacks.setFalse();
 		}
 
+	}
+
+
+	export module Delete {
+		export function show(): void {
+			deleteDialogCallbacks.setTrue();
+		}
+
+		export async function finish(): Promise<void> {
+			let fileName: string = Utils.trimString($("#renameInput", "").val());
+			deleteDialogCallbacks.setFalse();
+			waitingDialogCallbacks.setTrue();
+			let response: Workspaces.DeleteItemResponse = await Workspaces.deleteItem(pageInfo?.contentItem?.reactLocalUrl);
+			waitingDialogCallbacks.setFalse();
+			if (response?.actionStatus?.isOk == true) {
+				let parentUrl: string = Utils.trimString(response?.parentReactLocalUrl, "");
+				if (!parentUrl.startsWith("/")) parentUrl = "/" + parentUrl;
+				Workspaces.clearTreeCache();
+				EventBus.dispatch("fileStructChanged");
+				navigateCallback("/workspace" + parentUrl);
+			} else {
+				let title = "Can't delete folder";
+				let desc = response.actionStatus.getDialogMessage();
+				alertDialogCallbacks.setTrue();
+				alertDialogCallbacks.setTitle(title);
+				alertDialogCallbacks.setContent(desc);
+			}
+		}
+
+		export function cancel(): void {
+			deleteDialogCallbacks.setFalse();
+		}
 	}
 
 }

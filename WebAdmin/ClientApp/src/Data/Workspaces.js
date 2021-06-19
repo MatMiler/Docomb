@@ -273,5 +273,21 @@ export var Workspaces;
         });
     }
     Workspaces.createDirectory = createDirectory;
+    class DeleteItemResponse {
+        constructor(source) {
+            this.actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
+            this.parentUrl = Utils.tryGetString(source, "parentUrl");
+            this.parentReactLocalUrl = Utils.tryGetString(source, "parentReactLocalUrl");
+        }
+    }
+    Workspaces.DeleteItemResponse = DeleteItemResponse;
+    function deleteItem(url) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let response = null;
+            response = yield Apis.postJsonAsync("api/content/deleteItem", { url: url });
+            return new DeleteItemResponse(response);
+        });
+    }
+    Workspaces.deleteItem = deleteItem;
 })(Workspaces || (Workspaces = {}));
 //# sourceMappingURL=Workspaces.js.map

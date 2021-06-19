@@ -21,12 +21,14 @@ const ContentFileInfo: FC<{}> = (): ReactElement => {
 	const [renameIsVisible, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }] = useBoolean(false);
 	const [moveIsVisible, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove }] = useBoolean(false);
 	const [moveDirectories, setMoveDirectories] = useState<IDropdownOption[]>([]);
+	const [deleteIsVisible, { toggle: toggleDelete, setTrue: showDelete, setFalse: hideDelete }] = useBoolean(false);
 
 	ContentFileInfoController.prepData(navigate,
 		{ toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting },
 		{ toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent },
 		{ toggle: toggleRename, setTrue: showRename, setFalse: hideRename },
-		{ toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories });
+		{ toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories },
+		{ toggle: toggleDelete, setTrue: showDelete, setFalse: hideDelete });
 
 	return (
 		<>
@@ -71,6 +73,17 @@ const ContentFileInfo: FC<{}> = (): ReactElement => {
 					<DefaultButton onClick={ContentFileInfoController.Move.cancel} text="Cancel" />
 				</DialogFooter>
 			</Dialog>
+			<Dialog
+				hidden={!deleteIsVisible}
+				onDismiss={hideDelete}
+				dialogContentProps={{ type: DialogType.largeHeader, title: "Delete file", subText: "Delete this file?" }}
+				modalProps={{ isBlocking: false }}
+			>
+				<DialogFooter>
+					<PrimaryButton onClick={ContentFileInfoController.Delete.finish} text="Delete" />
+					<DefaultButton onClick={ContentFileInfoController.Delete.cancel} text="Cancel" />
+				</DialogFooter>
+			</Dialog>
 		</>
 	);
 };
@@ -98,6 +111,7 @@ module ContentFileInfoController {
 	let alertDialogCallbacks: IAlertDialogOptions = null;
 	let renameDialogCallbacks: IUseBooleanCallbacks = null;
 	let moveDialogCallbacks: IMoveDialogOptions = null;
+	let deleteDialogCallbacks: IUseBooleanCallbacks = null;
 
 
 	export function prepData(
@@ -105,7 +119,8 @@ module ContentFileInfoController {
 		waitingDialog: IUseBooleanCallbacks,
 		alertDialog: IAlertDialogOptions,
 		renameDialog: IUseBooleanCallbacks,
-		moveDialog: IMoveDialogOptions
+		moveDialog: IMoveDialogOptions,
+		deleteDialog: IUseBooleanCallbacks
 	): void {
 		let newPageInfo: Workspaces.WorkspacePageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
 		pageInfo = newPageInfo;
@@ -117,6 +132,7 @@ module ContentFileInfoController {
 		alertDialogCallbacks = alertDialog;
 		renameDialogCallbacks = renameDialog;
 		moveDialogCallbacks = moveDialog;
+		deleteDialogCallbacks = deleteDialog;
 	}
 
 	export function getToolbar(): JSX.Element {
@@ -136,7 +152,7 @@ module ContentFileInfoController {
 
 		commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
 		commandBarItems.push({ key: "move", text: "Move", onClick: Move.show, iconProps: { iconName: "MoveToFolder" } });
-		commandBarItems.push({ key: "delete", text: "Delete", disabled: true, iconProps: { iconName: "Delete" } });
+		commandBarItems.push({ key: "delete", text: "Delete", onClick: Delete.show, iconProps: { iconName: "Delete" } });
 
 		let farItems: ICommandBarItemProps[] = [
 			{ key: "toggleInfo", text: "Toggle file information", iconOnly: true, ariaLabel: "Toggle file information", iconProps: { iconName: "Info" }, onClick: toggleMetaDataPanel }
@@ -309,6 +325,38 @@ module ContentFileInfoController {
 
 		export function onSelectionChange(event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption, index?: number): void {
 			currentSelection = Utils.parseString(option?.key);
+		}
+	}
+
+
+	export module Delete {
+		export function show(): void {
+			deleteDialogCallbacks.setTrue();
+		}
+
+		export async function finish(): Promise<void> {
+			let fileName: string = Utils.trimString($("#renameInput", "").val());
+			deleteDialogCallbacks.setFalse();
+			waitingDialogCallbacks.setTrue();
+			let response: Workspaces.DeleteItemResponse = await Workspaces.deleteItem(fileDetails?.reactLocalUrl);
+			waitingDialogCallbacks.setFalse();
+			if (response?.actionStatus?.isOk == true) {
+				let parentUrl: string = Utils.trimString(response?.parentReactLocalUrl, "");
+				if (!parentUrl.startsWith("/")) parentUrl = "/" + parentUrl;
+				Workspaces.clearTreeCache();
+				EventBus.dispatch("fileStructChanged");
+				navigateCallback("/workspace" + parentUrl);
+			} else {
+				let title = "Can't delete file";
+				let desc = response.actionStatus.getDialogMessage();
+				alertDialogCallbacks.setTrue();
+				alertDialogCallbacks.setTitle(title);
+				alertDialogCallbacks.setContent(desc);
+			}
+		}
+
+		export function cancel(): void {
+			deleteDialogCallbacks.setFalse();
 		}
 	}
 

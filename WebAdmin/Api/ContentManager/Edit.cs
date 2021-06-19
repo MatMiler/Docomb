@@ -228,6 +228,65 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			return response;
 		}
 
+		
+		public class DeleteItemRequest
+		{
+			[JsonPropertyName("url")]
+			public string Url { get; set; }
+		}
+
+		public class DeleteItemResponse
+		{
+			[JsonPropertyName("actionStatus")]
+			public ActionStatus ActionStatus { get; set; }
+
+			[JsonPropertyName("parentUrl")]
+			public string ParentUrl { get; set; }
+
+			[JsonPropertyName("parentReactLocalUrl")]
+			public string ParentReactLocalUrl { get; set; }
+
+			public DeleteItemResponse() { }
+			public DeleteItemResponse(ActionStatus actionStatus, string parentUrl = null, string parentReactLocalUrl = null)
+			{
+				ActionStatus = actionStatus;
+				ParentUrl = parentUrl;
+				ParentReactLocalUrl = parentReactLocalUrl;
+			}
+		}
+
+		public static DeleteItemResponse DeleteItem(DeleteItemRequest request) => DeleteItem(request?.Url);
+		public static DeleteItemResponse DeleteItem(string url)
+		{
+			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
+			if ((workspace == null) || (remainingPath == null)) return new(new ActionStatus(ActionStatus.StatusCode.NotFound));
+			ContentItem item = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical);
+			if (item == null) return new(new ActionStatus(ActionStatus.StatusCode.NotFound));
+
+			string parentUrl = null;
+			string parentReactLocalUrl = null;
+
+			try
+			{
+				List<string> parentParts = remainingPath.GetRange(0, remainingPath.Count - 1);
+				ContentItemSummary parent = new ContentItemSummary(workspace.Content.FindItem(parentParts, ContentStorage.MatchType.Physical));
+				if (parent != null)
+				{
+					parentUrl = parent.Url;
+					parentReactLocalUrl = parent.ReactLocalUrl;
+				}
+			}
+			catch { }
+
+			ActionStatus status = null;
+
+			if (item.Type == ContentItemType.File)
+				status = item.AsFile?.Delete();
+			else if (item.Type == ContentItemType.Directory)
+				status = item.AsDirectory?.Delete();
+
+			return new(status, parentUrl, parentReactLocalUrl);
+		}
 
 	}
 }

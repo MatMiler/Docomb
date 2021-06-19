@@ -28,7 +28,8 @@ const ContentFileInfo = () => {
     const [renameIsVisible, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }] = useBoolean(false);
     const [moveIsVisible, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove }] = useBoolean(false);
     const [moveDirectories, setMoveDirectories] = useState([]);
-    ContentFileInfoController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent }, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories });
+    const [deleteIsVisible, { toggle: toggleDelete, setTrue: showDelete, setFalse: hideDelete }] = useBoolean(false);
+    ContentFileInfoController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent }, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories }, { toggle: toggleDelete, setTrue: showDelete, setFalse: hideDelete });
     return (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "pageGrid" },
             React.createElement("div", { className: "pageTitle" },
@@ -53,7 +54,11 @@ const ContentFileInfo = () => {
             React.createElement(Dropdown, { id: "moveInput", placeholder: "Select a folder", label: "Move to folder", defaultSelectedKey: ContentFileInfoController.pageInfo.contentItem.getParentPath(), options: moveDirectories, onChange: ContentFileInfoController.Move.onSelectionChange }),
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: ContentFileInfoController.Move.finish, text: "Move" }),
-                React.createElement(DefaultButton, { onClick: ContentFileInfoController.Move.cancel, text: "Cancel" })))));
+                React.createElement(DefaultButton, { onClick: ContentFileInfoController.Move.cancel, text: "Cancel" }))),
+        React.createElement(Dialog, { hidden: !deleteIsVisible, onDismiss: hideDelete, dialogContentProps: { type: DialogType.largeHeader, title: "Delete file", subText: "Delete this file?" }, modalProps: { isBlocking: false } },
+            React.createElement(DialogFooter, null,
+                React.createElement(PrimaryButton, { onClick: ContentFileInfoController.Delete.finish, text: "Delete" }),
+                React.createElement(DefaultButton, { onClick: ContentFileInfoController.Delete.cancel, text: "Cancel" })))));
 };
 export default ContentFileInfo;
 var ContentFileInfoController;
@@ -65,7 +70,8 @@ var ContentFileInfoController;
     let alertDialogCallbacks = null;
     let renameDialogCallbacks = null;
     let moveDialogCallbacks = null;
-    function prepData(navigate, waitingDialog, alertDialog, renameDialog, moveDialog) {
+    let deleteDialogCallbacks = null;
+    function prepData(navigate, waitingDialog, alertDialog, renameDialog, moveDialog, deleteDialog) {
         let newPageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
         ContentFileInfoController.pageInfo = newPageInfo;
         ContentFileInfoController.fileDetails = ContentFileInfoController.pageInfo === null || ContentFileInfoController.pageInfo === void 0 ? void 0 : ContentFileInfoController.pageInfo.details;
@@ -75,6 +81,7 @@ var ContentFileInfoController;
         alertDialogCallbacks = alertDialog;
         renameDialogCallbacks = renameDialog;
         moveDialogCallbacks = moveDialog;
+        deleteDialogCallbacks = deleteDialog;
     }
     ContentFileInfoController.prepData = prepData;
     function getToolbar() {
@@ -92,7 +99,7 @@ var ContentFileInfoController;
         }
         commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
         commandBarItems.push({ key: "move", text: "Move", onClick: Move.show, iconProps: { iconName: "MoveToFolder" } });
-        commandBarItems.push({ key: "delete", text: "Delete", disabled: true, iconProps: { iconName: "Delete" } });
+        commandBarItems.push({ key: "delete", text: "Delete", onClick: Delete.show, iconProps: { iconName: "Delete" } });
         let farItems = [
             { key: "toggleInfo", text: "Toggle file information", iconOnly: true, ariaLabel: "Toggle file information", iconProps: { iconName: "Info" }, onClick: toggleMetaDataPanel }
         ];
@@ -270,5 +277,42 @@ var ContentFileInfoController;
         }
         Move.onSelectionChange = onSelectionChange;
     })(Move = ContentFileInfoController.Move || (ContentFileInfoController.Move = {}));
+    let Delete;
+    (function (Delete) {
+        function show() {
+            deleteDialogCallbacks.setTrue();
+        }
+        Delete.show = show;
+        function finish() {
+            var _a;
+            return __awaiter(this, void 0, void 0, function* () {
+                let fileName = Utils.trimString($("#renameInput", "").val());
+                deleteDialogCallbacks.setFalse();
+                waitingDialogCallbacks.setTrue();
+                let response = yield Workspaces.deleteItem(ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.reactLocalUrl);
+                waitingDialogCallbacks.setFalse();
+                if (((_a = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _a === void 0 ? void 0 : _a.isOk) == true) {
+                    let parentUrl = Utils.trimString(response === null || response === void 0 ? void 0 : response.parentReactLocalUrl, "");
+                    if (!parentUrl.startsWith("/"))
+                        parentUrl = "/" + parentUrl;
+                    Workspaces.clearTreeCache();
+                    EventBus.dispatch("fileStructChanged");
+                    navigateCallback("/workspace" + parentUrl);
+                }
+                else {
+                    let title = "Can't delete file";
+                    let desc = response.actionStatus.getDialogMessage();
+                    alertDialogCallbacks.setTrue();
+                    alertDialogCallbacks.setTitle(title);
+                    alertDialogCallbacks.setContent(desc);
+                }
+            });
+        }
+        Delete.finish = finish;
+        function cancel() {
+            deleteDialogCallbacks.setFalse();
+        }
+        Delete.cancel = cancel;
+    })(Delete = ContentFileInfoController.Delete || (ContentFileInfoController.Delete = {}));
 })(ContentFileInfoController || (ContentFileInfoController = {}));
 //# sourceMappingURL=ContentFileInfo.js.map

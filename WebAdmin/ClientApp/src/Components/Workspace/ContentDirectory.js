@@ -32,7 +32,8 @@ const ContentDirectory = () => {
     const [createLabel, setCreateLabel] = useState("");
     const [createSuffix, setCreateSuffix] = useState("");
     const [createContent, setCreateContent] = useState({});
-    ContentDirectoryController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent }, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories }, { toggle: toggleCreate, setTrue: showCreate, setFalse: hideCreate, setLabel: setCreateLabel, setSuffix: setCreateSuffix, setContent: setCreateContent });
+    const [deleteIsVisible, { toggle: toggleDelete, setTrue: showDelete, setFalse: hideDelete }] = useBoolean(false);
+    ContentDirectoryController.prepData(navigate, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }, { toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent }, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories }, { toggle: toggleCreate, setTrue: showCreate, setFalse: hideCreate, setLabel: setCreateLabel, setSuffix: setCreateSuffix, setContent: setCreateContent }, { toggle: toggleDelete, setTrue: showDelete, setFalse: hideDelete });
     return (React.createElement(React.Fragment, null,
         React.createElement("div", { className: "pageGrid" },
             React.createElement("div", { className: "pageTitle" },
@@ -65,7 +66,11 @@ const ContentDirectory = () => {
             React.createElement(TextField, { label: createLabel, id: "createInput", defaultValue: "", suffix: createSuffix }),
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: ContentDirectoryController.NewItem.finish, text: "Create" }),
-                React.createElement(DefaultButton, { onClick: ContentDirectoryController.NewItem.cancel, text: "Cancel" })))));
+                React.createElement(DefaultButton, { onClick: ContentDirectoryController.NewItem.cancel, text: "Cancel" }))),
+        React.createElement(Dialog, { hidden: !deleteIsVisible, onDismiss: hideDelete, dialogContentProps: { type: DialogType.largeHeader, title: "Delete folder", subText: "Delete this folder?" }, modalProps: { isBlocking: false } },
+            React.createElement(DialogFooter, null,
+                React.createElement(PrimaryButton, { onClick: ContentDirectoryController.Delete.finish, text: "Delete" }),
+                React.createElement(DefaultButton, { onClick: ContentDirectoryController.Delete.cancel, text: "Cancel" })))));
 };
 export default ContentDirectory;
 var ContentDirectoryController;
@@ -78,7 +83,8 @@ var ContentDirectoryController;
     let renameDialogCallbacks = null;
     let moveDialogCallbacks = null;
     let createDialogCallbacks = null;
-    function prepData(navigate, waitingDialog, alertDialog, renameDialog, moveDialog, createDialog) {
+    let deleteDialogCallbacks = null;
+    function prepData(navigate, waitingDialog, alertDialog, renameDialog, moveDialog, createDialog, deleteDialog) {
         let newPageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
         ContentDirectoryController.pageInfo = newPageInfo;
         // UI & React callbacks
@@ -88,6 +94,7 @@ var ContentDirectoryController;
         renameDialogCallbacks = renameDialog;
         moveDialogCallbacks = moveDialog;
         createDialogCallbacks = createDialog;
+        deleteDialogCallbacks = deleteDialog;
         let directoryUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
         if (!directoryUrl.startsWith("/"))
             directoryUrl = "/" + directoryUrl;
@@ -114,7 +121,7 @@ var ContentDirectoryController;
         if (!ContentDirectoryController.isRoot) {
             commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
             commandBarItems.push({ key: "move", text: "Move", onClick: Move.show, iconProps: { iconName: "MoveToFolder" } });
-            commandBarItems.push({ key: "delete", text: "Delete", disabled: true, iconProps: { iconName: "Delete" } });
+            commandBarItems.push({ key: "delete", text: "Delete", onClick: Delete.show, iconProps: { iconName: "Delete" } });
         }
         return (React.createElement("div", { className: "pageCommands" },
             React.createElement(CommandBar, { items: commandBarItems })));
@@ -312,5 +319,42 @@ var ContentDirectoryController;
         }
         NewItem.cancel = cancel;
     })(NewItem = ContentDirectoryController.NewItem || (ContentDirectoryController.NewItem = {}));
+    let Delete;
+    (function (Delete) {
+        function show() {
+            deleteDialogCallbacks.setTrue();
+        }
+        Delete.show = show;
+        function finish() {
+            var _a, _b;
+            return __awaiter(this, void 0, void 0, function* () {
+                let fileName = Utils.trimString($("#renameInput", "").val());
+                deleteDialogCallbacks.setFalse();
+                waitingDialogCallbacks.setTrue();
+                let response = yield Workspaces.deleteItem((_a = ContentDirectoryController.pageInfo === null || ContentDirectoryController.pageInfo === void 0 ? void 0 : ContentDirectoryController.pageInfo.contentItem) === null || _a === void 0 ? void 0 : _a.reactLocalUrl);
+                waitingDialogCallbacks.setFalse();
+                if (((_b = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _b === void 0 ? void 0 : _b.isOk) == true) {
+                    let parentUrl = Utils.trimString(response === null || response === void 0 ? void 0 : response.parentReactLocalUrl, "");
+                    if (!parentUrl.startsWith("/"))
+                        parentUrl = "/" + parentUrl;
+                    Workspaces.clearTreeCache();
+                    EventBus.dispatch("fileStructChanged");
+                    navigateCallback("/workspace" + parentUrl);
+                }
+                else {
+                    let title = "Can't delete folder";
+                    let desc = response.actionStatus.getDialogMessage();
+                    alertDialogCallbacks.setTrue();
+                    alertDialogCallbacks.setTitle(title);
+                    alertDialogCallbacks.setContent(desc);
+                }
+            });
+        }
+        Delete.finish = finish;
+        function cancel() {
+            deleteDialogCallbacks.setFalse();
+        }
+        Delete.cancel = cancel;
+    })(Delete = ContentDirectoryController.Delete || (ContentDirectoryController.Delete = {}));
 })(ContentDirectoryController || (ContentDirectoryController = {}));
 //# sourceMappingURL=ContentDirectory.js.map

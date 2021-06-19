@@ -180,6 +180,20 @@ namespace Docomb.ContentStorage
 			}
 		}
 
+		public ActionStatus Delete()
+		{
+			try
+			{
+				File.Delete(FilePath);
+				Workspace.Content.ClearCache();
+				return new(ActionStatus.StatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return new(ActionStatus.StatusCode.Error, exception: e);
+			}
+		}
+
 		#endregion
 
 	}

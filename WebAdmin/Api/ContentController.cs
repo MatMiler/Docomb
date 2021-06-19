@@ -81,5 +81,14 @@ namespace Docomb.WebAdmin.Api
 		}
 
 
+		[HttpPost("deleteItem")]
+		public DeleteItemResponse DeleteItem([FromBody] DeleteItemRequest request)
+		{
+			DeleteItemResponse response = ContentManager.Edit.DeleteItem(request);
+			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
+			return response;
+		}
+
+
 	}
 }

@@ -298,4 +298,22 @@ export module Workspaces {
 	}
 
 
+	export class DeleteItemResponse {
+		public actionStatus: Apis.ActionStatus;
+		public parentUrl: string;
+		public parentReactLocalUrl: string;
+
+		public constructor(source: any) {
+			this.actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
+			this.parentUrl = Utils.tryGetString(source, "parentUrl");
+			this.parentReactLocalUrl = Utils.tryGetString(source, "parentReactLocalUrl");
+		}
+	}
+
+	export async function deleteItem(url: string): Promise<DeleteItemResponse> {
+		let response = null;
+		response = await Apis.postJsonAsync("api/content/deleteItem", { url: url });
+		return new DeleteItemResponse(response);
+	}
+
 }
