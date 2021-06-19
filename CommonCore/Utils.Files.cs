@@ -44,7 +44,7 @@ namespace Docomb.CommonCore
 			if (string.IsNullOrEmpty(fileName)) return null;
 			if ((fileName.Contains('\\')) || (fileName.Contains('/'))) fileName = GetFileNameFromPath(fileName) ?? "";
 			int lastDot = fileName.LastIndexOf('.');
-			if ((lastDot <= 0) || (lastDot >= fileName.Length - 1)) return null;
+			if ((lastDot < 0) || (lastDot >= fileName.Length - 1)) return null;
 			return fileName.Substring(lastDot + 1);
 		}
 
@@ -54,7 +54,8 @@ namespace Docomb.CommonCore
 			if ((fileName.Contains('\\')) || (fileName.Contains('/'))) fileName = GetFileNameFromPath(fileName) ?? "";
 			if (string.IsNullOrEmpty(fileName?.Trim('.'))) return null;
 			int lastDot = fileName.LastIndexOf('.');
-			if ((lastDot <= 0) || (lastDot >= fileName.Length - 1)) return fileName;
+			if (lastDot == 0) return null;
+			if ((lastDot < 0) || (lastDot >= fileName.Length - 1)) return fileName;
 			return fileName.Substring(0, lastDot);
 		}
 

@@ -36,6 +36,7 @@ export class MainNav extends Component {
     }
     componentWillUnmount() {
         EventBus.remove("navUpdate", this.navUpdateCall);
+        EventBus.remove("fileStructChanged", this.fileStructChangedCall);
     }
     shouldComponentUpdate(nextProps, nextState) {
         if (this.instanceData.forceRefresh)

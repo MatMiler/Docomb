@@ -107,7 +107,7 @@ export module Apis {
 		}
 	}
 
-	export class ResponseWithStatus<T> {
+	export class DataWithStatus<T> {
 		public actionStatus: ActionStatus;
 		public data: T;
 		public constructor(actionStatus: ActionStatus, data: T) {

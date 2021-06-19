@@ -13,20 +13,25 @@ namespace Docomb.ContentStorage
 		[JsonPropertyName("type")]
 		public ContentItemType Type { get; protected set; }
 
+		[JsonPropertyName("fileName")]
 		public string FileName { get; protected set; }
 
+		[JsonIgnore]
 		public string FilePath { get; protected set; }
 
 		[JsonPropertyName("url")]
 		public string Url { get; protected set; }
 
+		[JsonIgnore]
 		public bool NeedsTrailingSlash { get; protected set; }
 
+		[JsonIgnore]
 		public List<string> UrlParts { get; protected set; }
 
 		[JsonPropertyName("name")]
 		public string Title { get; set; }
 
+		[JsonIgnore]
 		public Workspace Workspace { get; protected set; }
 
 		[JsonPropertyName("children")]

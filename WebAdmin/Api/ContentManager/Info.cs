@@ -157,7 +157,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 
 
-		public static ResponseWithStatus<List<string>> GetDirectoryPaths(string workspaceUrl)
+		public static DataWithStatus<List<string>> GetDirectoryPaths(string workspaceUrl)
 		{
 			(Workspace workspace, _) = WebCore.Configurations.WorkspacesConfig.FindFromPath(workspaceUrl);
 			if (workspace == null) return new(new ActionStatus(ActionStatus.StatusCode.NotFound), null);

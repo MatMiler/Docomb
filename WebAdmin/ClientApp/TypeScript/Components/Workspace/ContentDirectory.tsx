@@ -8,6 +8,7 @@ import { LayoutUtils } from '../../LayoutUtils';
 import PageBreadcrumbs from './PageBreadcrumbs';
 import $ from 'jquery';
 import { EventBus } from '../../EventBus';
+import { Apis } from '../../Data/Apis';
 
 
 const ContentDirectory: FC<{}> = (): ReactElement => {
@@ -21,18 +22,17 @@ const ContentDirectory: FC<{}> = (): ReactElement => {
 	const [renameIsVisible, { toggle: toggleRename, setTrue: showRename, setFalse: hideRename }] = useBoolean(false);
 	const [moveIsVisible, { toggle: toggleMove, setTrue: showMove, setFalse: hideMove }] = useBoolean(false);
 	const [moveDirectories, setMoveDirectories] = useState<IDropdownOption[]>([]);
+	const [createIsVisible, { toggle: toggleCreate, setTrue: showCreate, setFalse: hideCreate }] = useBoolean(false);
+	const [createLabel, setCreateLabel] = useState("");
+	const [createSuffix, setCreateSuffix] = useState("");
+	const [createContent, setCreateContent] = useState<IDialogContentProps>({  });
 
 	ContentDirectoryController.prepData(navigate,
 		{ toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting },
 		{ toggle: toggleAlert, setTrue: showAlert, setFalse: hideAlert, setTitle: setAlertTitle, setContent: setAlertContent },
 		{ toggle: toggleRename, setTrue: showRename, setFalse: hideRename },
-		{ toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories });
-
-	let renameDialogContent: IDialogContentProps = {
-		type: DialogType.largeHeader,
-		title: "Rename folder"
-	};
-	let renameDialogModal: IModalProps = { isBlocking: false };
+		{ toggle: toggleMove, setTrue: showMove, setFalse: hideMove, setDirectories: setMoveDirectories },
+		{ toggle: toggleCreate, setTrue: showCreate, setFalse: hideCreate, setLabel: setCreateLabel, setSuffix: setCreateSuffix, setContent: setCreateContent });
 
 
 	return (
@@ -59,8 +59,8 @@ const ContentDirectory: FC<{}> = (): ReactElement => {
 			<Dialog
 				hidden={!renameIsVisible}
 				onDismiss={hideRename}
-				dialogContentProps={renameDialogContent}
-				modalProps={renameDialogModal}
+				dialogContentProps={{ type: DialogType.largeHeader, title: "Rename folder" }}
+				modalProps={{ isBlocking: false }}
 			>
 				<TextField label="New folder name" id="renameInput" defaultValue={ContentDirectoryController?.pageInfo?.contentItem?.name} />
 				<DialogFooter>
@@ -78,6 +78,18 @@ const ContentDirectory: FC<{}> = (): ReactElement => {
 				<DialogFooter>
 					<PrimaryButton onClick={ContentDirectoryController.Move.finish} text="Move" />
 					<DefaultButton onClick={ContentDirectoryController.Move.cancel} text="Cancel" />
+				</DialogFooter>
+			</Dialog>
+			<Dialog
+				hidden={!createIsVisible}
+				onDismiss={hideCreate}
+				dialogContentProps={createContent}
+				modalProps={{ isBlocking: false }}
+			>
+				<TextField label={createLabel} id="createInput" defaultValue="" suffix={createSuffix} />
+				<DialogFooter>
+					<PrimaryButton onClick={ContentDirectoryController.NewItem.finish} text="Create" />
+					<DefaultButton onClick={ContentDirectoryController.NewItem.cancel} text="Cancel" />
 				</DialogFooter>
 			</Dialog>
 		</>
@@ -102,12 +114,18 @@ module ContentDirectoryController {
 	export interface IMoveDialogOptions extends IUseBooleanCallbacks {
 		setDirectories: React.Dispatch<React.SetStateAction<IDropdownOption[]>>
 	}
+	export interface ICreateDialogOptions extends IUseBooleanCallbacks {
+		setLabel: React.Dispatch<React.SetStateAction<string>>,
+		setSuffix: React.Dispatch<React.SetStateAction<string>>,
+		setContent: React.Dispatch<React.SetStateAction<IDialogContentProps>>,
+	}
 
 	let navigateCallback: (url: string) => void = null;
 	let waitingDialogCallbacks: IUseBooleanCallbacks = null;
 	let alertDialogCallbacks: IAlertDialogOptions = null;
 	let renameDialogCallbacks: IUseBooleanCallbacks = null;
 	let moveDialogCallbacks: IMoveDialogOptions = null;
+	let createDialogCallbacks: ICreateDialogOptions = null;
 
 
 
@@ -116,7 +134,8 @@ module ContentDirectoryController {
 		waitingDialog: IUseBooleanCallbacks,
 		alertDialog: IAlertDialogOptions,
 		renameDialog: IUseBooleanCallbacks,
-		moveDialog: IMoveDialogOptions
+		moveDialog: IMoveDialogOptions,
+		createDialog: ICreateDialogOptions
 	): void {
 		let newPageInfo: Workspaces.WorkspacePageInfo = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo);
 		pageInfo = newPageInfo;
@@ -127,6 +146,7 @@ module ContentDirectoryController {
 		alertDialogCallbacks = alertDialog;
 		renameDialogCallbacks = renameDialog;
 		moveDialogCallbacks = moveDialog;
+		createDialogCallbacks = createDialog;
 
 		let directoryUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
 		if (!directoryUrl.startsWith("/")) directoryUrl = "/" + directoryUrl;
@@ -141,13 +161,13 @@ module ContentDirectoryController {
 	export function getToolbar(): JSX.Element {
 		let commandBarItems: ICommandBarItemProps[] = [
 			{
-				key: "newItem", text: "New", disabled: true, iconProps: { iconName: "Add" },
+				key: "newItem", text: "New", iconProps: { iconName: "Add" },
 				subMenuProps: {
 					items: [
-						{ key: "newMarkdown", text: "Markdown file", iconProps: { iconName: "MarkDownLanguage" } },
-						{ key: "newText", text: "Text file", iconProps: { iconName: "TextDocument" } },
+						{ key: "newMarkdown", text: "Markdown file", onClick: ContentDirectoryController.NewItem.createMarkdown, iconProps: { iconName: "MarkDownLanguage" } },
+						{ key: "newText", text: "Text file", onClick: ContentDirectoryController.NewItem.createPlainText, iconProps: { iconName: "TextDocument" } },
 						{ key: 'divider', name: '-', itemType: ContextualMenuItemType.Divider },
-						{ key: "newDirectory", text: "Folder", iconProps: { iconName: "FolderHorizontal" } }
+						{ key: "newDirectory", text: "Folder", disabled: true, onClick: ContentDirectoryController.NewItem.createDirectory, iconProps: { iconName: "FolderHorizontal" } }
 					]
 				}
 			},
@@ -270,6 +290,73 @@ module ContentDirectoryController {
 			currentSelection = Utils.parseString(option?.key);
 		}
 	}
+
+
+	export module NewItem {
+
+		let currentItemType: Workspaces.ContentItemType;
+		let title: string = null;
+		let label: string = null;
+		let suffix: string = null;
+
+		export function createMarkdown(): void {
+			currentItemType = Workspaces.ContentItemType.File;
+			title = "New Markdown file";
+			label = "File name:";
+			suffix = ".md";
+			show();
+		}
+
+		export function createPlainText(): void {
+			currentItemType = Workspaces.ContentItemType.File;
+			title = "New plain text file";
+			label = "File name:";
+			suffix = ".txt";
+			show();
+		}
+
+		export function createDirectory(): void {
+			currentItemType = Workspaces.ContentItemType.Directory;
+			title = "New directory";
+			label = "Directory name:";
+			suffix = undefined;
+			show();
+		}
+
+		function show(): void {
+			createDialogCallbacks.setLabel(label);
+			createDialogCallbacks.setContent({ title: title });
+			createDialogCallbacks.setSuffix(suffix);
+			createDialogCallbacks.setTrue();
+		}
+
+		export async function finish(): Promise<void> {
+			let fileName: string = Utils.trimString($("#createInput", "").val()) + suffix;
+			console.log(fileName);
+			createDialogCallbacks.setFalse();
+			waitingDialogCallbacks.setTrue();
+			let response: Apis.DataWithStatus<Workspaces.ContentItem> = await Workspaces.createFile(pageInfo?.contentItem?.reactLocalUrl, fileName);
+			waitingDialogCallbacks.setFalse();
+			if (response?.actionStatus?.isOk == true) {
+				let newUrl: string = Utils.trimString(response?.data?.reactLocalUrl, "");
+				Workspaces.clearTreeCache();
+				EventBus.dispatch("fileStructChanged");
+				navigateCallback("/workspace" + newUrl);
+			} else {
+				let title = "Can't rename folder";
+				let desc = response.actionStatus.getDialogMessage();
+				alertDialogCallbacks.setTrue();
+				alertDialogCallbacks.setTitle(title);
+				alertDialogCallbacks.setContent(desc);
+			}
+		}
+
+		export function cancel(): void {
+			createDialogCallbacks.setFalse();
+		}
+
+	}
+
 
 }
 

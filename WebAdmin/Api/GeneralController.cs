@@ -1,4 +1,5 @@
-﻿using Docomb.ContentStorage;
+﻿using Docomb.CommonCore;
+using Docomb.ContentStorage;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -24,9 +25,9 @@ namespace Docomb.WebAdmin.Api
 
 
 		[HttpGet("workspeceDirectoryPaths")]
-		public ResponseWithStatus<List<string>> WorkspaceDirectoryPaths(string workspaceUrl)
+		public DataWithStatus<List<string>> WorkspaceDirectoryPaths(string workspaceUrl)
 		{
-			ResponseWithStatus<List<string>> data = GetDirectoryPaths(workspaceUrl);
+			DataWithStatus<List<string>> data = GetDirectoryPaths(workspaceUrl);
 			if (data?.ActionStatus != null) Response.StatusCode = data.ActionStatus.GetHttpStatusCode();
 			return data;
 		}

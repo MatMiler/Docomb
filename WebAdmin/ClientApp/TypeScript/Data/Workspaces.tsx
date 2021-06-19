@@ -268,13 +268,24 @@ export module Workspaces {
 	}
 
 
-	export async function directoryPaths(workspaceUrl: string): Promise<Apis.ResponseWithStatus<string[]>> {
+	export async function directoryPaths(workspaceUrl: string): Promise<Apis.DataWithStatus<string[]>> {
 		let source: any = await Apis.fetchJsonAsync("api/general/workspeceDirectoryPaths?workspaceUrl=" + encodeURI(workspaceUrl), false);
 		let actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
 		let list: string[] = null;
-		if (actionStatus?.isOk == true) 
+		if (actionStatus?.isOk == true)
 			list = Utils.mapArray(Utils.tryGet(source, "data"), x => Utils.trimString(x, null), x => (x != null));
-		return new Apis.ResponseWithStatus(actionStatus, list);
+		return new Apis.DataWithStatus(actionStatus, list);
 	}
+
+	export async function createFile(parentUrl: string, fileName: string): Promise<Apis.DataWithStatus<ContentItem>> {
+		let response = null;
+		response = await Apis.postJsonAsync("api/content/createFile", { parent: parentUrl, fileName: fileName });
+		let actionStatus = new Apis.ActionStatus(Utils.tryGet(response, "actionStatus"));
+		let item: ContentItem;
+		if (actionStatus?.isOk == true)
+			item = new ContentItem(Utils.tryGet(response, "data"));
+		return new Apis.DataWithStatus(actionStatus, item);
+	}
+
 
 }

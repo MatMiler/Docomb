@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Docomb.CommonCore;
 
 namespace Docomb.ContentStorage
 {
@@ -320,6 +321,41 @@ namespace Docomb.ContentStorage
 		}
 
 		#endregion
+
+
+
+
+
+
+		#region New items
+
+		public DataWithStatus<ContentItemSummary> CreateFile(ContentDirectory parent, string fileName, string content = null)
+		{
+			if (string.IsNullOrWhiteSpace(fileName)) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, "File name cannot be empty."), null);
+			if (string.IsNullOrWhiteSpace(GetFileNameWithoutExtension(fileName))) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, "File name cannot be empty."), null);
+			if (Path.GetInvalidFileNameChars().Any(fileName.Contains)) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, $"New name '{fileName}' contains invalid characters."), null);
+			if (parent == null) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, $"No folder was given in which to create a file."), null);
+			string filePath = Path.Combine(parent.FilePath, fileName);
+			if (File.Exists(filePath)) return new(new ActionStatus(ActionStatus.StatusCode.Conflict, $"A file named '{fileName}' already exists."), null);
+
+			try
+			{
+				File.Create(filePath);
+				if (content?.Length > 0) File.WriteAllText(filePath, content, Encoding.UTF8);
+				List<string> fileParts = new List<string>(parent.UrlParts);
+				fileParts.Add(fileName);
+				ContentItem item = FindItem(fileParts, MatchType.Physical);
+				ClearCache();
+				return new DataWithStatus<ContentItemSummary>(new ActionStatus(ActionStatus.StatusCode.OK), new ContentItemSummary(item));
+			}
+			catch (Exception e)
+			{
+				return new(new ActionStatus(ActionStatus.StatusCode.Error, exception: e), null);
+			}
+		}
+
+		#endregion
+
 
 	}
 }

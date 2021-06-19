@@ -190,5 +190,30 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 
 
+
+		public class CreateFileRequest
+		{
+			[JsonPropertyName("parent")]
+			public string Parent { get; set; }
+
+			[JsonPropertyName("fileName")]
+			public string FileName { get; set; }
+		}
+
+
+		public static DataWithStatus<ContentItemSummary> CreateFile(CreateFileRequest request) => CreateFile(request?.Parent, request?.FileName);
+		public static DataWithStatus<ContentItemSummary> CreateFile(string parentUrl, string fileName)
+		{
+			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(parentUrl);
+			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
+			ContentDirectory parent = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsDirectory;
+			if (parent == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound, message: "Can't find selected folder") };
+
+			DataWithStatus<ContentItemSummary> response = workspace.Content.CreateFile(parent, fileName);
+
+			return response;
+		}
+
+
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using Docomb.CommonCore;
+using Docomb.ContentStorage;
 using Docomb.WebAdmin.Api.ContentManager;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -60,6 +61,16 @@ namespace Docomb.WebAdmin.Api
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
 		}
+
+
+		[HttpPost("createFile")]
+		public DataWithStatus<ContentItemSummary> CreateFile([FromBody] CreateFileRequest request)
+		{
+			DataWithStatus<ContentItemSummary> response = ContentManager.Edit.CreateFile(request);
+			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
+			return response;
+		}
+
 
 	}
 }

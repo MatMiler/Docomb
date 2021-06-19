@@ -245,9 +245,21 @@ export var Workspaces;
             let list = null;
             if ((actionStatus === null || actionStatus === void 0 ? void 0 : actionStatus.isOk) == true)
                 list = Utils.mapArray(Utils.tryGet(source, "data"), x => Utils.trimString(x, null), x => (x != null));
-            return new Apis.ResponseWithStatus(actionStatus, list);
+            return new Apis.DataWithStatus(actionStatus, list);
         });
     }
     Workspaces.directoryPaths = directoryPaths;
+    function createFile(parentUrl, fileName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let response = null;
+            response = yield Apis.postJsonAsync("api/content/createFile", { parent: parentUrl, fileName: fileName });
+            let actionStatus = new Apis.ActionStatus(Utils.tryGet(response, "actionStatus"));
+            let item;
+            if ((actionStatus === null || actionStatus === void 0 ? void 0 : actionStatus.isOk) == true)
+                item = new ContentItem(Utils.tryGet(response, "data"));
+            return new Apis.DataWithStatus(actionStatus, item);
+        });
+    }
+    Workspaces.createFile = createFile;
 })(Workspaces || (Workspaces = {}));
 //# sourceMappingURL=Workspaces.js.map
