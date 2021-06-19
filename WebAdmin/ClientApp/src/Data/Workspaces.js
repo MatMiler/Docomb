@@ -261,5 +261,17 @@ export var Workspaces;
         });
     }
     Workspaces.createFile = createFile;
+    function createDirectory(parentUrl, fileName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let response = null;
+            response = yield Apis.postJsonAsync("api/content/createDirectory", { parent: parentUrl, fileName: fileName });
+            let actionStatus = new Apis.ActionStatus(Utils.tryGet(response, "actionStatus"));
+            let item;
+            if ((actionStatus === null || actionStatus === void 0 ? void 0 : actionStatus.isOk) == true)
+                item = new ContentItem(Utils.tryGet(response, "data"));
+            return new Apis.DataWithStatus(actionStatus, item);
+        });
+    }
+    Workspaces.createDirectory = createDirectory;
 })(Workspaces || (Workspaces = {}));
 //# sourceMappingURL=Workspaces.js.map

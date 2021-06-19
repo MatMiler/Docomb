@@ -145,6 +145,8 @@ export var Utils;
     function trimString(value, defaultValue) {
         if (defaultValue === undefined)
             defaultValue = "";
+        if ((value == null) || (value == undefined))
+            return defaultValue;
         if (typeof value == "string") {
             let s = value.trim();
             return (s != "") ? s : defaultValue;

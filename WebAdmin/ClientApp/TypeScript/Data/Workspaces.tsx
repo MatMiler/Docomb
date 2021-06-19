@@ -287,5 +287,15 @@ export module Workspaces {
 		return new Apis.DataWithStatus(actionStatus, item);
 	}
 
+	export async function createDirectory(parentUrl: string, fileName: string): Promise<Apis.DataWithStatus<ContentItem>> {
+		let response = null;
+		response = await Apis.postJsonAsync("api/content/createDirectory", { parent: parentUrl, fileName: fileName });
+		let actionStatus = new Apis.ActionStatus(Utils.tryGet(response, "actionStatus"));
+		let item: ContentItem;
+		if (actionStatus?.isOk == true)
+			item = new ContentItem(Utils.tryGet(response, "data"));
+		return new Apis.DataWithStatus(actionStatus, item);
+	}
+
 
 }

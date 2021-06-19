@@ -26,8 +26,8 @@ namespace Docomb.ContentStorage
 				if (string.IsNullOrWhiteSpace(newName)) return new(ActionStatus.StatusCode.InvalidRequestData, "Folder name cannot be empty.");
 				if (Path.GetInvalidFileNameChars().Any(newName.Contains)) return new(ActionStatus.StatusCode.InvalidRequestData, $"New name '{newName}' contains invalid characters.");
 				string newPath = Path.Combine(Directory.GetParent(FilePath).FullName, newName);
-				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"Folder '{newName}' already exists.");
 				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"File '{newName}' already exists.");
+				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"Folder '{newName}' already exists.");
 				Directory.Move(FilePath, newPath);
 				Workspace.Content.ClearCache();
 				return new(ActionStatus.StatusCode.OK);

@@ -105,7 +105,7 @@ var ContentDirectoryController;
                         { key: "newMarkdown", text: "Markdown file", onClick: ContentDirectoryController.NewItem.createMarkdown, iconProps: { iconName: "MarkDownLanguage" } },
                         { key: "newText", text: "Text file", onClick: ContentDirectoryController.NewItem.createPlainText, iconProps: { iconName: "TextDocument" } },
                         { key: 'divider', name: '-', itemType: ContextualMenuItemType.Divider },
-                        { key: "newDirectory", text: "Folder", disabled: true, onClick: ContentDirectoryController.NewItem.createDirectory, iconProps: { iconName: "FolderHorizontal" } }
+                        { key: "newDirectory", text: "Folder", onClick: ContentDirectoryController.NewItem.createDirectory, iconProps: { iconName: "FolderHorizontal" } }
                     ]
                 }
             },
@@ -273,16 +273,26 @@ var ContentDirectoryController;
             createDialogCallbacks.setTrue();
         }
         function finish() {
-            var _a, _b, _c;
+            var _a, _b, _c, _d;
             return __awaiter(this, void 0, void 0, function* () {
-                let fileName = Utils.trimString($("#createInput", "").val()) + suffix;
+                let fileName = Utils.trimString($("#createInput", "").val()) + Utils.trimString(suffix, "");
                 console.log(fileName);
                 createDialogCallbacks.setFalse();
                 waitingDialogCallbacks.setTrue();
-                let response = yield Workspaces.createFile((_a = ContentDirectoryController.pageInfo === null || ContentDirectoryController.pageInfo === void 0 ? void 0 : ContentDirectoryController.pageInfo.contentItem) === null || _a === void 0 ? void 0 : _a.reactLocalUrl, fileName);
+                let response = null;
+                switch (currentItemType) {
+                    case Workspaces.ContentItemType.File: {
+                        response = yield Workspaces.createFile((_a = ContentDirectoryController.pageInfo === null || ContentDirectoryController.pageInfo === void 0 ? void 0 : ContentDirectoryController.pageInfo.contentItem) === null || _a === void 0 ? void 0 : _a.reactLocalUrl, fileName);
+                        break;
+                    }
+                    case Workspaces.ContentItemType.Directory: {
+                        response = yield Workspaces.createDirectory((_b = ContentDirectoryController.pageInfo === null || ContentDirectoryController.pageInfo === void 0 ? void 0 : ContentDirectoryController.pageInfo.contentItem) === null || _b === void 0 ? void 0 : _b.reactLocalUrl, fileName);
+                        break;
+                    }
+                }
                 waitingDialogCallbacks.setFalse();
-                if (((_b = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _b === void 0 ? void 0 : _b.isOk) == true) {
-                    let newUrl = Utils.trimString((_c = response === null || response === void 0 ? void 0 : response.data) === null || _c === void 0 ? void 0 : _c.reactLocalUrl, "");
+                if (((_c = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _c === void 0 ? void 0 : _c.isOk) == true) {
+                    let newUrl = Utils.trimString((_d = response === null || response === void 0 ? void 0 : response.data) === null || _d === void 0 ? void 0 : _d.reactLocalUrl, "");
                     Workspaces.clearTreeCache();
                     EventBus.dispatch("fileStructChanged");
                     navigateCallback("/workspace" + newUrl);

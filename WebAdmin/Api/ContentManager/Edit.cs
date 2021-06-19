@@ -215,5 +215,19 @@ namespace Docomb.WebAdmin.Api.ContentManager
 		}
 
 
+		public static DataWithStatus<ContentItemSummary> CreateDirectory(CreateFileRequest request) => CreateDirectory(request?.Parent, request?.FileName);
+		public static DataWithStatus<ContentItemSummary> CreateDirectory(string parentUrl, string fileName)
+		{
+			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(parentUrl);
+			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
+			ContentDirectory parent = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsDirectory;
+			if (parent == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound, message: "Can't find selected folder") };
+
+			DataWithStatus<ContentItemSummary> response = workspace.Content.CreateDirectory(parent, fileName);
+
+			return response;
+		}
+
+
 	}
 }

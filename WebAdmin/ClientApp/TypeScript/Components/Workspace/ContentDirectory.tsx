@@ -167,7 +167,7 @@ module ContentDirectoryController {
 						{ key: "newMarkdown", text: "Markdown file", onClick: ContentDirectoryController.NewItem.createMarkdown, iconProps: { iconName: "MarkDownLanguage" } },
 						{ key: "newText", text: "Text file", onClick: ContentDirectoryController.NewItem.createPlainText, iconProps: { iconName: "TextDocument" } },
 						{ key: 'divider', name: '-', itemType: ContextualMenuItemType.Divider },
-						{ key: "newDirectory", text: "Folder", disabled: true, onClick: ContentDirectoryController.NewItem.createDirectory, iconProps: { iconName: "FolderHorizontal" } }
+						{ key: "newDirectory", text: "Folder", onClick: ContentDirectoryController.NewItem.createDirectory, iconProps: { iconName: "FolderHorizontal" } }
 					]
 				}
 			},
@@ -331,11 +331,15 @@ module ContentDirectoryController {
 		}
 
 		export async function finish(): Promise<void> {
-			let fileName: string = Utils.trimString($("#createInput", "").val()) + suffix;
+			let fileName: string = Utils.trimString($("#createInput", "").val()) + Utils.trimString(suffix, "");
 			console.log(fileName);
 			createDialogCallbacks.setFalse();
 			waitingDialogCallbacks.setTrue();
-			let response: Apis.DataWithStatus<Workspaces.ContentItem> = await Workspaces.createFile(pageInfo?.contentItem?.reactLocalUrl, fileName);
+			let response: Apis.DataWithStatus<Workspaces.ContentItem> = null;
+			switch (currentItemType) {
+				case Workspaces.ContentItemType.File: { response = await Workspaces.createFile(pageInfo?.contentItem?.reactLocalUrl, fileName); break; }
+				case Workspaces.ContentItemType.Directory: { response = await Workspaces.createDirectory(pageInfo?.contentItem?.reactLocalUrl, fileName); break; }
+			}
 			waitingDialogCallbacks.setFalse();
 			if (response?.actionStatus?.isOk == true) {
 				let newUrl: string = Utils.trimString(response?.data?.reactLocalUrl, "");
@@ -357,7 +361,5 @@ module ContentDirectoryController {
 
 	}
 
-
 }
-
 

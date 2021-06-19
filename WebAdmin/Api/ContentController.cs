@@ -72,5 +72,14 @@ namespace Docomb.WebAdmin.Api
 		}
 
 
+		[HttpPost("createDirectory")]
+		public DataWithStatus<ContentItemSummary> CreateDirectory([FromBody] CreateFileRequest request)
+		{
+			DataWithStatus<ContentItemSummary> response = ContentManager.Edit.CreateDirectory(request);
+			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
+			return response;
+		}
+
+
 	}
 }
