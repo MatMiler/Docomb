@@ -169,17 +169,18 @@ namespace Docomb.ContentStorage
 			Dictionary<string, ContentItemSummary> dict = new();
 			string path = Path.Combine(RootPath, parentPath);
 			if (!Directory.Exists(path)) return dict;
+			DirectoryInfo parent = new(path);
 
 			HashSet<string> usedNames = new();
 
 			#region Directories
 			{
-				string[] directoryPaths = Directory.GetDirectories(path);
-				if (directoryPaths?.Length > 0)
+				List<DirectoryInfo> directories = parent.GetDirectories()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				if (directories?.Count > 0)
 				{
-					foreach (string directoryPath in directoryPaths)
+					foreach (DirectoryInfo directory in directories)
 					{
-						string directoryName = GetFileNameFromPath(directoryPath);
+						string directoryName = directory.Name;
 						string nameLower = directoryName.ToLower();
 						if (_itemLogicalSummaryByPath.ContainsKey(directoryName))
 						{
@@ -210,7 +211,7 @@ namespace Docomb.ContentStorage
 						#region Add directory as such
 						if (!defaultFileFound)
 						{
-							ContentItemSummary summary = new(new ContentDirectory(Workspace, directoryPath, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
+							ContentItemSummary summary = new(new ContentDirectory(Workspace, directory.FullName, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
 							dict.Add(directoryName, summary);
 							_itemLogicalSummaryByPath.Add(directoryName, summary);
 							usedNames.Add(nameLower);
@@ -223,12 +224,12 @@ namespace Docomb.ContentStorage
 
 			#region Files
 			{
-				string[] filePaths = Directory.GetFiles(path);
-				if (filePaths?.Length > 0)
+				List<FileInfo> files = parent.GetFiles()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				if (files?.Count > 0)
 				{
-					foreach (string filePath in filePaths)
+					foreach (FileInfo file in files)
 					{
-						string fileName = GetFileNameFromPath(filePath);
+						string fileName = file.Name;
 						string extension = GetFileExtension(fileName)?.ToLower();
 						// Not a supported article or not logically a child
 						if ((string.IsNullOrEmpty(extension)) || (!ArticleExtensions.Contains(extension?.ToLower())) || (DefaultFileNames.Contains(fileName))) continue;
@@ -237,7 +238,7 @@ namespace Docomb.ContentStorage
 						if (string.IsNullOrEmpty(simplifiedName)) continue;
 						string simplifiedLower = simplifiedName.ToLower();
 						if (usedNames.Contains(simplifiedLower)) continue;
-						ContentItemSummary summary = new(new ContentFile(Workspace, filePath, parentPathParts.Concat(new List<string>() { simplifiedName }).ToList(), false));
+						ContentItemSummary summary = new(new ContentFile(Workspace, file.FullName, parentPathParts.Concat(new List<string>() { simplifiedName }).ToList(), false));
 						dict.Add(simplifiedName, summary);
 						_itemLogicalSummaryByPath.Add(simplifiedName, summary);
 						usedNames.Add(simplifiedLower);
@@ -260,17 +261,18 @@ namespace Docomb.ContentStorage
 			List<ContentItemSummary> list = new();
 			string path = Path.Combine(RootPath, parentPath);
 			if (!Directory.Exists(path)) return list;
+			DirectoryInfo parent = new(path);
 
 			#region Directories
 			if (includeDirectories)
 			{
-				string[] directoryPaths = Directory.GetDirectories(path);
-				if (directoryPaths?.Length > 0)
+				List<DirectoryInfo> directories = parent.GetDirectories()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				if (directories?.Count > 0)
 				{
-					foreach (string directoryPath in directoryPaths)
+					foreach (DirectoryInfo directory in directories)
 					{
-						string directoryName = GetFileNameFromPath(directoryPath);
-						ContentItemSummary summary = new(new ContentDirectory(Workspace, directoryPath, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
+						string directoryName = directory.Name;
+						ContentItemSummary summary = new(new ContentDirectory(Workspace, directory.FullName, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
 						list.Add(summary);
 					}
 				}
@@ -280,13 +282,13 @@ namespace Docomb.ContentStorage
 			#region Files
 			if (includeFiles)
 			{
-				string[] filePaths = Directory.GetFiles(path);
-				if (filePaths?.Length > 0)
+				List<FileInfo> files = parent.GetFiles()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				if (files?.Count > 0)
 				{
-					foreach (string filePath in filePaths)
+					foreach (FileInfo file in files)
 					{
-						string fileName = GetFileNameFromPath(filePath);
-						ContentItemSummary summary = new(new ContentFile(Workspace, filePath, parentPathParts.Concat(new List<string>() { fileName }).ToList(), false));
+						string fileName = file.Name;
+						ContentItemSummary summary = new(new ContentFile(Workspace, file.FullName, parentPathParts.Concat(new List<string>() { fileName }).ToList(), false));
 						list.Add(summary);
 					}
 				}
