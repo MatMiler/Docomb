@@ -106,8 +106,8 @@ export class MainNav extends Component {
     static itemToNavLink(item, currentUrl) {
         if (item == null)
             return null;
-        let currentUrlTrailed = currentUrl + ((currentUrl.endsWith("/")) ? "" : "/");
-        let itemUrlTrailed = item.url + ((item.url.endsWith("/")) ? "" : "/");
+        let currentUrlTrailed = Utils.padWithSlash(currentUrl, false, true);
+        let itemUrlTrailed = Utils.padWithSlash(item.url, false, true);
         let isExpanded = ((item.url == currentUrl) || (currentUrlTrailed.startsWith(itemUrlTrailed)));
         return {
             name: item.name,
@@ -119,7 +119,7 @@ export class MainNav extends Component {
     }
     onLinkClick(ev, item) {
         ev.preventDefault();
-        Utils.tryGet(this.props, "history").push("/" + item.url);
+        Utils.tryGet(this.props, "history").push(Utils.padWithSlash(item.url, true, false));
         EventBus.dispatch("navChange");
     }
     populateContent() {

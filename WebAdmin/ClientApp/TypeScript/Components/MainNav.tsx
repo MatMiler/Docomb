@@ -123,8 +123,8 @@ export class MainNav extends Component<{}, MainNavState> {
 
 	static itemToNavLink(item: Workspaces.ContentItem, currentUrl: string): INavLink {
 		if (item == null) return null;
-		let currentUrlTrailed = currentUrl + ((currentUrl.endsWith("/")) ? "" : "/");
-		let itemUrlTrailed = item.url + ((item.url.endsWith("/")) ? "" : "/");
+		let currentUrlTrailed = Utils.padWithSlash(currentUrl, false, true);
+		let itemUrlTrailed = Utils.padWithSlash(item.url, false, true);
 		let isExpanded: boolean = ((item.url == currentUrl) || (currentUrlTrailed.startsWith(itemUrlTrailed)));
 		return {
 			name: item.name,
@@ -137,7 +137,7 @@ export class MainNav extends Component<{}, MainNavState> {
 
 	onLinkClick(ev?: React.MouseEvent<HTMLElement>, item?: INavLink) {
 		ev.preventDefault();
-		Utils.tryGet(this.props, "history").push("/" + item.url);
+		Utils.tryGet(this.props, "history").push(Utils.padWithSlash(item.url, true, false));
 		EventBus.dispatch("navChange");
 	}
 

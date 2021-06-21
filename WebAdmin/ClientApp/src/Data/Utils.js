@@ -173,6 +173,15 @@ export var Utils;
         return (pos >= 0) ? value.substring(pos + separator.length) : value;
     }
     Utils.lastStringPart = lastStringPart;
+    function padWithSlash(value, atStart = true, atEnd = true) {
+        value = trimString(value, "");
+        if ((atStart == true) && (!value.startsWith("/")))
+            value = "/" + value;
+        if ((atEnd == true) && (!value.endsWith("/")))
+            value += "/";
+        return value;
+    }
+    Utils.padWithSlash = padWithSlash;
     //#endregion
     //#region Arrays & Objects
     /**

@@ -90,5 +90,29 @@ namespace Docomb.WebAdmin.Api
 		}
 
 
+		[HttpPost("preUploadCheck")]
+		public PreUploadCheckResponse PreUploadCheck([FromBody] PreUploadCheckRequest request)
+		{
+			PreUploadCheckResponse response = ContentManager.Edit.PreUploadCheck(request);
+			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
+			return response;
+		}
+
+
+		[HttpPost("uploadFile")]
+		public DataWithStatus<ContentItemSummary> UploadFile()
+		{
+			//int a = 1;
+			UploadFileRequest request = new UploadFileRequest();
+			request.ParentUrl = Request.Form["parentUrl"];
+			request.File = Request.Form.Files.FirstOrDefault();
+			DataWithStatus<ContentItemSummary> response = ContentManager.Edit.UploadFile(request);
+			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
+			return response;
+			//return new DataWithStatus<ContentItemSummary>(new ActionStatus(ActionStatus.StatusCode.ActionNotSupported), null);
+		}
+
+
+
 	}
 }

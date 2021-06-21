@@ -37,12 +37,9 @@ export var LayoutUtils;
     function fixLocalLinksInHtml(html, workspace, contentItem) {
         try {
             let container = $("<div />").html(html);
-            let readerBasePath = Utils.tryGetString(window, "readerBasePath");
-            if (!readerBasePath.endsWith("/"))
-                readerBasePath += "/";
+            let readerBasePath = Utils.padWithSlash(Utils.tryGetString(window, "readerBasePath"), false, true);
             readerBasePath += workspace === null || workspace === void 0 ? void 0 : workspace.url;
-            if (!readerBasePath.endsWith("/"))
-                readerBasePath += "/";
+            readerBasePath = Utils.padWithSlash(readerBasePath, false, true);
             container.find("a").each((index, element) => {
                 let a = $(element);
                 a.attr("target", "_blank");

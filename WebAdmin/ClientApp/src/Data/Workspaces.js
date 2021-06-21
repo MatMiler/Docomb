@@ -289,5 +289,63 @@ export var Workspaces;
         });
     }
     Workspaces.deleteItem = deleteItem;
+    let PreUploadCheck;
+    (function (PreUploadCheck) {
+        class Request {
+            constructor(parentUrl = null, files = null) {
+                this.parentUrl = parentUrl;
+                this.files = files;
+            }
+        }
+        PreUploadCheck.Request = Request;
+        class ClientFile {
+            constructor(name = null) {
+                this.name = name;
+            }
+        }
+        PreUploadCheck.ClientFile = ClientFile;
+        let FileStatusType;
+        (function (FileStatusType) {
+            FileStatusType["OK"] = "OK";
+            FileStatusType["AlreadyExists"] = "AlreadyExists";
+        })(FileStatusType = PreUploadCheck.FileStatusType || (PreUploadCheck.FileStatusType = {}));
+        class Response {
+            constructor(source) {
+                this.actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
+                this.files = Utils.mapArray(Utils.tryGet(source, "files"), x => new FileStatus(x), x => { var _a; return (((_a = x === null || x === void 0 ? void 0 : x.name) === null || _a === void 0 ? void 0 : _a.length) > 0); }, false);
+            }
+        }
+        PreUploadCheck.Response = Response;
+        class FileStatus {
+            constructor(source) {
+                this.name = Utils.tryGetString(source, "name");
+                this.status = Utils.tryGetEnum(source, "status", FileStatusType);
+            }
+        }
+        PreUploadCheck.FileStatus = FileStatus;
+        function check(request) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let response = null;
+                response = yield Apis.postJsonAsync("api/content/preUploadCheck", request);
+                return new Response(response);
+            });
+        }
+        PreUploadCheck.check = check;
+    })(PreUploadCheck = Workspaces.PreUploadCheck || (Workspaces.PreUploadCheck = {}));
+    function uploadFile(parentUrl, file) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let response = null;
+            let form = new FormData();
+            form.append("parentUrl", parentUrl);
+            form.append("file", file);
+            response = yield Apis.postFormAsync("api/content/uploadFile", form);
+            let actionStatus = new Apis.ActionStatus(Utils.tryGet(response, "actionStatus"));
+            let item;
+            if ((actionStatus === null || actionStatus === void 0 ? void 0 : actionStatus.isOk) == true)
+                item = new ContentItem(Utils.tryGet(response, "data"));
+            return new Apis.DataWithStatus(actionStatus, item);
+        });
+    }
+    Workspaces.uploadFile = uploadFile;
 })(Workspaces || (Workspaces = {}));
 //# sourceMappingURL=Workspaces.js.map

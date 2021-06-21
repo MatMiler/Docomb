@@ -165,6 +165,13 @@
 		return (pos >= 0) ? value.substring(pos + separator.length) : value;
 	}
 
+	export function padWithSlash(value: string, atStart: boolean = true, atEnd: boolean = true): string {
+		value = trimString(value, "");
+		if ((atStart == true) && (!value.startsWith("/"))) value = "/" + value;
+		if ((atEnd == true) && (!value.endsWith("/"))) value += "/";
+		return value;
+	}
+
 	//#endregion
 
 

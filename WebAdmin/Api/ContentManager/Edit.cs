@@ -7,12 +7,15 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Docomb.CommonCore;
+using Microsoft.AspNetCore.Http;
 
 namespace Docomb.WebAdmin.Api.ContentManager
 {
 	public static class Edit
 	{
 
+
+		#region Save content
 
 		public class SaveRequest
 		{
@@ -49,9 +52,13 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			return new ActionStatus(success ? ActionStatus.StatusCode.OK : ActionStatus.StatusCode.Error);
 		}
 
+		#endregion
 
 
 
+
+
+		#region Move file/directory
 
 		public class MoveRequest
 		{
@@ -134,7 +141,13 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			return new() { ActionStatus = status, OldUrl = url, NewUrl = newUrl };
 		}
 
+		#endregion
 
+
+
+
+
+		#region Rename file/directory
 
 		public static MoveResponse RenameDirectory(MoveRequest request) => RenameDirectory(request?.Url, request?.FileName);
 		public static MoveResponse RenameDirectory(string url, string newName)
@@ -188,8 +201,13 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			return new() { ActionStatus = status, OldUrl = url, NewUrl = newUrl };
 		}
 
+		#endregion
 
 
+
+
+
+		#region Create file/directory
 
 		public class CreateFileRequest
 		{
@@ -228,7 +246,14 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			return response;
 		}
 
-		
+		#endregion
+
+
+
+
+
+		#region Delete file/directory
+
 		public class DeleteItemRequest
 		{
 			[JsonPropertyName("url")]
@@ -287,6 +312,133 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 			return new(status, parentUrl, parentReactLocalUrl);
 		}
+
+		#endregion
+
+
+
+
+
+		#region Upload files
+
+		public class PreUploadCheckRequest
+		{
+			[JsonPropertyName("parentUrl")]
+			public string ParentUrl { get; set; }
+
+			[JsonPropertyName("files")]
+			public List<ClientFile> Files { get; set; }
+
+			public class ClientFile
+			{
+				[JsonPropertyName("name")]
+				public string Name { get; set; }
+			}
+		}
+
+		public class PreUploadCheckResponse
+		{
+			[JsonPropertyName("actionStatus")]
+			public ActionStatus ActionStatus { get; set; }
+
+			[JsonPropertyName("files")]
+			public List<FileStatus> Files { get; set; }
+
+			public enum FileStatusType
+			{
+				OK,
+				AlreadyExists
+			}
+			public class FileStatus
+			{
+				[JsonPropertyName("name")]
+				public string Name { get; set; }
+
+				[JsonPropertyName("status")]
+				public FileStatusType Status { get; set; }
+			}
+		}
+
+		public static PreUploadCheckResponse PreUploadCheck(PreUploadCheckRequest request)
+		{
+			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request?.ParentUrl);
+			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
+			ContentDirectory parent = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsDirectory;
+			if (parent == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound, message: "Can't find target folder") };
+
+			try
+			{
+				List<ContentItemSummary> children = workspace.Content.GetChildren(parent.UrlParts, MatchType.Physical);
+
+				// Presume case-insensitive file system
+				HashSet<string> existingItems = children.Select(x => x.FileName?.ToLower()).Distinct().ToHashSet();
+
+				List<PreUploadCheckResponse.FileStatus> statuses = new();
+
+				if (request?.Files?.Count > 0)
+				{
+					foreach(var file in request.Files)
+					{
+						if (string.IsNullOrWhiteSpace(file?.Name)) continue;
+						PreUploadCheckResponse.FileStatus status = new() { Name = file?.Name };
+						if (existingItems.Contains(file.Name.ToLower()))
+							status.Status = PreUploadCheckResponse.FileStatusType.AlreadyExists;
+						else
+							status.Status = PreUploadCheckResponse.FileStatusType.OK;
+						statuses.Add(status);
+					}
+				}
+
+				return new() { ActionStatus = new(ActionStatus.StatusCode.OK), Files = statuses };
+			}
+			catch (Exception e)
+			{
+				return new PreUploadCheckResponse() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.Error, exception: e) };
+			}
+		}
+
+
+
+		public class UploadFileRequest
+		{
+			[JsonPropertyName("parentUrl")]
+			public string ParentUrl { get; set; }
+
+			[JsonPropertyName("file")]
+			public IFormFile File { get; set; }
+		}
+
+		public static DataWithStatus<ContentItemSummary> UploadFile(UploadFileRequest request)
+		{
+			if (request?.File == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.MissingRequestData, "No file was sent") };
+			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request?.ParentUrl);
+			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
+			ContentDirectory parent = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsDirectory;
+			if (parent == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound, message: "Can't find target folder") };
+
+			try
+			{
+				string fileName = request.File?.FileName;
+				ContentFile file = workspace.Content.FindItem(parent.UrlParts.Append(fileName).ToList(), MatchType.Physical)?.AsFile;
+				if (file == null)
+				{
+					DataWithStatus<ContentItemSummary> createResponse = workspace.Content.CreateFile(parent, fileName);
+					if (createResponse?.ActionStatus?.IsOk != true) return new() { ActionStatus = createResponse?.ActionStatus ?? new(ActionStatus.StatusCode.Error) };
+					file = workspace.Content.FindItem(createResponse?.Data?.UrlParts, MatchType.Physical)?.AsFile;
+					if (file == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.Error) };
+				}
+				ActionStatus status = file.SaveBinaryFile(request.File.OpenReadStream());
+				return new(status, new ContentItemSummary(file));
+			}
+			catch (Exception e)
+			{
+				return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.Error, exception: e) };
+			}
+		}
+
+
+
+		#endregion
 
 	}
 }

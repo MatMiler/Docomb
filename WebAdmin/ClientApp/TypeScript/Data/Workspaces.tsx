@@ -316,4 +316,68 @@ export module Workspaces {
 		return new DeleteItemResponse(response);
 	}
 
+
+
+	export module PreUploadCheck {
+		export class Request {
+			public parentUrl: string;
+			public files: ClientFile[];
+
+			public constructor(parentUrl: string = null, files: ClientFile[] = null) {
+				this.parentUrl = parentUrl;
+				this.files = files;
+			}
+		}
+		export class ClientFile {
+			public name: string;
+
+			public constructor(name: string = null) {
+				this.name = name;
+			}
+		}
+		export enum FileStatusType {
+			OK = "OK",
+			AlreadyExists = "AlreadyExists"
+		}
+		export class Response {
+			public actionStatus: Apis.ActionStatus;
+			public files: FileStatus[];
+
+			public constructor(source: any) {
+				this.actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
+				this.files = Utils.mapArray(Utils.tryGet(source, "files"), x => new FileStatus(x), x => (x?.name?.length > 0), false);
+			}
+		}
+		export class FileStatus {
+			public name: string;
+			public status: FileStatusType;
+
+			public constructor(source: any) {
+				this.name = Utils.tryGetString(source, "name");
+				this.status = Utils.tryGetEnum(source, "status", FileStatusType);
+			}
+		}
+
+		export async function check(request: Request): Promise<Response> {
+			let response = null;
+			response = await Apis.postJsonAsync("api/content/preUploadCheck", request);
+			return new Response(response);
+		}
+
+	}
+
+
+	export async function uploadFile(parentUrl: string, file: File): Promise<Apis.DataWithStatus<ContentItem>> {
+		let response = null;
+		let form: FormData = new FormData();
+		form.append("parentUrl", parentUrl);
+		form.append("file", file);
+		response = await Apis.postFormAsync("api/content/uploadFile", form);
+		let actionStatus = new Apis.ActionStatus(Utils.tryGet(response, "actionStatus"));
+		let item: ContentItem;
+		if (actionStatus?.isOk == true)
+			item = new ContentItem(Utils.tryGet(response, "data"));
+		return new Apis.DataWithStatus(actionStatus, item);
+	}
+
 }

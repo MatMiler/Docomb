@@ -44,10 +44,9 @@ export module LayoutUtils {
 	export function fixLocalLinksInHtml(html: string, workspace: Workspaces.Workspace, contentItem: Workspaces.ContentItem): string {
 		try {
 			let container: JQuery<HTMLElement> = $("<div />").html(html);
-			let readerBasePath: string = Utils.tryGetString(window, "readerBasePath");
-			if (!readerBasePath.endsWith("/")) readerBasePath += "/";
+			let readerBasePath: string = Utils.padWithSlash(Utils.tryGetString(window, "readerBasePath"), false, true);
 			readerBasePath += workspace?.url;
-			if (!readerBasePath.endsWith("/")) readerBasePath += "/";
+			readerBasePath = Utils.padWithSlash(readerBasePath, false, true);
 			container.find("a").each((index: number, element: HTMLAnchorElement) => {
 				let a = $(element);
 				a.attr("target", "_blank");

@@ -343,7 +343,8 @@ namespace Docomb.ContentStorage
 
 			try
 			{
-				File.Create(filePath);
+				using FileStream stream = File.Create(filePath);
+				stream.Close();
 				if (content?.Length > 0) File.WriteAllText(filePath, content, Encoding.UTF8);
 				List<string> fileParts = new List<string>(parent.UrlParts);
 				fileParts.Add(fileName);

@@ -181,9 +181,7 @@ var ContentFileInfoController;
                 let response = yield Workspaces.renameFile(ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.reactLocalUrl, fileName);
                 waitingDialogCallbacks.setFalse();
                 if (((_a = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _a === void 0 ? void 0 : _a.isOk) == true) {
-                    let newUrl = Utils.trimString(response === null || response === void 0 ? void 0 : response.newUrl, "");
-                    if (!newUrl.startsWith("/"))
-                        newUrl = "/" + newUrl;
+                    let newUrl = Utils.padWithSlash(Utils.trimString(response === null || response === void 0 ? void 0 : response.newUrl, ""), true, false);
                     Workspaces.clearTreeCache();
                     EventBus.dispatch("fileStructChanged");
                     navigateCallback("/workspace" + newUrl);
@@ -251,9 +249,7 @@ var ContentFileInfoController;
                 let response = yield Workspaces.moveFile(ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.reactLocalUrl, newParent);
                 waitingDialogCallbacks.setFalse();
                 if (((_a = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _a === void 0 ? void 0 : _a.isOk) == true) {
-                    let newUrl = Utils.trimString(response === null || response === void 0 ? void 0 : response.newUrl, "");
-                    if (!newUrl.startsWith("/"))
-                        newUrl = "/" + newUrl;
+                    let newUrl = Utils.padWithSlash(Utils.trimString(response === null || response === void 0 ? void 0 : response.newUrl, ""), true, false);
                     Workspaces.clearTreeCache();
                     EventBus.dispatch("fileStructChanged");
                     navigateCallback("/workspace" + newUrl);
@@ -292,9 +288,7 @@ var ContentFileInfoController;
                 let response = yield Workspaces.deleteItem(ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.reactLocalUrl);
                 waitingDialogCallbacks.setFalse();
                 if (((_a = response === null || response === void 0 ? void 0 : response.actionStatus) === null || _a === void 0 ? void 0 : _a.isOk) == true) {
-                    let parentUrl = Utils.trimString(response === null || response === void 0 ? void 0 : response.parentReactLocalUrl, "");
-                    if (!parentUrl.startsWith("/"))
-                        parentUrl = "/" + parentUrl;
+                    let parentUrl = Utils.padWithSlash(Utils.trimString(response === null || response === void 0 ? void 0 : response.parentReactLocalUrl, ""), true, false);
                     Workspaces.clearTreeCache();
                     EventBus.dispatch("fileStructChanged");
                     navigateCallback("/workspace" + parentUrl);

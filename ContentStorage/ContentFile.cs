@@ -141,6 +141,24 @@ namespace Docomb.ContentStorage
 		}
 
 
+		public ActionStatus SaveBinaryFile(Stream stream)
+		{
+			try
+			{
+				using (var fileStream = new FileStream(FilePath, FileMode.OpenOrCreate))
+				{
+					stream.CopyTo(fileStream);
+					stream.Close();
+				}
+				return new ActionStatus(ActionStatus.StatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return new ActionStatus(ActionStatus.StatusCode.Error, exception: e);
+			}
+		}
+
+
 		public ActionStatus Rename(string newName)
 		{
 			try

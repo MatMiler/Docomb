@@ -14,7 +14,7 @@ const PageBreadcrumbs: FC<{}> = (): ReactElement => {
 	const history = useHistory();
 	function onClick(ev: React.MouseEvent<HTMLElement>, item: IBreadcrumbItem) {
 		ev.preventDefault();
-		history.push("/" + item.href);
+		history.push(Utils.padWithSlash(item.href, true, false));
 		EventBus.dispatch("navChange");
 	}
 

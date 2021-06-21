@@ -240,8 +240,7 @@ module ContentFileInfoController {
 			let response: Workspaces.MoveResponse = await Workspaces.renameFile(fileDetails?.reactLocalUrl, fileName);
 			waitingDialogCallbacks.setFalse();
 			if (response?.actionStatus?.isOk == true) {
-				let newUrl: string = Utils.trimString(response?.newUrl, "");
-				if (!newUrl.startsWith("/")) newUrl = "/" + newUrl;
+				let newUrl: string = Utils.padWithSlash(Utils.trimString(response?.newUrl, ""), true, false);
 				Workspaces.clearTreeCache();
 				EventBus.dispatch("fileStructChanged");
 				navigateCallback("/workspace" + newUrl);
@@ -305,8 +304,7 @@ module ContentFileInfoController {
 			let response: Workspaces.MoveResponse = await Workspaces.moveFile(fileDetails?.reactLocalUrl, newParent);
 			waitingDialogCallbacks.setFalse();
 			if (response?.actionStatus?.isOk == true) {
-				let newUrl: string = Utils.trimString(response?.newUrl, "");
-				if (!newUrl.startsWith("/")) newUrl = "/" + newUrl;
+				let newUrl: string = Utils.padWithSlash(Utils.trimString(response?.newUrl, ""), true, false);
 				Workspaces.clearTreeCache();
 				EventBus.dispatch("fileStructChanged");
 				navigateCallback("/workspace" + newUrl);
@@ -341,8 +339,7 @@ module ContentFileInfoController {
 			let response: Workspaces.DeleteItemResponse = await Workspaces.deleteItem(fileDetails?.reactLocalUrl);
 			waitingDialogCallbacks.setFalse();
 			if (response?.actionStatus?.isOk == true) {
-				let parentUrl: string = Utils.trimString(response?.parentReactLocalUrl, "");
-				if (!parentUrl.startsWith("/")) parentUrl = "/" + parentUrl;
+				let parentUrl: string = Utils.padWithSlash(Utils.trimString(response?.parentReactLocalUrl, ""), true, false);
 				Workspaces.clearTreeCache();
 				EventBus.dispatch("fileStructChanged");
 				navigateCallback("/workspace" + parentUrl);

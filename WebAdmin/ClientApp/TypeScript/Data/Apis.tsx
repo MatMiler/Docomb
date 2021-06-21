@@ -63,6 +63,20 @@ export module Apis {
 	}
 
 
+
+	export async function postFormAsync(url: string, data: FormData): Promise<any> {
+		let fetchData: RequestInit = { method: "POST", body: data };
+		let receivedData: any = null;
+		try {
+			let response: Response = await fetch(url, fetchData);
+			receivedData = await response.json();
+		}
+		catch (e) { }
+		return receivedData;
+	}
+
+
+
 	export enum ActionStatusCode {
 		OK = "OK",
 		Error = "Error",

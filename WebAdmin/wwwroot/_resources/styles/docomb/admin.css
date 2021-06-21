@@ -442,6 +442,12 @@ html .sideBarItem.selected a:before {
       .light .editTextFile .preview {
         border-color: #eee; } }
 
+.invisibleUploadInput {
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  display: block; }
+
 .articleContent blockquote {
   border-left: 4px solid;
   padding: 5px 5px 5px 15px;

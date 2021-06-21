@@ -69,6 +69,19 @@ export var Apis;
         });
     }
     Apis.postJsonAsync = postJsonAsync;
+    function postFormAsync(url, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let fetchData = { method: "POST", body: data };
+            let receivedData = null;
+            try {
+                let response = yield fetch(url, fetchData);
+                receivedData = yield response.json();
+            }
+            catch (e) { }
+            return receivedData;
+        });
+    }
+    Apis.postFormAsync = postFormAsync;
     let ActionStatusCode;
     (function (ActionStatusCode) {
         ActionStatusCode["OK"] = "OK";

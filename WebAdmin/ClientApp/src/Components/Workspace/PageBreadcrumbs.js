@@ -9,7 +9,7 @@ const PageBreadcrumbs = () => {
     const history = useHistory();
     function onClick(ev, item) {
         ev.preventDefault();
-        history.push("/" + item.href);
+        history.push(Utils.padWithSlash(item.href, true, false));
         EventBus.dispatch("navChange");
     }
     let breadcrumbs = [];
