@@ -436,9 +436,36 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			}
 		}
 
+		#endregion
 
+
+
+
+
+		#region Markdown preview
+
+		public static DataWithStatus<string> PreviewMarkdown(SaveRequest request)
+		{
+			if (request == null) return new(new ActionStatus(ActionStatus.StatusCode.MissingRequestData), null);
+			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request.Url);
+			if ((workspace == null) || (remainingPath == null)) return new(new ActionStatus(ActionStatus.StatusCode.NotFound), null);
+			ContentFile contentFile = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsFile;
+			if (contentFile == null) return new(new ActionStatus(ActionStatus.StatusCode.NotFound), null);
+
+			try
+			{
+				ContentStorage.MarkdownEngines.MarkdownEngine engine = ContentStorage.MarkdownEngines.Manager.GetEngine(workspace);
+				string html = engine.RenderHtml(contentFile, request?.TextContent);
+				return new(new ActionStatus(ActionStatus.StatusCode.OK), html);
+			}
+			catch (Exception e)
+			{
+				return new(new ActionStatus(ActionStatus.StatusCode.Error, exception: e), null);
+			}
+		}
 
 		#endregion
+
 
 	}
 }

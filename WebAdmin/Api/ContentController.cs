@@ -113,6 +113,16 @@ namespace Docomb.WebAdmin.Api
 		}
 
 
+		[HttpPost("previewMarkdown")]
+		public DataWithStatus<string> PreviewMarkdown([FromBody] SaveRequest request)
+		{
+			DataWithStatus<string> response = ContentManager.Edit.PreviewMarkdown(request) ?? new(new ActionStatus(ActionStatus.StatusCode.Error), null);
+			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
+			return response;
+		}
+
+
+
 
 	}
 }

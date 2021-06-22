@@ -26,15 +26,15 @@ export const darkTheme = {
 };
 export const lightTheme = {
     palette: {
-        themePrimary: '#3366cc',
-        themeLighterAlt: '#f5f8fd',
-        themeLighter: '#d9e3f7',
-        themeLight: '#baccf0',
-        themeTertiary: '#7b9de0',
-        themeSecondary: '#4776d2',
-        themeDarkAlt: '#2e5cb8',
-        themeDark: '#274e9b',
-        themeDarker: '#1d3972',
+        themePrimary: '#0033ff',
+        themeLighterAlt: '#f5f7ff',
+        themeLighter: '#d6deff',
+        themeLight: '#b3c2ff',
+        themeTertiary: '#6685ff',
+        themeSecondary: '#1f4bff',
+        themeDarkAlt: '#002ee6',
+        themeDark: '#0027c2',
+        themeDarker: '#001d8f',
         neutralLighterAlt: '#faf9f8',
         neutralLighter: '#f3f2f1',
         neutralLight: '#edebe9',
@@ -47,7 +47,7 @@ export const lightTheme = {
         neutralPrimary: '#000000',
         neutralDark: '#151515',
         black: '#0b0b0b',
-        white: '#ffffff'
+        white: '#ffffff',
     }
 };
 //# sourceMappingURL=Themes.js.map

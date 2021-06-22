@@ -123,6 +123,7 @@ var ContentDirectoryController;
         Upload.callbacks = uploadDialog;
         let directoryUrl = Utils.padWithSlash(Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]));
         ContentDirectoryController.isRoot = (directoryUrl == "/");
+        Move.prep();
     }
     ContentDirectoryController.prepData = prepData;
     function getToolbar() {
@@ -190,6 +191,15 @@ var ContentDirectoryController;
         Move.callbacks = null;
         let pathOptions = null;
         let currentSelection = null;
+        let lastPageUrl = null;
+        function prep() {
+            var _a, _b;
+            if (lastPageUrl != ((_a = ContentDirectoryController.pageInfo === null || ContentDirectoryController.pageInfo === void 0 ? void 0 : ContentDirectoryController.pageInfo.contentItem) === null || _a === void 0 ? void 0 : _a.reactLocalUrl)) {
+                pathOptions = null;
+            }
+            lastPageUrl = (_b = ContentDirectoryController.pageInfo === null || ContentDirectoryController.pageInfo === void 0 ? void 0 : ContentDirectoryController.pageInfo.contentItem) === null || _b === void 0 ? void 0 : _b.reactLocalUrl;
+        }
+        Move.prep = prep;
         function show() { showAsync(); }
         Move.show = show;
         function showAsync() {
@@ -404,7 +414,6 @@ var ContentDirectoryController;
         let wasAnythingUploaded = false;
         let issues = null;
         function reset() {
-            console.log("Resetting");
             files = null;
             hasAnyConflicts = false;
             hasAnyNewFiles = false;

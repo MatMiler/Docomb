@@ -25,9 +25,9 @@ namespace Docomb.ContentStorage.MarkdownEngines
 
 
 
-		public override string RenderHtml(ContentFile file)
+		public override string RenderHtml(ContentFile file, string content = null)
 		{
-			string source = file?.TextContent;
+			string source = content ?? file?.TextContent;
 			if (string.IsNullOrWhiteSpace(source)) return "";
 			var writer = new StringWriter();
 			var renderer = new HtmlRenderer(writer);

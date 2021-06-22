@@ -71,16 +71,12 @@ var EditTextFileController;
                 hasPreview = true;
                 break;
             }
-            case Workspaces.FileType.Html: {
-                hasPreview = true;
-                break;
-            }
+            //case Workspaces.FileType.Html: { hasPreview = true; break; }
             //case Workspaces.FileType.PlainText: { hasPreview = false; break; }
         }
-        //if (hasPreview) {
-        //	//commandBarItems.push({ key: "preview", text: "Preview", iconProps: { iconName: "Preview" } });
-        //	farItems.push({ key: "togglePreview", text: "Toggle preview", iconOnly: true, ariaLabel: "Toggle preview", iconProps: { iconName: "View" }, onClick: togglePreviewPanel });
-        //}
+        if (hasPreview) {
+            farItems.push({ key: "togglePreview", text: "Toggle preview", iconOnly: true, ariaLabel: "Toggle preview", iconProps: { iconName: "EntryView" }, onClick: togglePreviewPanel });
+        }
         return (React.createElement("div", { className: "pageCommands" },
             React.createElement(CommandBar, { items: commandBarItems, farItems: farItems })));
     }
@@ -124,33 +120,102 @@ var EditTextFileController;
         switch (EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.type) {
             case Workspaces.FileType.Markdown: {
                 return (React.createElement("div", { className: "editTextFile" },
-                    React.createElement("div", { className: "editor" },
-                        React.createElement(TextField, { id: "editorInput", defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, borderless: true, onChange: onEditorChange }))));
+                    React.createElement("div", { className: "editor watermarkedPart" },
+                        React.createElement("div", { className: "watermark" },
+                            React.createElement(FontIcon, { iconName: "Edit" })),
+                        React.createElement("div", { className: "editorInput" },
+                            React.createElement(TextField, { id: "editorInput", defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, onChange: onEditorChange }))),
+                    React.createElement("div", { className: "preview watermarkedPart" },
+                        React.createElement("div", { className: "watermark" },
+                            React.createElement(FontIcon, { iconName: "EntryView" })),
+                        React.createElement("div", { id: "previewContainer", className: "articleContent", style: previewStyle, dangerouslySetInnerHTML: { __html: LayoutUtils.fixLocalLinksInHtml(EditTextFileController.fileDetails.contentHtml, EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.workspace, EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.contentItem) } }))));
             }
             case Workspaces.FileType.Html:
             case Workspaces.FileType.PlainText: {
                 return (React.createElement("div", { className: "editTextFile" },
-                    React.createElement("div", { className: "editor" },
-                        React.createElement(TextField, { id: "editorInput", defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, borderless: true, onChange: onEditorChange }))));
+                    React.createElement("div", { className: "editor watermarkedPart" },
+                        React.createElement("div", { className: "watermark" },
+                            React.createElement(FontIcon, { iconName: "Edit" })),
+                        React.createElement("div", { className: "editorInput" },
+                            React.createElement(TextField, { id: "editorInput", defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, onChange: onEditorChange })))));
             }
         }
         return (React.createElement("div", { className: "editTextFile" },
             React.createElement("div", { className: "articleContent" }, "Edit is not supported for this file type")));
     }
     EditTextFileController.getContentPanel = getContentPanel;
-    //function togglePreviewPanel(): void {
-    //	let show = !Utils.tryGetBool(window, "showPreviewPanel", true);
-    //	window["showPreviewPanel"] = show;
-    //	$(".preview").toggle(show);
-    //}
-    function onEditorChange(ev, newText) {
-        content = newText;
-        //	switch (fileDetails?.type) {
-        //		case Workspaces.FileType.Markdown: {
-        //			$("#previewContainer").text(content);
-        //			break;
-        //		}
-        //	}
+    function togglePreviewPanel() {
+        let show = !Utils.tryGetBool(window, "showPreviewPanel", true);
+        window["showPreviewPanel"] = show;
+        $(".preview").toggle(show);
     }
+    function onEditorChange(ev, newText) {
+        let prevContent = content;
+        content = newText;
+        switch (EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.type) {
+            case Workspaces.FileType.Markdown: {
+                let immediate = false;
+                let eventType = Utils.tryGetString(ev, ["nativeEvent", "inputType"]);
+                switch (eventType) {
+                    case "deleteByCut":
+                    case "insertFromPaste":
+                    case "insertFromDrop": {
+                        immediate = true;
+                        break;
+                    }
+                }
+                MarkdownPreview.refresh(content, prevContent, immediate);
+                break;
+            }
+        }
+    }
+    let MarkdownPreview;
+    (function (MarkdownPreview) {
+        function refresh(content, prevContent, immediate = false) {
+            if (content == prevContent)
+                return; // No changes
+            if (((Date.now() - lastRequest) < requestTimeout) && ((updateTimeoutId > 0) || (isExecuting)))
+                return; // Already queued
+            let sinceLast = Date.now() - lastUpdate;
+            if (immediate == true) {
+                if (sinceLast < minUpdateInterval) {
+                    request();
+                    lastRequest = Date.now();
+                    return;
+                }
+                updateTimeoutId = window.setTimeout(request, minUpdateInterval - sinceLast);
+                lastRequest = Date.now();
+                return;
+            }
+            updateTimeoutId = window.setTimeout(request, minUpdateInterval);
+            lastRequest = Date.now();
+        }
+        MarkdownPreview.refresh = refresh;
+        const minUpdateInterval = 1500;
+        const requestTimeout = 15000;
+        let updateTimeoutId = null;
+        let lastUpdate = 0;
+        let lastRequest = 0;
+        let isExecuting = false;
+        function request() {
+            return __awaiter(this, void 0, void 0, function* () {
+                isExecuting = true;
+                try {
+                    let c = Utils.parseString($("#editorInput").val(), content);
+                    let response = yield Apis.postJsonAsync("api/content/previewMarkdown", { url: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.reactLocalUrl, textContent: c });
+                    let status = new Apis.ActionStatus(Utils.tryGet(response, "actionStatus"));
+                    if ((status === null || status === void 0 ? void 0 : status.isOk) == true) {
+                        let html = Utils.tryGetString(response, "data");
+                        html = LayoutUtils.fixLocalLinksInHtml(html, EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.workspace, EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.contentItem);
+                        $("#previewContainer").html(html);
+                    }
+                }
+                catch (e) { }
+                lastUpdate = Date.now();
+                updateTimeoutId = null;
+                isExecuting = false;
+            });
+        }
+    })(MarkdownPreview || (MarkdownPreview = {}));
 })(EditTextFileController || (EditTextFileController = {}));
 //# sourceMappingURL=EditTextFile.js.map

@@ -91,14 +91,13 @@ module EditTextFileController {
 
 		switch (fileDetails?.type) {
 			case Workspaces.FileType.Markdown: { hasPreview = true; break; }
-			case Workspaces.FileType.Html: { hasPreview = true; break; }
+			//case Workspaces.FileType.Html: { hasPreview = true; break; }
 			//case Workspaces.FileType.PlainText: { hasPreview = false; break; }
 		}
 
-		//if (hasPreview) {
-		//	//commandBarItems.push({ key: "preview", text: "Preview", iconProps: { iconName: "Preview" } });
-		//	farItems.push({ key: "togglePreview", text: "Toggle preview", iconOnly: true, ariaLabel: "Toggle preview", iconProps: { iconName: "View" }, onClick: togglePreviewPanel });
-		//}
+		if (hasPreview) {
+			farItems.push({ key: "togglePreview", text: "Toggle preview", iconOnly: true, ariaLabel: "Toggle preview", iconProps: { iconName: "EntryView" }, onClick: togglePreviewPanel });
+		}
 
 		return (<div className="pageCommands"><CommandBar items={commandBarItems} farItems={farItems} /></div>);
 	}
@@ -145,18 +144,25 @@ module EditTextFileController {
 			case Workspaces.FileType.Markdown: {
 				return (
 					<div className="editTextFile">
-						<div className="editor"><TextField id="editorInput" defaultValue={fileDetails?.contentText} multiline resizable={false} borderless onChange={onEditorChange} /></div>
-					{/*	<div className="preview">*/}
-					{/*		<div id="previewContainer" className="articleContent" style={previewStyle}*/}
-					{/*			dangerouslySetInnerHTML={{ __html: LayoutUtils.fixLocalLinksInHtml(fileDetails.contentHtml, pageInfo?.workspace, pageInfo?.contentItem) }} />*/}
-					{/*	</div>*/}
+						<div className="editor watermarkedPart">
+							<div className="watermark"><FontIcon iconName="Edit" /></div>
+							<div className="editorInput"><TextField id="editorInput" defaultValue={fileDetails?.contentText} multiline resizable={false} onChange={onEditorChange} /></div>
+						</div>
+						<div className="preview watermarkedPart">
+							<div className="watermark"><FontIcon iconName="EntryView" /></div>
+							<div id="previewContainer" className="articleContent" style={previewStyle}
+								dangerouslySetInnerHTML={{ __html: LayoutUtils.fixLocalLinksInHtml(fileDetails.contentHtml, pageInfo?.workspace, pageInfo?.contentItem) }} />
+						</div>
 					</div>
 				);
 			}
 			case Workspaces.FileType.Html: case Workspaces.FileType.PlainText: {
 				return (
 					<div className="editTextFile">
-						<div className="editor"><TextField id="editorInput" defaultValue={fileDetails?.contentText} multiline resizable={false} borderless onChange={onEditorChange} /></div>
+						<div className="editor watermarkedPart">
+							<div className="watermark"><FontIcon iconName="Edit" /></div>
+							<div className="editorInput"><TextField id="editorInput" defaultValue={fileDetails?.contentText} multiline resizable={false} onChange={onEditorChange} /></div>
+						</div>
 					</div>
 				);
 			}
@@ -169,20 +175,77 @@ module EditTextFileController {
 		);
 	}
 
-	//function togglePreviewPanel(): void {
-	//	let show = !Utils.tryGetBool(window, "showPreviewPanel", true);
-	//	window["showPreviewPanel"] = show;
-	//	$(".preview").toggle(show);
-	//}
+	function togglePreviewPanel(): void {
+		let show = !Utils.tryGetBool(window, "showPreviewPanel", true);
+		window["showPreviewPanel"] = show;
+		$(".preview").toggle(show);
+	}
 
 	function onEditorChange(ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newText: string): void {
+		let prevContent: string = content;
 		content = newText;
-	//	switch (fileDetails?.type) {
-	//		case Workspaces.FileType.Markdown: {
-	//			$("#previewContainer").text(content);
-	//			break;
-	//		}
-	//	}
+		switch (fileDetails?.type) {
+			case Workspaces.FileType.Markdown: {
+				let immediate: boolean = false;
+				let eventType = Utils.tryGetString(ev, ["nativeEvent", "inputType"]);
+				switch (eventType) {
+					case "deleteByCut": case "insertFromPaste": case "insertFromDrop": { immediate = true; break; }
+				}
+				MarkdownPreview.refresh(content, prevContent, immediate);
+				break;
+			}
+		}
+	}
+
+	module MarkdownPreview {
+
+		export function refresh(content: string, prevContent: string, immediate: boolean = false): void {
+			if (content == prevContent) return; // No changes
+			if (((Date.now() - lastRequest) < requestTimeout) && ((updateTimeoutId > 0) || (isExecuting))) return; // Already queued
+
+			let sinceLast: number = Date.now() - lastUpdate;
+
+			if (immediate == true) {
+				if (sinceLast < minUpdateInterval) {
+					request();
+					lastRequest = Date.now();
+					return;
+				}
+				updateTimeoutId = window.setTimeout(request, minUpdateInterval - sinceLast);
+				lastRequest = Date.now();
+				return;
+			}
+
+			updateTimeoutId = window.setTimeout(request, minUpdateInterval);
+
+			lastRequest = Date.now();
+		}
+
+		const minUpdateInterval: number = 1500;
+		const requestTimeout: number = 15000;
+		let updateTimeoutId: number = null;
+		let lastUpdate: number = 0;
+		let lastRequest: number = 0;
+		let isExecuting: boolean = false;
+
+		async function request(): Promise<void> {
+			isExecuting = true;
+			try {
+				let c = Utils.parseString($("#editorInput").val(), content);
+				let response = await Apis.postJsonAsync("api/content/previewMarkdown", { url: fileDetails?.reactLocalUrl, textContent: c });
+				let status = new Apis.ActionStatus(Utils.tryGet(response, "actionStatus"));
+				if (status?.isOk == true) {
+					let html: string = Utils.tryGetString(response, "data");
+					html = LayoutUtils.fixLocalLinksInHtml(html, pageInfo?.workspace, pageInfo?.contentItem);
+					$("#previewContainer").html(html);
+				}
+			}
+			catch (e) {}
+			lastUpdate = Date.now();
+			updateTimeoutId = null;
+			isExecuting = false;
+		}
+
 	}
 
 }

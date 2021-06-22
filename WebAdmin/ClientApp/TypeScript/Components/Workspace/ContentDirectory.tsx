@@ -228,6 +228,7 @@ module ContentDirectoryController {
 		let directoryUrl = Utils.padWithSlash(Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]));
 		isRoot = (directoryUrl == "/");
 
+		Move.prep();
 	}
 
 
@@ -304,6 +305,14 @@ module ContentDirectoryController {
 
 		let pathOptions: IDropdownOption[] = null;
 		let currentSelection: string = null;
+		let lastPageUrl: string = null;
+
+		export function prep(): void {
+			if (lastPageUrl != pageInfo?.contentItem?.reactLocalUrl) {
+				pathOptions = null;
+			}
+			lastPageUrl = pageInfo?.contentItem?.reactLocalUrl;
+		}
 
 		export function show(): void { showAsync(); }
 		export async function showAsync(): Promise<void> {
@@ -513,7 +522,6 @@ module ContentDirectoryController {
 		let issues: string[] = null;
 
 		export function reset(): void {
-			console.log("Resetting");
 			files = null;
 			hasAnyConflicts = false;
 			hasAnyNewFiles = false;
