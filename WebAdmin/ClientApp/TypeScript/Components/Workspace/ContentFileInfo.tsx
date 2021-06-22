@@ -55,7 +55,7 @@ const ContentFileInfo: FC<{}> = (): ReactElement => {
 				dialogContentProps={{ type: DialogType.largeHeader, title: "Rename file" }}
 				modalProps={{ isBlocking: false }}
 			>
-				<TextField label="New file name" id="renameInput" defaultValue={ContentFileInfoController?.fileDetails?.fileName} />
+				<TextField label="New file name" id="renameInput" defaultValue={ContentFileInfoController.Rename.getFileNameBase()} suffix={ContentFileInfoController.Rename.getFileExtension()} />
 				<DialogFooter>
 					<PrimaryButton onClick={ContentFileInfoController.Rename.finish} text="Rename" />
 					<DefaultButton onClick={ContentFileInfoController.Rename.cancel} text="Cancel" />
@@ -150,7 +150,9 @@ module ContentFileInfoController {
 				}
 		}
 
-		commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
+		if (Utils.firstStringPart(fileDetails?.fileName, ".")?.length > 0) {
+			commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
+		}
 		commandBarItems.push({ key: "move", text: "Move", onClick: Move.show, iconProps: { iconName: "MoveToFolder" } });
 		commandBarItems.push({ key: "delete", text: "Delete", onClick: Delete.show, iconProps: { iconName: "Delete" } });
 
@@ -233,9 +235,20 @@ module ContentFileInfoController {
 			renameDialogCallbacks.setTrue();
 		}
 
+		export function getFileNameBase(): string {
+			return Utils.withoutLastStringPart(fileDetails?.fileName, ".");
+		}
+
+		export function getFileExtension(): string {
+			if (fileDetails?.fileName?.includes(".") != true) return undefined;
+			let ext = Utils.lastStringPart(fileDetails?.fileName, ".");
+			return (ext?.length > 0) ? "." + ext : undefined;
+		}
+
 		export async function finish(): Promise<void> {
-			let fileName: string = Utils.trimString($("#renameInput", "").val());
+			let fileName: string = Utils.trimString($("#renameInput", "").val(), "") + Utils.trimString(getFileExtension(), "");
 			renameDialogCallbacks.setFalse();
+			if (fileName == fileDetails?.fileName) return; // No changes made
 			waitingDialogCallbacks.setTrue();
 			let response: Workspaces.MoveResponse = await Workspaces.renameFile(fileDetails?.reactLocalUrl, fileName);
 			waitingDialogCallbacks.setFalse();

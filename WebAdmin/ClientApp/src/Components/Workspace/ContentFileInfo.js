@@ -18,7 +18,6 @@ import PageBreadcrumbs from './PageBreadcrumbs';
 import $ from 'jquery';
 import { EventBus } from '../../EventBus';
 const ContentFileInfo = () => {
-    var _a;
     const history = useHistory();
     function navigate(url) { history.push(url); }
     const [waitingIsVisible, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }] = useBoolean(false);
@@ -46,7 +45,7 @@ const ContentFileInfo = () => {
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: hideAlert, text: "OK" }))),
         React.createElement(Dialog, { hidden: !renameIsVisible, onDismiss: hideRename, dialogContentProps: { type: DialogType.largeHeader, title: "Rename file" }, modalProps: { isBlocking: false } },
-            React.createElement(TextField, { label: "New file name", id: "renameInput", defaultValue: (_a = ContentFileInfoController === null || ContentFileInfoController === void 0 ? void 0 : ContentFileInfoController.fileDetails) === null || _a === void 0 ? void 0 : _a.fileName }),
+            React.createElement(TextField, { label: "New file name", id: "renameInput", defaultValue: ContentFileInfoController.Rename.getFileNameBase(), suffix: ContentFileInfoController.Rename.getFileExtension() }),
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: ContentFileInfoController.Rename.finish, text: "Rename" }),
                 React.createElement(DefaultButton, { onClick: ContentFileInfoController.Rename.cancel, text: "Cancel" }))),
@@ -85,6 +84,7 @@ var ContentFileInfoController;
     }
     ContentFileInfoController.prepData = prepData;
     function getToolbar() {
+        var _a;
         let commandBarItems = [];
         let hasRaw = false;
         switch (ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.type) {
@@ -97,7 +97,9 @@ var ContentFileInfoController;
                     break;
                 }
         }
-        commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
+        if (((_a = Utils.firstStringPart(ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.fileName, ".")) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+            commandBarItems.push({ key: "rename", text: "Rename", onClick: Rename.show, iconProps: { iconName: "Rename" } });
+        }
         commandBarItems.push({ key: "move", text: "Move", onClick: Move.show, iconProps: { iconName: "MoveToFolder" } });
         commandBarItems.push({ key: "delete", text: "Delete", onClick: Delete.show, iconProps: { iconName: "Delete" } });
         let farItems = [
@@ -172,11 +174,25 @@ var ContentFileInfoController;
             renameDialogCallbacks.setTrue();
         }
         Rename.show = show;
+        function getFileNameBase() {
+            return Utils.withoutLastStringPart(ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.fileName, ".");
+        }
+        Rename.getFileNameBase = getFileNameBase;
+        function getFileExtension() {
+            var _a;
+            if (((_a = ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.fileName) === null || _a === void 0 ? void 0 : _a.includes(".")) != true)
+                return undefined;
+            let ext = Utils.lastStringPart(ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.fileName, ".");
+            return ((ext === null || ext === void 0 ? void 0 : ext.length) > 0) ? "." + ext : undefined;
+        }
+        Rename.getFileExtension = getFileExtension;
         function finish() {
             var _a;
             return __awaiter(this, void 0, void 0, function* () {
-                let fileName = Utils.trimString($("#renameInput", "").val());
+                let fileName = Utils.trimString($("#renameInput", "").val(), "") + Utils.trimString(getFileExtension(), "");
                 renameDialogCallbacks.setFalse();
+                if (fileName == (ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.fileName))
+                    return; // No changes made
                 waitingDialogCallbacks.setTrue();
                 let response = yield Workspaces.renameFile(ContentFileInfoController.fileDetails === null || ContentFileInfoController.fileDetails === void 0 ? void 0 : ContentFileInfoController.fileDetails.reactLocalUrl, fileName);
                 waitingDialogCallbacks.setFalse();

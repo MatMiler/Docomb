@@ -415,9 +415,10 @@ module ContentDirectoryController {
 		}
 
 		export async function finish(): Promise<void> {
-			let fileName: string = Utils.trimString($("#createInput", "").val()) + Utils.trimString(suffix, "");
-			console.log(fileName);
+			let fileNameBase = Utils.trimString($("#createInput", "").val());
 			callbacks.setFalse();
+			if (!(fileNameBase?.length > 0)) return; // No file name specified
+			let fileName: string = fileNameBase + Utils.trimString(suffix, "");
 			waitingDialogCallbacks.setTrue();
 			let response: Apis.DataWithStatus<Workspaces.ContentItem> = null;
 			switch (currentItemType) {
@@ -431,7 +432,11 @@ module ContentDirectoryController {
 				EventBus.dispatch("fileStructChanged");
 				navigateCallback("/workspace" + newUrl);
 			} else {
-				let title = "Can't rename folder";
+				let title = "Can't create item";
+				switch (currentItemType) {
+					case Workspaces.ContentItemType.File: { title = "Can't create file"; break; }
+					case Workspaces.ContentItemType.Directory: { title = "Can't create folder"; break; }
+				}
 				let desc = response.actionStatus.getDialogMessage();
 				alertDialogCallbacks.setTrue();
 				alertDialogCallbacks.setTitle(title);

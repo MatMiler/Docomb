@@ -301,9 +301,11 @@ var ContentDirectoryController;
         function finish() {
             var _a, _b, _c, _d;
             return __awaiter(this, void 0, void 0, function* () {
-                let fileName = Utils.trimString($("#createInput", "").val()) + Utils.trimString(suffix, "");
-                console.log(fileName);
+                let fileNameBase = Utils.trimString($("#createInput", "").val());
                 CreateItem.callbacks.setFalse();
+                if (!((fileNameBase === null || fileNameBase === void 0 ? void 0 : fileNameBase.length) > 0))
+                    return; // No file name specified
+                let fileName = fileNameBase + Utils.trimString(suffix, "");
                 waitingDialogCallbacks.setTrue();
                 let response = null;
                 switch (currentItemType) {
@@ -324,7 +326,17 @@ var ContentDirectoryController;
                     navigateCallback("/workspace" + newUrl);
                 }
                 else {
-                    let title = "Can't rename folder";
+                    let title = "Can't create item";
+                    switch (currentItemType) {
+                        case Workspaces.ContentItemType.File: {
+                            title = "Can't create file";
+                            break;
+                        }
+                        case Workspaces.ContentItemType.Directory: {
+                            title = "Can't create folder";
+                            break;
+                        }
+                    }
                     let desc = response.actionStatus.getDialogMessage();
                     alertDialogCallbacks.setTrue();
                     alertDialogCallbacks.setTitle(title);
