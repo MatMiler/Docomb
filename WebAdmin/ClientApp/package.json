@@ -1,0 +1,33 @@
+{
+    "name": "docomb-webadmin",
+    "version": "0.1.0",
+    "private": true,
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "babel src -d lib"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@fluentui/react": "^8.17.3",
+        "@types/jquery": "^3.5.5",
+        "@types/react": "^17.0.11",
+        "@types/react-dom": "^17.0.7",
+        "acorn": "^8.4.0",
+        "babel-plugin-transform-runtime": "^6.23.0",
+        "buble": "^0.20.0",
+        "buble-loader": "^0.5.1",
+        "jquery": "^3.6.0",
+        "react": "^17.0.2",
+        "react-dom": "^17.0.2",
+        "react-router-dom": "^5.2.0",
+        "typescript": "^4.3.2",
+        "webpack-cli": "^4.7.2"
+    },
+    "devDependencies": {
+        "webpack": "^5.38.1"
+    }
+}

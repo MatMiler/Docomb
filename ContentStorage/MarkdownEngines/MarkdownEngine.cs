@@ -17,7 +17,7 @@ namespace Docomb.ContentStorage.MarkdownEngines
 		public virtual bool IsActive => true;
 
 
-		public abstract string RenderHtml(ContentFile file);
+		public abstract string RenderHtml(ContentFile file, string content = null);
 
 
 

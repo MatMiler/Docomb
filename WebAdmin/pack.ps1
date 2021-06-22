@@ -1,0 +1,1 @@
+﻿npx webpack --config clientapp/webpack.config.js

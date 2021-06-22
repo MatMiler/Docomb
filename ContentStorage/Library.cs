@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Docomb.CommonCore;
 
 namespace Docomb.ContentStorage
 {
@@ -44,8 +45,8 @@ namespace Docomb.ContentStorage
 		public static readonly HashSet<string> DefaultFileNames = MergeListContents(DefaultFileNameCores, OmittableExtensions, (a, b) => $"{a}.{b}").ToHashSet();
 
 
-		public ContentItem FindItem(string path) => FindItem(SplitPath(path, true));
-		public ContentItem FindItem(List<string> pathParts)
+		public ContentItem FindItem(string path, MatchType matchType) => FindItem(SplitPath(path, true), matchType);
+		public ContentItem FindItem(List<string> pathParts, MatchType matchType)
 		{
 			string path = Path.Combine(RootPath, string.Join('/', pathParts));
 
@@ -79,7 +80,7 @@ namespace Docomb.ContentStorage
 
 
 			#region Default files
-			if (Directory.Exists(path))
+			if ((matchType == MatchType.Logical) && (Directory.Exists(path)))
 			{
 				foreach (string fileName in DefaultFileNames)
 				{
@@ -114,26 +115,53 @@ namespace Docomb.ContentStorage
 
 		#region Item summaries
 
-		private Dictionary<string, ContentItemSummary> _itemSummaryByPath = new();
+		private Dictionary<string, ContentItemSummary> _itemPhysicalSummaryByPath = new();
+		private Dictionary<string, ContentItemSummary> _itemLogicalSummaryByPath = new();
 		private Dictionary<string, Dictionary<string, ContentItemSummary>> _itemSummariesByParentPath = new();
+		private Dictionary<string, List<ContentItemSummary>> _physicalItemSummariesByParentPath = new();
 
-		public ContentItemSummary GetItemSummary(List<string> pathParts)
+		public void ClearCache()
+		{
+			_itemPhysicalSummaryByPath = new();
+			_itemLogicalSummaryByPath = new();
+			_itemSummariesByParentPath = new();
+			_physicalItemSummariesByParentPath = new();
+		}
+
+		public ContentItemSummary GetItemSummary(List<string> pathParts, MatchType matchType)
 		{
 			string path = (pathParts?.Count > 0) ? string.Join('/', pathParts) : "";
-			if (_itemSummaryByPath.ContainsKey(path)) return _itemSummaryByPath[path];
+			Dictionary<string, ContentItemSummary> cacheDict = matchType switch {
+				MatchType.Physical => _itemPhysicalSummaryByPath,
+				MatchType.Logical => _itemLogicalSummaryByPath,
+				_ => null
+			};
+			if ((cacheDict != null) && (cacheDict.TryGetValue(path, out ContentItemSummary cached)))
+				return cached;
 
-			ContentItem item = FindItem(pathParts);
+			ContentItem item = FindItem(pathParts, matchType);
 			if (item != null)
 			{
 				ContentItemSummary summary = new(item);
-				_itemSummaryByPath.Add(path, summary);
+				cacheDict?.Add(path, summary);
 				return summary;
 			}
 
 			return null;
 		}
 
-		public Dictionary<string, ContentItemSummary> GetChildren(List<string> parentPathParts)
+
+		public List<ContentItemSummary> GetChildren(List<string> parentPathParts, MatchType matchType = MatchType.Logical)
+		{
+			return matchType switch
+			{
+				MatchType.Logical => GetLogicalChildren(parentPathParts)?.Values.ToList(),
+				MatchType.Physical => GetPhysicalChildren(parentPathParts),
+				_ => throw new NotImplementedException()
+			};
+		}
+
+		public Dictionary<string, ContentItemSummary> GetLogicalChildren(List<string> parentPathParts)
 		{
 			string parentPath = string.Join('/', parentPathParts);
 			if (_itemSummariesByParentPath.ContainsKey(parentPath)) return _itemSummariesByParentPath[parentPath];
@@ -141,21 +169,22 @@ namespace Docomb.ContentStorage
 			Dictionary<string, ContentItemSummary> dict = new();
 			string path = Path.Combine(RootPath, parentPath);
 			if (!Directory.Exists(path)) return dict;
+			DirectoryInfo parent = new(path);
 
 			HashSet<string> usedNames = new();
 
 			#region Directories
 			{
-				string[] directoryPaths = Directory.GetDirectories(path);
-				if (directoryPaths?.Length > 0)
+				List<DirectoryInfo> directories = parent.GetDirectories()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				if (directories?.Count > 0)
 				{
-					foreach (string directoryPath in directoryPaths)
+					foreach (DirectoryInfo directory in directories)
 					{
-						string directoryName = GetFileNameFromPath(directoryPath);
+						string directoryName = directory.Name;
 						string nameLower = directoryName.ToLower();
-						if (_itemSummaryByPath.ContainsKey(directoryName))
+						if (_itemLogicalSummaryByPath.ContainsKey(directoryName))
 						{
-							dict.Add(directoryName, _itemSummaryByPath[directoryName]);
+							dict.Add(directoryName, _itemLogicalSummaryByPath[directoryName]);
 							usedNames.Add(nameLower);
 						}
 
@@ -171,7 +200,7 @@ namespace Docomb.ContentStorage
 							{
 								ContentItemSummary summary = new(new ContentFile(Workspace, files[0], parentPathParts.Concat(new List<string>() { directoryName }).ToList(), true));
 								dict.Add(directoryName, summary);
-								_itemSummaryByPath.Add(directoryName, summary);
+								_itemLogicalSummaryByPath.Add(directoryName, summary);
 								usedNames.Add(nameLower);
 								defaultFileFound = true;
 								break;
@@ -182,9 +211,9 @@ namespace Docomb.ContentStorage
 						#region Add directory as such
 						if (!defaultFileFound)
 						{
-							ContentItemSummary summary = new(new ContentDirectory(Workspace, directoryPath, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
+							ContentItemSummary summary = new(new ContentDirectory(Workspace, directory.FullName, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
 							dict.Add(directoryName, summary);
-							_itemSummaryByPath.Add(directoryName, summary);
+							_itemLogicalSummaryByPath.Add(directoryName, summary);
 							usedNames.Add(nameLower);
 						}
 						#endregion
@@ -195,12 +224,12 @@ namespace Docomb.ContentStorage
 
 			#region Files
 			{
-				string[] filePaths = Directory.GetFiles(path);
-				if (filePaths?.Length > 0)
+				List<FileInfo> files = parent.GetFiles()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				if (files?.Count > 0)
 				{
-					foreach (string filePath in filePaths)
+					foreach (FileInfo file in files)
 					{
-						string fileName = GetFileNameFromPath(filePath);
+						string fileName = file.Name;
 						string extension = GetFileExtension(fileName)?.ToLower();
 						// Not a supported article or not logically a child
 						if ((string.IsNullOrEmpty(extension)) || (!ArticleExtensions.Contains(extension?.ToLower())) || (DefaultFileNames.Contains(fileName))) continue;
@@ -209,20 +238,153 @@ namespace Docomb.ContentStorage
 						if (string.IsNullOrEmpty(simplifiedName)) continue;
 						string simplifiedLower = simplifiedName.ToLower();
 						if (usedNames.Contains(simplifiedLower)) continue;
-						ContentItemSummary summary = new(new ContentFile(Workspace, filePath, parentPathParts.Concat(new List<string>() { simplifiedName }).ToList(), false));
+						ContentItemSummary summary = new(new ContentFile(Workspace, file.FullName, parentPathParts.Concat(new List<string>() { simplifiedName }).ToList(), false));
 						dict.Add(simplifiedName, summary);
-						_itemSummaryByPath.Add(simplifiedName, summary);
+						_itemLogicalSummaryByPath.Add(simplifiedName, summary);
 						usedNames.Add(simplifiedLower);
 					}
 				}
 			}
 			#endregion
 
-			_itemSummariesByParentPath.Add(parentPath, dict);
+			_itemSummariesByParentPath.TryAdd(parentPath, dict);
 			return dict;
 		}
 
+
+		public List<ContentItemSummary> GetPhysicalChildren(List<string> parentPathParts, bool includeFiles = true, bool includeDirectories = true)
+		{
+			string parentPath = string.Join('/', parentPathParts);
+			if (_physicalItemSummariesByParentPath.TryGetValue(parentPath, out List<ContentItemSummary> cachedList))
+				return cachedList;
+
+			List<ContentItemSummary> list = new();
+			string path = Path.Combine(RootPath, parentPath);
+			if (!Directory.Exists(path)) return list;
+			DirectoryInfo parent = new(path);
+
+			#region Directories
+			if (includeDirectories)
+			{
+				List<DirectoryInfo> directories = parent.GetDirectories()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				if (directories?.Count > 0)
+				{
+					foreach (DirectoryInfo directory in directories)
+					{
+						string directoryName = directory.Name;
+						ContentItemSummary summary = new(new ContentDirectory(Workspace, directory.FullName, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
+						list.Add(summary);
+					}
+				}
+			}
+			#endregion
+
+			#region Files
+			if (includeFiles)
+			{
+				List<FileInfo> files = parent.GetFiles()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				if (files?.Count > 0)
+				{
+					foreach (FileInfo file in files)
+					{
+						string fileName = file.Name;
+						ContentItemSummary summary = new(new ContentFile(Workspace, file.FullName, parentPathParts.Concat(new List<string>() { fileName }).ToList(), false));
+						list.Add(summary);
+					}
+				}
+			}
+			#endregion
+
+			_physicalItemSummariesByParentPath.TryAdd(parentPath, list);
+			return list;
+		}
+
+
+		public List<ContentItemSummary> GetParents(List<string> pagePathParts, MatchType matchType, bool includeLast = false)
+		{
+			List<ContentItemSummary> list = new();
+			if (Workspace == null) return list;
+
+			if (pagePathParts?.Count > 0)
+			{
+				for (int x = 0; x <= (pagePathParts.Count + (includeLast ? 0 : -1)); x++)
+				{
+					ContentItemSummary item = Workspace.Content.GetItemSummary(pagePathParts.GetRange(0, x), matchType);
+					if (item != null) list.Add(item);
+				}
+			}
+			else if (includeLast)
+			{
+				ContentItemSummary root = Workspace.Content.GetItemSummary(new(), matchType);
+				if (root != null) list.Add(root);
+			}
+
+			return list;
+		}
+
 		#endregion
+
+
+
+
+
+
+		#region New items
+
+		public DataWithStatus<ContentItemSummary> CreateFile(ContentDirectory parent, string fileName, string content = null)
+		{
+			if (string.IsNullOrWhiteSpace(fileName)) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, "File name cannot be empty."), null);
+			if (string.IsNullOrWhiteSpace(GetFileNameWithoutExtension(fileName))) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, "File name cannot be empty."), null);
+			if (Path.GetInvalidFileNameChars().Any(fileName.Contains)) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, $"New name '{fileName}' contains invalid characters."), null);
+			if (parent == null) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, $"No folder was given in which to create a file."), null);
+			string filePath = Path.Combine(parent.FilePath, fileName);
+			if (File.Exists(filePath)) return new(new ActionStatus(ActionStatus.StatusCode.Conflict, $"A file named '{fileName}' already exists."), null);
+			if (Directory.Exists(filePath)) return new(new ActionStatus(ActionStatus.StatusCode.Conflict, $"A folder named '{fileName}' already exists."), null);
+
+			try
+			{
+				using FileStream stream = File.Create(filePath);
+				stream.Close();
+				if (content?.Length > 0) File.WriteAllText(filePath, content, Encoding.UTF8);
+				List<string> fileParts = new List<string>(parent.UrlParts);
+				fileParts.Add(fileName);
+				ContentItem item = FindItem(fileParts, MatchType.Physical);
+				ClearCache();
+				return new DataWithStatus<ContentItemSummary>(new ActionStatus(ActionStatus.StatusCode.OK), new ContentItemSummary(item));
+			}
+			catch (Exception e)
+			{
+				return new(new ActionStatus(ActionStatus.StatusCode.Error, exception: e), null);
+			}
+		}
+
+		public DataWithStatus<ContentItemSummary> CreateDirectory(ContentDirectory parent, string fileName)
+		{
+			if (string.IsNullOrWhiteSpace(fileName)) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, "Folder name cannot be empty."), null);
+			if (string.IsNullOrWhiteSpace(GetFileNameWithoutExtension(fileName))) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, "Folder name cannot be empty."), null);
+			if (Path.GetInvalidFileNameChars().Any(fileName.Contains)) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, $"New name '{fileName}' contains invalid characters."), null);
+			if (parent == null) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, $"No folder was given in which to create a sub-folder."), null);
+			string filePath = Path.Combine(parent.FilePath, fileName);
+			if (File.Exists(filePath)) return new(new ActionStatus(ActionStatus.StatusCode.Conflict, $"A file named '{fileName}' already exists."), null);
+			if (Directory.Exists(filePath)) return new(new ActionStatus(ActionStatus.StatusCode.Conflict, $"A folder named '{fileName}' already exists."), null);
+
+			try
+			{
+				Directory.CreateDirectory(filePath);
+				List<string> fileParts = new List<string>(parent.UrlParts);
+				fileParts.Add(fileName);
+				ContentItem item = FindItem(fileParts, MatchType.Physical);
+				ClearCache();
+				return new DataWithStatus<ContentItemSummary>(new ActionStatus(ActionStatus.StatusCode.OK), new ContentItemSummary(item));
+			}
+			catch (Exception e)
+			{
+				return new(new ActionStatus(ActionStatus.StatusCode.Error, exception: e), null);
+			}
+		}
+
+		#endregion
+
 
 	}
 }

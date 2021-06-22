@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using Docomb.CommonCore;
 
 namespace Docomb.ContentStorage
 {
@@ -119,23 +120,96 @@ namespace Docomb.ContentStorage
 				_textContentWasLoaded = true;
 				return _textContent;
 			}
-			catch (Exception e) { }
+			catch { }
 			_textContent = "";
 			return _textContent;
 		}
 
 
-		public static bool SaveTextFile(string filePath, string content)
+		public bool SaveTextFile(string content)
 		{
 			try
 			{
-				StreamWriter fileStream = new StreamWriter(filePath);
+				StreamWriter fileStream = new StreamWriter(FilePath);
 				fileStream.Write(content);
 				fileStream.Flush();
 				fileStream.Close();
+				Workspace.Content.ClearCache();
 				return true;
 			}
 			catch { return false; }
+		}
+
+
+		public ActionStatus SaveBinaryFile(Stream stream)
+		{
+			try
+			{
+				using (var fileStream = new FileStream(FilePath, FileMode.OpenOrCreate))
+				{
+					stream.CopyTo(fileStream);
+					stream.Close();
+				}
+				return new ActionStatus(ActionStatus.StatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return new ActionStatus(ActionStatus.StatusCode.Error, exception: e);
+			}
+		}
+
+
+		public ActionStatus Rename(string newName)
+		{
+			try
+			{
+				if (string.IsNullOrWhiteSpace(newName)) return new(ActionStatus.StatusCode.InvalidRequestData, "File name cannot be empty.");
+				if (Path.GetInvalidFileNameChars().Any(newName.Contains)) return new(ActionStatus.StatusCode.InvalidRequestData, $"New name '{newName}' contains invalid characters.");
+				string newPath = Path.Combine(Path.GetDirectoryName(FilePath), newName);
+				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"File '{newName}' already exists.");
+				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"Folder '{newName}' already exists.");
+				File.Move(FilePath, newPath);
+				Workspace.Content.ClearCache();
+				return new(ActionStatus.StatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return new(ActionStatus.StatusCode.Error, exception: e);
+			}
+		}
+
+		public ActionStatus Move(string newParentPath)
+		{
+			try
+			{
+				ContentDirectory parent = Workspace.Content.FindItem(newParentPath, MatchType.Physical)?.AsDirectory;
+				if (parent == null) return new(ActionStatus.StatusCode.NotFound, $"Target path '{newParentPath}' doesn't exist.");
+				string newPath = Path.Combine(parent.FilePath, FileName);
+				if (newPath == FilePath) return new(ActionStatus.StatusCode.InvalidRequestData, $"The file is already in '{newParentPath}'");
+				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"A file with the same name already exists in '{newParentPath}'.");
+				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"A folder with the same name already exists in '{newParentPath}'.");
+				File.Move(FilePath, newPath);
+				Workspace.Content.ClearCache();
+				return new(ActionStatus.StatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return new(ActionStatus.StatusCode.Error, exception: e);
+			}
+		}
+
+		public ActionStatus Delete()
+		{
+			try
+			{
+				File.Delete(FilePath);
+				Workspace.Content.ClearCache();
+				return new(ActionStatus.StatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return new(ActionStatus.StatusCode.Error, exception: e);
+			}
 		}
 
 		#endregion

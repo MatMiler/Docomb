@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Docomb.WebReader;
+using Docomb.WebAdmin;
+//using Microsoft.Net.Http.Headers;
 
 namespace TestSite
 {
@@ -18,8 +20,17 @@ namespace TestSite
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddRazorPages();
+			services.AddDocombAdmin();
+			services.AddDocombReader();
 			services.AddMvc();
-			services.AddDocomReader();
+
+			//services.AddCors(options =>
+			//{
+			//	options.AddPolicy("CorsPolicy1", builder =>
+			//	{
+			//		builder.WithMethods("POST", "GET", "PUT", "DELETE").WithHeaders(HeaderNames.ContentType);
+			//	});
+			//});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -29,6 +40,10 @@ namespace TestSite
 			{
 				app.UseDeveloperExceptionPage();
 			}
+
+			//app.UseCors("CorsPolicy1");
+
+			app.UseDocombAdmin();
 
 			app.UseStaticFiles();
 

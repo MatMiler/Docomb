@@ -18,7 +18,7 @@ namespace Docomb.WebReader
 			(Workspace workspace, List<string> remainingPath) = Docomb.WebCore.Configurations.WorkspacesConfig.FindFromPath(itemPath);
 			if ((workspace != null) && (remainingPath != null))
 			{
-				ContentItem item = workspace.Content.FindItem(remainingPath);
+				ContentItem item = workspace.Content.FindItem(remainingPath, MatchType.Logical);
 				switch (item?.Type)
 				{
 					case ContentItemType.File: return ViewContentFile(itemPath, workspace, item.AsFile, remainingPath);
@@ -43,7 +43,7 @@ namespace Docomb.WebReader
 		{
 			if (workspace == null) (workspace, remainingPath) = Docomb.WebCore.Configurations.WorkspacesConfig.FindFromPath(itemPath);
 			if (workspace == null) return Content($"No workspace at '{string.Join('/', remainingPath)}'");
-			file ??= workspace.Content.FindItem(remainingPath)?.AsFile;
+			file ??= workspace.Content.FindItem(remainingPath, MatchType.Logical)?.AsFile;
 			if (file == null) return Content($"No content file at '{string.Join('/', remainingPath)}'");
 
 
@@ -79,7 +79,7 @@ namespace Docomb.WebReader
 		{
 			if (workspace == null) (workspace, remainingPath) = Docomb.WebCore.Configurations.WorkspacesConfig.FindFromPath(itemPath);
 			if (workspace == null) return NotFound(); // Content($"No workspace at '{string.Join('/', remainingPath)}'");
-			directory ??= workspace.Content.FindItem(remainingPath)?.AsDirectory;
+			directory ??= workspace.Content.FindItem(remainingPath, MatchType.Logical)?.AsDirectory;
 			if (directory == null) return NotFound(); //Content($"No content directory at '{string.Join('/', remainingPath)}'");
 
 			return View("~/Areas/Reader/Pages/Directory.cshtml", new ViewModels.DirectoryList(itemPath, workspace, directory, remainingPath, ViewBag));

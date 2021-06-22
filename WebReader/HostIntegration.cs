@@ -44,7 +44,7 @@ namespace Docomb.WebReader
 
 	public static class ServiceCollectionExtensions
 	{
-		public static void AddDocomReader(this IServiceCollection services)
+		public static void AddDocombReader(this IServiceCollection services)
 		{
 			services.ConfigureOptions(typeof(ConfigureOptions));
 		}

@@ -1,0 +1,182 @@
+﻿@import "shared/theme.scss";
+
+// Style reset & basics
+body { border: none; margin: 0; padding: 0; font-family: $fontFamily; overflow: hidden; }
+h1, h2, h3, h4, h5, h6 { margin: 30px 0 15px 0; padding: 0;
+	&:first-child { margin-top: 0; }
+	&:last-child { margin-bottom: 0; }
+}
+h1 + h2, h1 + h3, h1 + h4, h1 + h5, h1 + h6,
+h2 + h3, h2 + h4, h2 + h5, h2 + h6,
+h3 + h4, h3 + h5, h3 + h6,
+h4 + h5, h4 + h6,
+h5 + h6 { margin-top: 0; }
+p, blockquote, pre, hr, dl, dd, ol, ul, figure { margin: 0; padding: 0; }
+p + p { margin-top: .751em; }
+blockquote, pre, ul, ol, dl, figure, .highlight { margin-top: 10px; margin-bottom: 10px; }
+img { max-width: 100%; vertical-align: middle; }
+figure > img { display: block; }
+ul, ol { margin-left: 30px; }
+li > ul, li > ol { margin-top: 0; margin-bottom: 0; }
+
+* { box-sizing: border-box; }
+
+
+
+
+
+
+
+
+// Common light/dark styles
+@mixin lightPreset {
+	body { background: map-get($bgColor, 'light'); color: map-get($textColor, 'light'); }
+	a { color: map-get($linkColor, 'light'); }
+}
+@mixin darkPreset {
+	body { background: map-get($bgColor, 'dark'); color: map-get($textColor, 'dark'); }
+	a { color: map-get($linkColor, 'dark'); }
+}
+html { @include lightPreset; }
+.dark { @include darkPreset; }
+@media (prefers-color-scheme: dark) {
+	html { @include darkPreset; }
+	.light { @include lightPreset; }
+}
+
+
+
+
+
+.adminRoot { width: 100vw; height: 100vh; }
+
+.mainNavGrid { display: flex; width: 100vw; height: 100vh;
+	> .sideBarNav { border-right: 1px solid; box-sizing: content-box;
+		.sideBar { display: flex; flex-direction: column; justify-content: space-between; height: 100%;
+			.workspaces { flex: 1 1 100%; overflow: auto; }
+			.system { flex: 0 0 auto; border-top: 1px solid; }
+		}
+		.sideBarItem {
+			.icon { margin-right: 0; }
+		}
+		&.collapsed { flex: 0 0 50px;
+			.sideBar { 
+				.workspaces { scrollbar-width: none;
+					&::-webkit-scrollbar { display: none; }
+				}
+			}
+			.name { display: none; }
+		}
+		&.expanded { flex: 0 0 250px; }
+	}
+	> .mainNav {
+		flex: 0 0 250px;
+		border-right: 1px solid;
+		box-sizing: content-box;
+		@include themeMap("background", $menuBackgroundColor);
+		.loadingSpinner { padding: 20px 0; }
+		> [role="toolbar"] { display: flex; height: 100%; width: 100%; flex-direction: column;
+			> [role="tablist"] { flex: 0 0 auto;
+				button:hover { @include themeMaps(("color": $accentColor, "background": $buttonHoverColor)); }
+				button:active { @include themeMap("background", $buttonActiveColor); }
+			}
+			> [role="tabpanel"] { flex: 1 1 100%; overflow: auto; width: 250px;
+				/*a { white-space: normal; line-height: inherit; height: auto; }*/
+			}
+			.is-selected > button { background: transparent;
+				&::after { display: none; }
+			}
+			[role="listitem"] .is-selected a {
+				@include themeMap("background", $buttonHoverColor);
+			}
+			[role="listitem"] button, [role="listitem"] a {
+				&:hover { @include themeMap("background", $buttonHoverColor); }
+				&:active { @include themeMap("background", $buttonActiveColor); }
+			}
+		}
+	}
+	> .sideBarNav, .mainNav, > .sideBarNav .sideBar .system {
+		@include themeMap("border-color", $menuBorderColor);
+	}
+	> .mainNavGridContent { flex: 1 1 100%; overflow: hidden; }
+}
+
+
+.sideBarItem {
+	a { display: flex; align-items: center; padding: 10px; color: inherit; text-decoration: none; position: relative;
+		&:hover { @include themeMaps(("color": $accentColor, "background": $buttonHoverColor)); .name { color: inherit; } }
+		&:active { @include themeMap("background", $buttonActiveColor); }
+	}
+	.icon { display: inline-block; flex: 0 0 30px; width: 30px; height: 30px; font-size: 20px; line-height: 30px; text-align: center; overflow: hidden; font-weight: bold; margin-right: 10px; }
+	.name { display: inline-block; flex: 1 1 100%; font-size: 14px; padding-left: 10px; @include themeMap("color", $textColorLight); }
+	a:before {
+		content: ""; display: block; position: absolute; top: 10px; bottom: 10px; left: 0; border-left: 3px solid transparent;
+		transition: top 0.267s cubic-bezier(0.1, 0.25, 0.75, 0.9) 0s, bottom 0.267s cubic-bezier(0.1, 0.25, 0.75, 0.9) 0s;
+	}
+	&.selected a:before { @include themeMap("border-color", $accentColor); }
+	&.selected a:hover:before { top: 0; bottom: 0; }
+}
+
+
+
+
+.pageGrid { width: 100%; height: 100%; overflow: hidden; display: flex; flex-direction: column;
+	.pageTitle { flex: 0 0 auto; padding: 0px 24px 10px 24px; width: 100%; }
+	.pageCommands { flex: 0 0 auto; width: 100%; }
+	.pageContent { flex: 1 1 100%; overflow: auto; }
+	.pageTitle + .pageCommands { margin-top: -10px; }
+	.pageTitle + .pageContent, .pageCommands + .pageContent { border-top: 1px solid; @include themeMap("border-color", $menuBorderColor); }
+}
+
+
+
+.emptyPage { width: 100%; height: 100%; overflow: hidden; }
+.emptyPage, .watermarkedPart { position: relative;
+	.watermark { z-index: 1; position: absolute; left: 50%; top: 50%; font-size: 20vmin; margin: -10vmin; opacity: .1; user-select: none;
+		i { width: 1em; height: 1em; margin: 0; padding: 0; }
+	}
+}
+
+
+.errorPage { position: relative; width: 100%; height: 100%; overflow: hidden;
+	.codeWatermark { z-index: 1; font-size: 20vmin; height: 1.4em; line-height: 1.4em; margin: -.75em 0 -.65em 0; opacity: .1; font-weight: bold; }
+	.message { z-index: 2; font-size: 5vmin; height: 1.4em; line-height: 1.4em; margin: -.7em 0; font-weight: bold; text-transform: uppercase; }
+	.codeWatermark, .message { position: absolute; left: 0; top: 50%; width: 100%; height: 1.4em; line-height: 1.4em; text-align: center; overflow: hidden; user-select: none; }
+}
+
+
+.contentFileDetails { display: flex; width: 100%; height: 100%;
+	.articleContent { flex: 1 1 100%; overflow: auto; padding: 32px; }
+	.metaInfo { flex: 0 0 400px; max-width: 40%; padding: 16px; height: 100%; overflow: auto; border-left: 1px solid; @include themeMaps(("border-color": $menuBorderColor, "background": $menuBackgroundColor));
+		/*h2 { margin-top: 0; }*/
+		h2 i { vertical-align: middle; }
+		.item { display: flex; justify-content: flex-start; align-items: flex-start;
+			> b { flex: 0 0 auto; max-width: 40%; margin-right: 8px; }
+			> span { flex: 1 1 100; overflow-wrap: anywhere; }
+			+ .item { margin-top: 8px; }
+		}
+	}
+}
+
+
+.editTextFile { display: flex; width: 100%; height: 100%;
+	.editor { flex: 1 1 50%; overflow: hidden; position: relative;
+		/*.emptypage { position: absolute; z-index: 1; left: 0; top: 0; width: 100%; height: 100%; }*/
+		.editorInput { position: absolute; z-index: 2; left: 0; top: 0; width: 100%; height: 100%;
+			* { background: transparent; width: 100%; height: 100%; margin: 0; border-radius: 0; }
+		}
+		textarea { padding: 32px; font-family: $fontFamilyMono; }
+	}
+	.preview { flex: 1 1 50%; max-width: 50%; border-left: 1px solid; @include themeMaps(("border-color": $menuBorderColor, "background": $menuBackgroundColor));
+		#previewContainer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; z-index: 2; overflow: auto; padding: 32px; background-color: transparent; }
+	}
+}
+
+
+
+.invisibleUploadInput { width: 0; height: 0; overflow: hidden; display: block; }
+
+
+
+@import "article.scss";
+

@@ -11,9 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebReader", "WebReader\WebR
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContentStorage", "ContentStorage\ContentStorage.csproj", "{3B717E6A-DD78-423E-8F0B-FE15E39A2B19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonCore", "CommonCore\CommonCore.csproj", "{8AD1B044-517F-43E1-9F92-E355FB33410D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonCore", "CommonCore\CommonCore.csproj", "{8AD1B044-517F-43E1-9F92-E355FB33410D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAdmin", "WebAdmin\WebAdmin.csproj", "{687A98B9-8E1A-4242-831C-72EE7746681C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{687A98B9-8E1A-4242-831C-72EE7746681C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{687A98B9-8E1A-4242-831C-72EE7746681C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{687A98B9-8E1A-4242-831C-72EE7746681C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{687A98B9-8E1A-4242-831C-72EE7746681C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

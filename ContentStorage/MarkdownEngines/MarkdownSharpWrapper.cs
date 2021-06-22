@@ -21,9 +21,9 @@ namespace Docomb.ContentStorage.MarkdownEngines
 
 
 
-		public override string RenderHtml(ContentFile file)
+		public override string RenderHtml(ContentFile file, string content = null)
 		{
-			return Engine?.Transform(RemoveFrontMatter(file.TextContent));
+			return Engine?.Transform(RemoveFrontMatter(content ?? file?.TextContent));
 		}
 
 
