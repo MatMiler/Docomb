@@ -144,7 +144,7 @@
 	 * @param value Value to trim
 	 * @param defaultValue Default value to return if null or empty
 	 */
-	export function trimString(value: any, defaultValue?: string) {
+	export function trimString(value: any, defaultValue?: string): string {
 		if (defaultValue === undefined) defaultValue = "";
 		if ((value == null) || (value == undefined)) return defaultValue;
 		if (typeof value == "string") { let s = value.trim(); return (s != "") ? s : defaultValue; }
@@ -153,9 +153,15 @@
 		return defaultValue;
 	}
 
-	export function firstStringPart(value: string, separator: string) {
+	export function firstStringPart(value: string, separator: string): string {
 		if ((value == null) || (value == "") || (separator == null) || (separator == "")) return value;
 		let pos = value.indexOf(separator);
+		return (pos > 0) ? value.substring(0, pos) : (pos == 0) ? "" : value;
+	}
+
+	export function withoutLastStringPart(value: string, separator: string): string {
+		if ((value == null) || (value == "") || (separator == null) || (separator == "")) return value;
+		let pos = value.lastIndexOf(separator);
 		return (pos > 0) ? value.substring(0, pos) : (pos == 0) ? "" : value;
 	}
 
@@ -165,11 +171,121 @@
 		return (pos >= 0) ? value.substring(pos + separator.length) : value;
 	}
 
+	//#endregion
+
+
+
+
+
+
+
+
+
+
+	//#region Arrays & Objects
+
 	export function padWithSlash(value: string, atStart: boolean = true, atEnd: boolean = true): string {
 		value = trimString(value, "");
 		if ((atStart == true) && (!value.startsWith("/"))) value = "/" + value;
 		if ((atEnd == true) && (!value.endsWith("/"))) value += "/";
 		return value;
+	}
+
+	export function trimSlash(value: string, atStart: boolean = true, atEnd: boolean = true): string {
+		value = trimString(value, "");
+		if (atStart) value = value.replace(/^[\/]*/, "");
+		if (atEnd) value = value.replace(/[\/]*$/, "");
+		return value;
+	}
+
+
+	export function concatUrlPaths(a: string, b: string): string {
+		return Utils.padWithSlash(a, false, true) + Utils.trimSlash(b, true, false);
+	}
+
+	export class UrlParts {
+		protocol: string = null;
+		hostName: string = null;
+		domainName: string = null;
+		url: string = null;
+		port: number = null;
+		fullPath: string = null;
+		path: string = null;
+		directories: Array<string> = [];
+		directoryPath: string = null;
+		fileName: string = null;
+		queryString: string = null;
+		hash: string = null;
+		hasDomain: boolean = false;
+
+
+		public constructor(url: string) {
+			url = trimString(url);
+			this.url = url;
+			if (url == "") return;
+
+			// With domain
+			{
+				var match = url.match(/^(((.+):)?\/\/(((([a-zA-Z0-9\.\-_]+)\.)?([a-zA-Z0-9\-_]+)\.)?([a-zA-Z0-9\-_]+))(:(\d+))?(\/([^#?]*\/)?([^#?]*)?)?)(\?([^#]*))?(#.*)?$/);
+				// Groups: 1 full path; 3 protocol; 4 full domain; 7 subdomain; 8 domain name; 9 TLD; 11 port; 12 path; 13 directories; 14 file; 16 query; 17 hash
+				if ((match != null) && (match.length >= 11)) {
+					this.fullPath = match[1];
+					this.protocol = match[3];
+					this.hostName = match[4];
+					this.domainName = [match[8], match[8]].join(".");
+					this.port = parseNum(match[11], null);
+					this.path = match[12];
+					this.directoryPath = match[13];
+					this.directories = mapArray(this.directoryPath?.split("/"), x => x, x => (x?.length > 0), false);
+					this.fileName = match[14];
+					this.queryString = match[16];
+					this.hash = match[17];
+					this.hasDomain = true;
+					return;
+				}
+			}
+
+			// Partial (relative/absolute)
+			{
+				var match = url.match(/^(([^#?]+\/)?([^#?]*)?)?(\?([^#]*))?(#.*)?$/);
+				// Groups: 0 full; 1-fullpath; 2-folders; 3-file; 5-query; 6-hash
+				if ((match != null) && (match.length >= 7)) {
+					this.fullPath = this.path = match[1];
+					this.directoryPath = match[2];
+					this.directories = mapArray(this.directoryPath?.split("/"), x => x, x => (x?.length > 0), false);
+					this.fileName = match[3];
+					this.queryString = match[5];
+					this.hash = match[6];
+					this.hasDomain = false;
+					return;
+				}
+			}
+		}
+
+		public reconstruct(includeDomain: boolean = true, includePath: boolean = true, includeQuery: boolean = true, includeHash: boolean = true): string {
+			let s: string = "";
+			if (includeDomain) {
+				if (this.hasDomain) {
+					s += ((this.protocol?.length > 0) ? this.protocol + ":" : "") + "//" + this.hostName + ((isNumeric(this.port)) ? ":" + this.port : "") + "/";
+				} else {
+					s += "/";
+				}
+			}
+			if (includePath) { s += this.path; }
+			if ((includeQuery) && (this.queryString?.length > 0)) { s += "?" + this.queryString; }
+			if (includeHash) { s += this.hash; }
+			return s;
+		}
+
+
+		public combineWithPath(url: string): string {
+			if (!(url?.length > 0)) return this.url; // Nothing to append
+			if (url.startsWith("#")) return this.reconstruct(true, true, true, false) + url; // Only a hash link
+			let parts = new UrlParts(url);
+			if (parts.hasDomain) return url; // The new URL has domain and shouldn't be altered
+			return this.reconstruct(true, false, false, false) + ((url.startsWith("/")) ? "" : this.directoryPath) + trimSlash(url, true, false);
+		}
+
 	}
 
 	//#endregion
@@ -218,8 +334,8 @@
 	 * @param object Object from which to extract keys
 	 */
 	export function getObjectKeys(object: object): Array<string> {
-		var list = [];
-		for (var key in object)
+		let list = [];
+		for (let key in object)
 			if (object.hasOwnProperty(key))
 				list.push(key);
 		return list;
@@ -230,8 +346,8 @@
 	 * @param object Object from which to extract values
 	 */
 	export function getObjectValues(object: any): Array<any> {
-		var list = [];
-		for (var value in object)
+		let list = [];
+		for (let value in object)
 			list.push(object[value]);
 		return list;
 	}
@@ -242,7 +358,7 @@
 	 * @param key Key to look for
 	 */
 	export function hasObjectKey(object: object, key: string): boolean {
-		for (var s in object)
+		for (let s in object)
 			if (s == key)
 				return true;
 		return false;

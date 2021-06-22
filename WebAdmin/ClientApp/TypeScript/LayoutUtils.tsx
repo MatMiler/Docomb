@@ -1,5 +1,6 @@
 ﻿import { Utils } from "./Data/Utils";
 import { Workspaces } from "./Data/Workspaces";
+import $ from 'jquery';
 
 export module LayoutUtils {
 	export module NavBar {
@@ -45,26 +46,14 @@ export module LayoutUtils {
 		try {
 			let container: JQuery<HTMLElement> = $("<div />").html(html);
 			let readerBasePath: string = Utils.padWithSlash(Utils.tryGetString(window, "readerBasePath"), false, true);
-			readerBasePath += workspace?.url;
-			readerBasePath = Utils.padWithSlash(readerBasePath, false, true);
+			readerBasePath = Utils.padWithSlash(readerBasePath = workspace?.url, false, true);
+			let pageBasePath = Utils.concatUrlPaths(readerBasePath, contentItem?.url);
+			let pageBasePathParts = new Utils.UrlParts(pageBasePath);
 			container.find("a").each((index: number, element: HTMLAnchorElement) => {
 				let a = $(element);
 				a.attr("target", "_blank");
 				let href = a.attr("href");
-				if (Utils.trimString(href, null) != null) {
-					let slashPos = href.indexOf("/");
-					if (slashPos == 0) return;
-					let hashPos = href.indexOf("#");
-					let doubleSlashPos = href.indexOf("//");
-					let paramPos = href.indexOf("?");
-					if (hashPos < 0) hashPos = href.length;
-					if (doubleSlashPos < 0) doubleSlashPos = href.length;
-					if (paramPos < 0) paramPos = href.length;
-					if ((doubleSlashPos >= hashPos) && (doubleSlashPos >= paramPos)) {
-						href = readerBasePath + href;
-						a.attr("href", href);
-					}
-				}
+				a.attr("href", pageBasePathParts.combineWithPath(href));
 			});
 			html = container.html();
 		}

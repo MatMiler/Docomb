@@ -166,6 +166,13 @@ export var Utils;
         return (pos > 0) ? value.substring(0, pos) : (pos == 0) ? "" : value;
     }
     Utils.firstStringPart = firstStringPart;
+    function withoutLastStringPart(value, separator) {
+        if ((value == null) || (value == "") || (separator == null) || (separator == ""))
+            return value;
+        let pos = value.lastIndexOf(separator);
+        return (pos > 0) ? value.substring(0, pos) : (pos == 0) ? "" : value;
+    }
+    Utils.withoutLastStringPart = withoutLastStringPart;
     function lastStringPart(value, separator) {
         if ((value == null) || (value == "") || (separator == null) || (separator == ""))
             return value;
@@ -173,6 +180,8 @@ export var Utils;
         return (pos >= 0) ? value.substring(pos + separator.length) : value;
     }
     Utils.lastStringPart = lastStringPart;
+    //#endregion
+    //#region Arrays & Objects
     function padWithSlash(value, atStart = true, atEnd = true) {
         value = trimString(value, "");
         if ((atStart == true) && (!value.startsWith("/")))
@@ -182,6 +191,109 @@ export var Utils;
         return value;
     }
     Utils.padWithSlash = padWithSlash;
+    function trimSlash(value, atStart = true, atEnd = true) {
+        value = trimString(value, "");
+        if (atStart)
+            value = value.replace(/^[\/]*/, "");
+        if (atEnd)
+            value = value.replace(/[\/]*$/, "");
+        return value;
+    }
+    Utils.trimSlash = trimSlash;
+    function concatUrlPaths(a, b) {
+        return Utils.padWithSlash(a, false, true) + Utils.trimSlash(b, true, false);
+    }
+    Utils.concatUrlPaths = concatUrlPaths;
+    class UrlParts {
+        constructor(url) {
+            var _a, _b;
+            this.protocol = null;
+            this.hostName = null;
+            this.domainName = null;
+            this.url = null;
+            this.port = null;
+            this.fullPath = null;
+            this.path = null;
+            this.directories = [];
+            this.directoryPath = null;
+            this.fileName = null;
+            this.queryString = null;
+            this.hash = null;
+            this.hasDomain = false;
+            url = trimString(url);
+            this.url = url;
+            if (url == "")
+                return;
+            // With domain
+            {
+                var match = url.match(/^(((.+):)?\/\/(((([a-zA-Z0-9\.\-_]+)\.)?([a-zA-Z0-9\-_]+)\.)?([a-zA-Z0-9\-_]+))(:(\d+))?(\/([^#?]*\/)?([^#?]*)?)?)(\?([^#]*))?(#.*)?$/);
+                // Groups: 1 full path; 3 protocol; 4 full domain; 7 subdomain; 8 domain name; 9 TLD; 11 port; 12 path; 13 directories; 14 file; 16 query; 17 hash
+                if ((match != null) && (match.length >= 11)) {
+                    this.fullPath = match[1];
+                    this.protocol = match[3];
+                    this.hostName = match[4];
+                    this.domainName = [match[8], match[8]].join(".");
+                    this.port = parseNum(match[11], null);
+                    this.path = match[12];
+                    this.directoryPath = match[13];
+                    this.directories = mapArray((_a = this.directoryPath) === null || _a === void 0 ? void 0 : _a.split("/"), x => x, x => ((x === null || x === void 0 ? void 0 : x.length) > 0), false);
+                    this.fileName = match[14];
+                    this.queryString = match[16];
+                    this.hash = match[17];
+                    this.hasDomain = true;
+                    return;
+                }
+            }
+            // Partial (relative/absolute)
+            {
+                var match = url.match(/^(([^#?]+\/)?([^#?]*)?)?(\?([^#]*))?(#.*)?$/);
+                // Groups: 0 full; 1-fullpath; 2-folders; 3-file; 5-query; 6-hash
+                if ((match != null) && (match.length >= 7)) {
+                    this.fullPath = this.path = match[1];
+                    this.directoryPath = match[2];
+                    this.directories = mapArray((_b = this.directoryPath) === null || _b === void 0 ? void 0 : _b.split("/"), x => x, x => ((x === null || x === void 0 ? void 0 : x.length) > 0), false);
+                    this.fileName = match[3];
+                    this.queryString = match[5];
+                    this.hash = match[6];
+                    this.hasDomain = false;
+                    return;
+                }
+            }
+        }
+        reconstruct(includeDomain = true, includePath = true, includeQuery = true, includeHash = true) {
+            var _a, _b;
+            let s = "";
+            if (includeDomain) {
+                if (this.hasDomain) {
+                    s += ((((_a = this.protocol) === null || _a === void 0 ? void 0 : _a.length) > 0) ? this.protocol + ":" : "") + "//" + this.hostName + ((isNumeric(this.port)) ? ":" + this.port : "") + "/";
+                }
+                else {
+                    s += "/";
+                }
+            }
+            if (includePath) {
+                s += this.path;
+            }
+            if ((includeQuery) && (((_b = this.queryString) === null || _b === void 0 ? void 0 : _b.length) > 0)) {
+                s += "?" + this.queryString;
+            }
+            if (includeHash) {
+                s += this.hash;
+            }
+            return s;
+        }
+        combineWithPath(url) {
+            if (!((url === null || url === void 0 ? void 0 : url.length) > 0))
+                return this.url; // Nothing to append
+            if (url.startsWith("#"))
+                return this.reconstruct(true, true, true, false) + url; // Only a hash link
+            let parts = new UrlParts(url);
+            if (parts.hasDomain)
+                return url; // The new URL has domain and shouldn't be altered
+            return this.reconstruct(true, false, false, false) + ((url.startsWith("/")) ? "" : this.directoryPath) + trimSlash(url, true, false);
+        }
+    }
+    Utils.UrlParts = UrlParts;
     //#endregion
     //#region Arrays & Objects
     /**
@@ -222,8 +334,8 @@ export var Utils;
      * @param object Object from which to extract keys
      */
     function getObjectKeys(object) {
-        var list = [];
-        for (var key in object)
+        let list = [];
+        for (let key in object)
             if (object.hasOwnProperty(key))
                 list.push(key);
         return list;
@@ -234,8 +346,8 @@ export var Utils;
      * @param object Object from which to extract values
      */
     function getObjectValues(object) {
-        var list = [];
-        for (var value in object)
+        let list = [];
+        for (let value in object)
             list.push(object[value]);
         return list;
     }
@@ -246,7 +358,7 @@ export var Utils;
      * @param key Key to look for
      */
     function hasObjectKey(object, key) {
-        for (var s in object)
+        for (let s in object)
             if (s == key)
                 return true;
         return false;
