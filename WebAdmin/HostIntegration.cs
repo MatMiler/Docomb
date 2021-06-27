@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.StaticFiles;
@@ -53,10 +55,37 @@ namespace Docomb.WebAdmin
 				options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 			});
 			services.ConfigureOptions(typeof(ConfigureOptions));
+
+
+			#region Authentication
+			{
+				List<WebCore.Authentication.IScheme> schemes = WebCore.Configurations.MainConfig.Instance.Authentication.Schemes;
+				if (schemes?.Count > 0)
+				{
+					AuthenticationBuilder builder = services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme);
+					builder.AddCookie(item => item.LoginPath = new PathString($"/{AdminConfig.UrlPathPrefix}/account/login"));
+					foreach (var scheme in schemes)
+					{
+						scheme.AddToBuilder(builder);
+					}
+				}
+			}
+			#endregion
+
 		}
 
 		public static void UseDocombAdmin(this IApplicationBuilder app)
 		{
+			#region Authentication
+			{
+				List<WebCore.Authentication.IScheme> schemes = WebCore.Configurations.MainConfig.Instance.Authentication.Schemes;
+				if (schemes?.Count > 0)
+				{
+					app.UseAuthentication();
+					app.UseAuthorization();
+				}
+			}
+			#endregion
 		}
 	}
 

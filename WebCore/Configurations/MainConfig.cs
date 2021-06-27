@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Docomb.WebCore.Authentication;
 using Microsoft.Extensions.Configuration;
 
 namespace Docomb.WebCore.Configurations
@@ -49,6 +50,8 @@ namespace Docomb.WebCore.Configurations
 				SiteName = jsonConfig?.GetValue<string>("name");
 				if (string.IsNullOrWhiteSpace(SiteName)) SiteName = DefaultSiteName;
 				RootUrl = jsonConfig?.GetValue<string>("url") ?? DefaultRootUrl;
+
+				Authentication = new AuthenticationConfig(jsonConfig?.GetSection("authentication"));
 			}
 		}
 		/// <summary>Reload data from configuration sources</summary>
@@ -67,6 +70,13 @@ namespace Docomb.WebCore.Configurations
 
 		public const string DefaultRootUrl = "/";
 		public string RootUrl { get; private set; } = DefaultRootUrl;
+
+		#endregion
+
+
+		#region Authentication
+
+		public AuthenticationConfig Authentication { get; private set; }
 
 		#endregion
 

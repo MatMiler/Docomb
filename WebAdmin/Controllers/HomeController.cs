@@ -12,6 +12,9 @@ namespace Docomb.WebAdmin.Controllers
 		[HttpGet("{**itemPath}")]
 		public IActionResult Index()
 		{
+			if (!WebCore.Authentication.Access.HasAccess(User, WebCore.Authentication.AccessLevel.Editor))
+				return Redirect($"/{AdminConfig.UrlPathPrefix}/account/login");
+
 			ViewBag.baseHref = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/{AdminConfig.UrlPathPrefix}/";
 			ViewBag.basePath = $"{Request.PathBase}/{AdminConfig.UrlPathPrefix}/";
 			ViewBag.readerBasePath = $"{Request.PathBase}/";
