@@ -602,3 +602,94 @@ html .articleContent table th {
 
 .articleContent > :last-child, .articleContent blockquote > :last-child {
   margin-bottom: 0; }
+
+.authPage {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column; }
+  .authPage > .title {
+    flex: 0 0 auto;
+    text-align: center; }
+    .authPage > .title h1 {
+      margin: 0;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: bold;
+      border-bottom: 1px solid; }
+      html .authPage > .title h1 {
+        border-color: #c9c9c9;
+        background: #eee; }
+      .dark .authPage > .title h1 {
+        border-color: #494949;
+        background: #333; }
+      @media (prefers-color-scheme: dark) {
+        html .authPage > .title h1 {
+          border-color: #494949;
+          background: #333; }
+        .light .authPage > .title h1 {
+          border-color: #c9c9c9;
+          background: #eee; } }
+  .authPage .authContent {
+    flex: 1 1 100%; }
+    .authPage .authContent > .inner {
+      position: relative;
+      z-index: 2;
+      min-width: 100%;
+      min-height: 80%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center; }
+  .authPage .loginSchemeSelection {
+    padding: 16px 24px 24px 24px; }
+    .authPage .loginSchemeSelection .label {
+      font-size: 14px;
+      padding: 8px;
+      text-align: center; }
+    .authPage .loginSchemeSelection .schemes {
+      font-size: 0; }
+      .authPage .loginSchemeSelection .schemes form {
+        display: inline-block;
+        vertical-align: top;
+        padding: 4px; }
+        .authPage .loginSchemeSelection .schemes form input[type="submit"] {
+          background: transparent;
+          color: inherit;
+          border: 1px solid;
+          line-height: 30px;
+          padding: 0 16px;
+          border-radius: 2px;
+          font-weight: bold;
+          cursor: pointer; }
+          html .authPage .loginSchemeSelection .schemes form input[type="submit"] {
+            border-color: rgba(0, 0, 0, 0.2); }
+          .dark .authPage .loginSchemeSelection .schemes form input[type="submit"] {
+            border-color: rgba(255, 255, 255, 0.2); }
+          @media (prefers-color-scheme: dark) {
+            html .authPage .loginSchemeSelection .schemes form input[type="submit"] {
+              border-color: rgba(255, 255, 255, 0.2); }
+            .light .authPage .loginSchemeSelection .schemes form input[type="submit"] {
+              border-color: rgba(0, 0, 0, 0.2); } }
+          html .authPage .loginSchemeSelection .schemes form input[type="submit"]:hover {
+            color: #03f;
+            background: rgba(0, 0, 0, 0.1); }
+          .dark .authPage .loginSchemeSelection .schemes form input[type="submit"]:hover {
+            color: #0bf;
+            background: rgba(255, 255, 255, 0.1); }
+          @media (prefers-color-scheme: dark) {
+            html .authPage .loginSchemeSelection .schemes form input[type="submit"]:hover {
+              color: #0bf;
+              background: rgba(255, 255, 255, 0.1); }
+            .light .authPage .loginSchemeSelection .schemes form input[type="submit"]:hover {
+              color: #03f;
+              background: rgba(0, 0, 0, 0.1); } }
+          html .authPage .loginSchemeSelection .schemes form input[type="submit"]:active {
+            background: rgba(0, 0, 0, 0.13); }
+          .dark .authPage .loginSchemeSelection .schemes form input[type="submit"]:active {
+            background: rgba(255, 255, 255, 0.13); }
+          @media (prefers-color-scheme: dark) {
+            html .authPage .loginSchemeSelection .schemes form input[type="submit"]:active {
+              background: rgba(255, 255, 255, 0.13); }
+            .light .authPage .loginSchemeSelection .schemes form input[type="submit"]:active {
+              background: rgba(0, 0, 0, 0.13); } }

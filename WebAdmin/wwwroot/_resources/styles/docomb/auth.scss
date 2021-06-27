@@ -1,0 +1,31 @@
+﻿@import "shared/theme.scss";
+
+
+
+.authPage { width: 100vw; height: 100vh; display: flex; flex-direction: column;
+	> .title { flex: 0 0 auto; text-align: center;
+		h1 { margin: 0; padding: 16px; font-size: 16px; font-weight: bold; border-bottom: 1px solid;
+			@include themeMaps(("border-color": $menuBorderColor, "background": $menuBackgroundColor));
+		}
+	}
+	.authContent { flex: 1 1 100%;
+		> .inner { position: relative; z-index: 2; min-width: 100%; min-height: 80%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+	}
+
+	.loginSchemeSelection {
+		padding: 16px 24px 24px 24px;
+		.label { font-size: 14px; padding: 8px; text-align: center; }
+		.schemes { font-size: 0;
+			form { display: inline-block; vertical-align: top; padding: 4px;
+				input[type="submit"] { background: transparent; color: inherit; border: 1px solid; line-height: 30px; padding: 0 16px; border-radius: 2px; font-weight: bold; cursor: pointer;
+					@include themeMap("border-color", $menuBorderColorMultiply);
+					&:hover { @include themeMaps(("color": $accentColor, "background": $buttonHoverColor)); }
+					&:active { @include themeMap("background", $buttonActiveColor); }
+				}
+			}
+		}
+	}
+
+
+
+}

@@ -46,11 +46,12 @@ namespace Docomb.WebCore.Authentication
 
 		public void AddToBuilder(AuthenticationBuilder builder)
 		{
-			builder.AddFacebook(Code, facebookOptions =>
+			builder.AddFacebook(Code, option =>
 			{
-				facebookOptions.AppId = _appId;
-				facebookOptions.AppSecret = _appSecret;
-				facebookOptions.ReturnUrlParameter = "ReturnUrl";
+				option.AppId = _appId;
+				option.AppSecret = _appSecret;
+				option.ReturnUrlParameter = "ReturnUrl";
+				option.AccessDeniedPath = "/_admin/account/failed";
 			});
 		}
 	}

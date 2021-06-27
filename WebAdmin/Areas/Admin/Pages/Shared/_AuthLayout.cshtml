@@ -7,13 +7,17 @@
 	<base href="@ViewBag.baseHref" />
 	<link rel="stylesheet" href="~/_resources/styles/docomb/admin.css" />
 	<script>
-		window["layoutType"] = "admin";
 		window["basePath"] = @Json.Serialize(ViewBag.basePath);
 		window["readerBasePath"] = @Json.Serialize(ViewBag.readerBasePath);
 	</script>
 </head>
 <body>
-	<div id="root"></div>
+	<div class="authPage">
+		<div class="title"><h1>@(Docomb.WebCore.Configurations.MainConfig.Instance.SiteName)</h1></div>
+		<div class="authContent watermarkedPart">
+			@RenderBody()
+		</div>
+	</div>
 	<script type="module" src="@Url.Content("~/_resources/admin/bundle.js")"></script>
 </body>
 </html>

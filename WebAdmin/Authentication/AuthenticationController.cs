@@ -24,7 +24,9 @@ namespace Docomb.WebAdmin.Authentication
 				return Redirect("/" + AdminConfig.UrlPathPrefix); // No authentication scheme
 			else if((scheme != null) && (schemes?.Count == 1))
 				return Redirect($"/{AdminConfig.UrlPathPrefix}/account/login/default"); // Only one authentication scheme, redirect to login with default (only) scheme
-			return Content("Log in scheme selection");
+
+			PrepareViewBag();
+			return View("~/Areas/Admin/Pages/AuthSelection.cshtml");
 		}
 
 		[HttpGet("login/default")]
@@ -116,6 +118,15 @@ namespace Docomb.WebAdmin.Authentication
 				return Redirect("/" + AdminConfig.UrlPathPrefix); // Authentication not needed
 
 			return Content("Logged out");
+		}
+
+
+
+		private void PrepareViewBag()
+		{
+			ViewBag.baseHref = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/{AdminConfig.UrlPathPrefix}/";
+			ViewBag.basePath = $"{Request.PathBase}/{AdminConfig.UrlPathPrefix}/";
+			ViewBag.readerBasePath = $"{Request.PathBase}/";
 		}
 
 	}

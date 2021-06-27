@@ -4,6 +4,7 @@ $textColor: ( 'dark': #fff, 'light': #000 );
 $textColorLight: ( 'dark': #ccc, 'light': #666 );
 $menuBackgroundColor: ( 'dark': #333, 'light': #eee );
 $menuBorderColor: ( 'dark': #494949, 'light': #c9c9c9 );
+$menuBorderColorMultiply: ( 'dark': rgba(255, 255, 255, .2), 'light': rgba(0, 0, 0, .2) );
 $linkColor: ( 'dark': #0bf, 'light': #03f );
 $accentColor: ( 'dark': #0bf, 'light': #03f );
 $buttonHoverColor: ( 'dark': rgba(255, 255, 255, .1), 'light': rgba(0, 0, 0, .1) );
