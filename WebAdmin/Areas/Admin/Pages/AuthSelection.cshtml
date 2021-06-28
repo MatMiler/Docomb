@@ -1,12 +1,12 @@
 ﻿@{
 	Layout = "~/Areas/Admin/Pages/Shared/_AuthLayout.cshtml";
 }
-<script>
-	window["layoutType"] = "auth";
-	window["authPage"] = "schemeSelection";
-</script>
-<div id="pageWatermark" class="watermark"></div>
 <div class="inner">
+	@if (ViewBag.ShowLoginFailed == true) { 
+		<div class="actionStatus error">
+			<div class="title">Login failed</div>
+		</div>
+	}
 	<div class="loginSchemeSelection">
 		<div class="label">Select service to log in:</div>
 		<div class="schemes">
@@ -14,7 +14,12 @@
 			{
 				<form method="post" action="account/login/scheme">
 					<input type="hidden" name="schemeCode" value="@scheme.Code" />
-					<input type="submit" value="@scheme.Name" />
+					<button type="submit">
+						@if (!string.IsNullOrEmpty(scheme.ButtonLogo)) {
+							<i><img src="~/_resources/images/@(scheme.ButtonLogo).svg" alt="" /></i>
+						}
+						<b>@scheme.Name</b>
+					</button>
 				</form>
 			}
 		</div>

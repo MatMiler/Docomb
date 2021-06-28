@@ -17,13 +17,7 @@ namespace Docomb.WebCore.Authentication
 		public string Name { get; }
 
 		/// <summary>Icon code for the sign in button</summary>
-		public string ButtonIcon { get; }
-
-		/// <summary>Background color of the sign in button</summary>
-		public Color? ButtonBgColor { get; }
-
-		/// <summary>Text color of the sign in button</summary>
-		public Color? ButtonFgColor { get; }
+		public string ButtonLogo { get; }
 
 		public bool IsValid { get; }
 

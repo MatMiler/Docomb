@@ -18,11 +18,7 @@ namespace Docomb.WebCore.Authentication
 		public string Name => _name;
 		private string _name;
 
-		public string ButtonIcon => null;
-
-		public Color? ButtonBgColor => null;
-
-		public Color? ButtonFgColor => null;
+		public string ButtonLogo => "microsoft-color";
 
 		public bool IsValid { get; private set; }
 

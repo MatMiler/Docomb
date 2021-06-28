@@ -2,25 +2,44 @@
 
 
 
-.authPage { width: 100vw; height: 100vh; display: flex; flex-direction: column;
+.authPage { width: 100vw; height: 100vh; display: flex; flex-direction: column; overflow: auto;
 	> .title { flex: 0 0 auto; text-align: center;
 		h1 { margin: 0; padding: 16px; font-size: 16px; font-weight: bold; border-bottom: 1px solid;
 			@include themeMaps(("border-color": $menuBorderColor, "background": $menuBackgroundColor));
 		}
 	}
 	.authContent { flex: 1 1 100%;
-		> .inner { position: relative; z-index: 2; min-width: 100%; min-height: 80%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+		> .inner { position: relative; z-index: 2; min-width: 100%; min-height: 90%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+	}
+
+	.actionStatus { padding: 32px;
+		.title { font-size: 24px; text-align: center; }
+		&.error .title { font-weight: bold; @include themeMap("color", $errorColor); }
+	}
+	.otherActions {
+		padding: 20px;
+		.links { display: flex; flex-wrap: wrap; }
+		a {
+			color: inherit; font-size: 16px; padding: 12px; text-decoration: none;
+			&:hover, &:focus { @include themeMaps(("color": $accentColor, "background": $buttonHoverColor)); }
+			&:active { @include themeMap("background", $buttonActiveColor); }
+		}
 	}
 
 	.loginSchemeSelection {
-		padding: 16px 24px 24px 24px;
-		.label { font-size: 14px; padding: 8px; text-align: center; }
+		padding: 20px 20px 24px 20px;
+
+		.label { font-size: 14px; padding: 8px 12px; @include themeMap("color", $textColorLight); }
 		.schemes { font-size: 0;
-			form { display: inline-block; vertical-align: top; padding: 4px;
-				input[type="submit"] { background: transparent; color: inherit; border: 1px solid; line-height: 30px; padding: 0 16px; border-radius: 2px; font-weight: bold; cursor: pointer;
-					@include themeMap("border-color", $menuBorderColorMultiply);
-					&:hover { @include themeMaps(("color": $accentColor, "background": $buttonHoverColor)); }
+			form {
+				button {
+					display: flex; align-items: center; width: 100%;
+					background: transparent; color: inherit;
+					font-family: inherit; font-size: 16px; font-weight: bold;
+					border: none; border-radius: 0; padding: 12px; text-align: left; cursor: pointer;
+					&:hover, &:focus { @include themeMaps(("color": $accentColor, "background": $buttonHoverColor)); }
 					&:active { @include themeMap("background", $buttonActiveColor); }
+					img { display: block; width: 1.2em; height: 1.2em; margin-right: .5em; }
 				}
 			}
 		}

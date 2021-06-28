@@ -607,7 +607,8 @@ html .articleContent table th {
   width: 100vw;
   height: 100vh;
   display: flex;
-  flex-direction: column; }
+  flex-direction: column;
+  overflow: auto; }
   .authPage > .title {
     flex: 0 0 auto;
     text-align: center; }
@@ -636,60 +637,113 @@ html .articleContent table th {
       position: relative;
       z-index: 2;
       min-width: 100%;
-      min-height: 80%;
+      min-height: 90%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center; }
+  .authPage .actionStatus {
+    padding: 32px; }
+    .authPage .actionStatus .title {
+      font-size: 24px;
+      text-align: center; }
+    .authPage .actionStatus.error .title {
+      font-weight: bold; }
+      html .authPage .actionStatus.error .title {
+        color: #c00; }
+      .dark .authPage .actionStatus.error .title {
+        color: #c00; }
+      @media (prefers-color-scheme: dark) {
+        html .authPage .actionStatus.error .title {
+          color: #c00; }
+        .light .authPage .actionStatus.error .title {
+          color: #c00; } }
+  .authPage .otherActions {
+    padding: 20px; }
+    .authPage .otherActions .links {
+      display: flex;
+      flex-wrap: wrap; }
+    .authPage .otherActions a {
+      color: inherit;
+      font-size: 16px;
+      padding: 12px;
+      text-decoration: none; }
+      html .authPage .otherActions a:hover, html .authPage .otherActions a:focus {
+        color: #03f;
+        background: rgba(0, 0, 0, 0.1); }
+      .dark .authPage .otherActions a:hover, .dark .authPage .otherActions a:focus {
+        color: #0bf;
+        background: rgba(255, 255, 255, 0.1); }
+      @media (prefers-color-scheme: dark) {
+        html .authPage .otherActions a:hover, html .authPage .otherActions a:focus {
+          color: #0bf;
+          background: rgba(255, 255, 255, 0.1); }
+        .light .authPage .otherActions a:hover, .light .authPage .otherActions a:focus {
+          color: #03f;
+          background: rgba(0, 0, 0, 0.1); } }
+      html .authPage .otherActions a:active {
+        background: rgba(0, 0, 0, 0.13); }
+      .dark .authPage .otherActions a:active {
+        background: rgba(255, 255, 255, 0.13); }
+      @media (prefers-color-scheme: dark) {
+        html .authPage .otherActions a:active {
+          background: rgba(255, 255, 255, 0.13); }
+        .light .authPage .otherActions a:active {
+          background: rgba(0, 0, 0, 0.13); } }
   .authPage .loginSchemeSelection {
-    padding: 16px 24px 24px 24px; }
+    padding: 20px 20px 24px 20px; }
     .authPage .loginSchemeSelection .label {
       font-size: 14px;
-      padding: 8px;
-      text-align: center; }
+      padding: 8px 12px; }
+      html .authPage .loginSchemeSelection .label {
+        color: #666; }
+      .dark .authPage .loginSchemeSelection .label {
+        color: #ccc; }
+      @media (prefers-color-scheme: dark) {
+        html .authPage .loginSchemeSelection .label {
+          color: #ccc; }
+        .light .authPage .loginSchemeSelection .label {
+          color: #666; } }
     .authPage .loginSchemeSelection .schemes {
       font-size: 0; }
-      .authPage .loginSchemeSelection .schemes form {
-        display: inline-block;
-        vertical-align: top;
-        padding: 4px; }
-        .authPage .loginSchemeSelection .schemes form input[type="submit"] {
-          background: transparent;
-          color: inherit;
-          border: 1px solid;
-          line-height: 30px;
-          padding: 0 16px;
-          border-radius: 2px;
-          font-weight: bold;
-          cursor: pointer; }
-          html .authPage .loginSchemeSelection .schemes form input[type="submit"] {
-            border-color: rgba(0, 0, 0, 0.2); }
-          .dark .authPage .loginSchemeSelection .schemes form input[type="submit"] {
-            border-color: rgba(255, 255, 255, 0.2); }
-          @media (prefers-color-scheme: dark) {
-            html .authPage .loginSchemeSelection .schemes form input[type="submit"] {
-              border-color: rgba(255, 255, 255, 0.2); }
-            .light .authPage .loginSchemeSelection .schemes form input[type="submit"] {
-              border-color: rgba(0, 0, 0, 0.2); } }
-          html .authPage .loginSchemeSelection .schemes form input[type="submit"]:hover {
-            color: #03f;
-            background: rgba(0, 0, 0, 0.1); }
-          .dark .authPage .loginSchemeSelection .schemes form input[type="submit"]:hover {
+      .authPage .loginSchemeSelection .schemes form button {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        background: transparent;
+        color: inherit;
+        font-family: inherit;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 0;
+        padding: 12px;
+        text-align: left;
+        cursor: pointer; }
+        html .authPage .loginSchemeSelection .schemes form button:hover, html .authPage .loginSchemeSelection .schemes form button:focus {
+          color: #03f;
+          background: rgba(0, 0, 0, 0.1); }
+        .dark .authPage .loginSchemeSelection .schemes form button:hover, .dark .authPage .loginSchemeSelection .schemes form button:focus {
+          color: #0bf;
+          background: rgba(255, 255, 255, 0.1); }
+        @media (prefers-color-scheme: dark) {
+          html .authPage .loginSchemeSelection .schemes form button:hover, html .authPage .loginSchemeSelection .schemes form button:focus {
             color: #0bf;
             background: rgba(255, 255, 255, 0.1); }
-          @media (prefers-color-scheme: dark) {
-            html .authPage .loginSchemeSelection .schemes form input[type="submit"]:hover {
-              color: #0bf;
-              background: rgba(255, 255, 255, 0.1); }
-            .light .authPage .loginSchemeSelection .schemes form input[type="submit"]:hover {
-              color: #03f;
-              background: rgba(0, 0, 0, 0.1); } }
-          html .authPage .loginSchemeSelection .schemes form input[type="submit"]:active {
-            background: rgba(0, 0, 0, 0.13); }
-          .dark .authPage .loginSchemeSelection .schemes form input[type="submit"]:active {
+          .light .authPage .loginSchemeSelection .schemes form button:hover, .light .authPage .loginSchemeSelection .schemes form button:focus {
+            color: #03f;
+            background: rgba(0, 0, 0, 0.1); } }
+        html .authPage .loginSchemeSelection .schemes form button:active {
+          background: rgba(0, 0, 0, 0.13); }
+        .dark .authPage .loginSchemeSelection .schemes form button:active {
+          background: rgba(255, 255, 255, 0.13); }
+        @media (prefers-color-scheme: dark) {
+          html .authPage .loginSchemeSelection .schemes form button:active {
             background: rgba(255, 255, 255, 0.13); }
-          @media (prefers-color-scheme: dark) {
-            html .authPage .loginSchemeSelection .schemes form input[type="submit"]:active {
-              background: rgba(255, 255, 255, 0.13); }
-            .light .authPage .loginSchemeSelection .schemes form input[type="submit"]:active {
-              background: rgba(0, 0, 0, 0.13); } }
+          .light .authPage .loginSchemeSelection .schemes form button:active {
+            background: rgba(0, 0, 0, 0.13); } }
+        .authPage .loginSchemeSelection .schemes form button img {
+          display: block;
+          width: 1.2em;
+          height: 1.2em;
+          margin-right: .5em; }

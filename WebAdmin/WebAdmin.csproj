@@ -30,6 +30,8 @@
 
 	<ItemGroup>
 	  <Content Remove="compilerconfig.json" />
+	  <Content Remove="wwwroot\_resources\images\facebook-color.svg" />
+	  <Content Remove="wwwroot\_resources\images\microsoft-color.svg" />
 	  <Content Remove="wwwroot\_resources\styles\article.scss" />
 	  <Content Remove="wwwroot\_resources\styles\docomb\auth.scss" />
 	  <Content Remove="wwwroot\_resources\styles\docomb\shared\base.scss" />

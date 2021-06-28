@@ -96,7 +96,8 @@ namespace Docomb.WebAdmin.Authentication
 			if (!WebCore.Configurations.MainConfig.Instance.Authentication.AuthorizeAdmin)
 				return Redirect("/" + AdminConfig.UrlPathPrefix); // Authentication not needed
 
-			return Content("Access denied");
+			PrepareViewBag();
+			return View("~/Areas/Admin/Pages/AuthAccessDenied.cshtml");
 		}
 
 		[HttpGet("failed")]
@@ -105,7 +106,9 @@ namespace Docomb.WebAdmin.Authentication
 			if (!WebCore.Configurations.MainConfig.Instance.Authentication.AuthorizeAdmin)
 				return Redirect("/" + AdminConfig.UrlPathPrefix); // Authentication not needed
 
-			return Content("Log in failed");
+			PrepareViewBag();
+			ViewBag.ShowLoginFailed = true;
+			return View("~/Areas/Admin/Pages/AuthSelection.cshtml");
 		}
 
 		[HttpGet("logout")]
@@ -117,7 +120,21 @@ namespace Docomb.WebAdmin.Authentication
 			if (!WebCore.Configurations.MainConfig.Instance.Authentication.AuthorizeAdmin)
 				return Redirect("/" + AdminConfig.UrlPathPrefix); // Authentication not needed
 
-			return Content("Logged out");
+			PrepareViewBag();
+			return View("~/Areas/Admin/Pages/AuthLoggedOut.cshtml");
+		}
+
+
+		[HttpGet("switch")]
+		public ActionResult SwitchAccount()
+		{
+			if (User.Identity.IsAuthenticated)
+				HttpContext.SignOutAsync().Wait();
+
+			if (!WebCore.Configurations.MainConfig.Instance.Authentication.AuthorizeAdmin)
+				return Redirect("/" + AdminConfig.UrlPathPrefix); // Authentication not needed
+
+			return Login();
 		}
 
 
