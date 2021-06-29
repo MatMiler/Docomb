@@ -6,7 +6,8 @@ export module LayoutUtils {
 	export module NavBar {
 		export enum ItemKey {
 			Home = "home",
-			Settings = "settings"
+			Settings = "settings",
+			User = "user"
 		}
 
 		export function updateNavBar() {

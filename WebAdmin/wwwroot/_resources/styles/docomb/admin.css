@@ -85,6 +85,15 @@ html a {
   .mainNavGrid > .sideBarNav {
     border-right: 1px solid;
     box-sizing: content-box; }
+    html .mainNavGrid > .sideBarNav {
+      background: #e9e9e9; }
+    .dark .mainNavGrid > .sideBarNav {
+      background: #222; }
+    @media (prefers-color-scheme: dark) {
+      html .mainNavGrid > .sideBarNav {
+        background: #222; }
+      .light .mainNavGrid > .sideBarNav {
+        background: #e9e9e9; } }
     .mainNavGrid > .sideBarNav .sideBar {
       display: flex;
       flex-direction: column;
@@ -207,7 +216,8 @@ html a {
   padding: 10px;
   color: inherit;
   text-decoration: none;
-  position: relative; }
+  position: relative;
+  cursor: pointer; }
   html .sideBarItem a:hover {
     color: #03f;
     background: rgba(0, 0, 0, 0.1); }

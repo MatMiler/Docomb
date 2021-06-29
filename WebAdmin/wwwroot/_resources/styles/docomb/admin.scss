@@ -52,6 +52,7 @@ html { @include lightPreset; }
 
 .mainNavGrid { display: flex; width: 100vw; height: 100vh;
 	> .sideBarNav { border-right: 1px solid; box-sizing: content-box;
+		@include themeMap("background", $sideBarBackgroundColor);
 		.sideBar { display: flex; flex-direction: column; justify-content: space-between; height: 100%;
 			.workspaces { flex: 1 1 100%; overflow: auto; }
 			.system { flex: 0 0 auto; border-top: 1px solid; }
@@ -103,7 +104,7 @@ html { @include lightPreset; }
 
 
 .sideBarItem {
-	a { display: flex; align-items: center; padding: 10px; color: inherit; text-decoration: none; position: relative;
+	a { display: flex; align-items: center; padding: 10px; color: inherit; text-decoration: none; position: relative; cursor: pointer;
 		&:hover { @include themeMaps(("color": $accentColor, "background": $buttonHoverColor)); .name { color: inherit; } }
 		&:active { @include themeMap("background", $buttonActiveColor); }
 	}

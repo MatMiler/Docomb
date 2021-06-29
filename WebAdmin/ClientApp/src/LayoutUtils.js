@@ -8,6 +8,7 @@ export var LayoutUtils;
         (function (ItemKey) {
             ItemKey["Home"] = "home";
             ItemKey["Settings"] = "settings";
+            ItemKey["User"] = "user";
         })(ItemKey = NavBar.ItemKey || (NavBar.ItemKey = {}));
         function updateNavBar() {
             this.setState();

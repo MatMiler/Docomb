@@ -3,6 +3,7 @@ import { SideBarItem } from './SideBarItem';
 import { Workspaces } from "../Data/Workspaces";
 import { LayoutUtils } from '../LayoutUtils';
 import { EventBus } from '../EventBus';
+import SideBarUser from './SideBarUser';
 
 
 type SideBarState = {
@@ -63,6 +64,7 @@ export class SideBarNav extends Component<{}, SideBarState> {
 					{contents}
 				</div>
 				<div className="system">
+					<SideBarUser />
 					<SideBarItem name="Settings" url="/settings" initials="S" icon="Settings" itemKey={LayoutUtils.NavBar.ItemKey.Settings} />
 				</div>
 			</div>
