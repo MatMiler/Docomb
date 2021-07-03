@@ -3,29 +3,54 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Docomb.WebCore.Authentication
 {
 	public class UserAccessStorage
 	{
+		public UserAccessStorage() { }
 
 		public UserAccessStorage(IConfigurationSection configSource)
 		{
+			LoadData(configSource);
+		}
+
+		public UserAccessStorage(JsonStructure jsonStructure)
+		{
+			LoadData(jsonStructure);
+		}
+
+		public void LoadData(IConfigurationSection configSource)
+		{
 			Dictionary<string, AccessLevel> dict = new();
 
-			AddUserLevels(configSource?.GetSection("reader"), dict, AccessLevel.Reader);
-			AddUserLevels(configSource?.GetSection("editor"), dict, AccessLevel.Editor);
-			AddUserLevels(configSource?.GetSection("admin"), dict, AccessLevel.Admin);
+			AddUserLevels(configSource?.GetSection("none")?.GetChildren()?.Select(x => x.Value), dict, AccessLevel.None);
+			AddUserLevels(configSource?.GetSection("reader")?.GetChildren()?.Select(x => x.Value), dict, AccessLevel.Reader);
+			AddUserLevels(configSource?.GetSection("editor")?.GetChildren()?.Select(x => x.Value), dict, AccessLevel.Editor);
+			AddUserLevels(configSource?.GetSection("admin")?.GetChildren()?.Select(x => x.Value), dict, AccessLevel.Admin);
 
 			_userLevels = dict;
 		}
 
-		private void AddUserLevels(IConfigurationSection usersSection, Dictionary<string, AccessLevel> dict, AccessLevel level)
+		public void LoadData(JsonStructure jsonStructure)
 		{
-			List<string> list = usersSection?.GetChildren()?.Select(x => x.Value)?.ToList();
+			Dictionary<string, AccessLevel> dict = new();
 
-			if (list?.Count > 0)
+			AddUserLevels(jsonStructure?.None, dict, AccessLevel.None);
+			AddUserLevels(jsonStructure?.Reader, dict, AccessLevel.Reader);
+			AddUserLevels(jsonStructure?.Editor, dict, AccessLevel.Editor);
+			AddUserLevels(jsonStructure?.Admin, dict, AccessLevel.Admin);
+
+			_userLevels = dict;
+		}
+
+		private void AddUserLevels(IEnumerable<string> list, Dictionary<string, AccessLevel> dict, AccessLevel level)
+		{
+			//List<string> list = usersSection?.GetChildren()?.Select(x => x.Value)?.ToList();
+
+			if (list?.Count() > 0)
 			{
 				foreach (string username in list)
 				{
@@ -43,8 +68,47 @@ namespace Docomb.WebCore.Authentication
 
 		}
 
-		internal Dictionary<string, AccessLevel> UserLevels { get => _userLevels; }
+		public Dictionary<string, AccessLevel> UserLevels { get => _userLevels; }
 		private Dictionary<string, AccessLevel> _userLevels = null;
+
+
+
+		public JsonStructure ToJsonStructure()
+		{
+			JsonStructure data = new();
+			if (UserLevels == null) return data;
+
+			Dictionary<string, AccessLevel> users = new(UserLevels);
+			if (users?.Count > 0)
+			{
+				foreach (var user in users)
+				{
+					switch (user.Value)
+					{
+						case AccessLevel.Reader: { data.Reader.Add(user.Key); break; }
+						case AccessLevel.Editor: { data.Editor.Add(user.Key); break; }
+						case AccessLevel.Admin: { data.Admin.Add(user.Key); break; }
+					}
+				}
+			}
+
+			return data;
+		}
+
+		public class JsonStructure
+		{
+			[JsonPropertyName("none")]
+			public List<string> None { get; set; }
+
+			[JsonPropertyName("reader")]
+			public List<string> Reader { get; set; }
+
+			[JsonPropertyName("editor")]
+			public List<string> Editor { get; set; }
+
+			[JsonPropertyName("admin")]
+			public List<string> Admin { get; set; }
+		}
 
 	}
 }

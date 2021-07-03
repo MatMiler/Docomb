@@ -182,7 +182,7 @@
 
 
 
-	//#region Arrays & Objects
+	//#region Paths
 
 	export function padWithSlash(value: string, atStart: boolean = true, atEnd: boolean = true): string {
 		value = trimString(value, "");
@@ -329,6 +329,19 @@
 		return list;
 	}
 
+	export function mapObjectValues<T>(data: any, conversion: (source: any) => T, validation: (item: T) => boolean = null, includeNull: boolean = false): { [key: string]: T} {
+		let o = {};
+		if (data == null) return o;
+		for (let key in data) {
+			let value: T = null;
+			try { value = conversion(data[key]); } catch (e) { }
+			if ((validation != null) && (validation(value) != true)) value = null;
+			if ((includeNull == true) || (value != null))
+				o[key] = value;
+		}
+		return o;
+	}
+
 	/**
 	 * Get array of all keys in an object
 	 * @param object Object from which to extract keys
@@ -362,6 +375,41 @@
 			if (s == key)
 				return true;
 		return false;
+	}
+
+	/**
+	 * Convert all properties of an object into an array of values
+	 * @param data
+	 * @param conversion
+	 * @param validation
+	 * @param includeNull
+	 */
+	export function objectToArray<T>(data: any, conversion: (key: string, value: any) => T, validation: (item: T) => boolean = null, includeNull: boolean = false): Array<T> {
+		let list: T[] = [];
+		if (data == null) return list;
+		for (let key in data) {
+			let value: T = null;
+			try { value = conversion(key, data[key]); } catch (e) { }
+			if ((validation != null) && (validation(value) != true)) value = null;
+			if ((includeNull == true) || (value != null))
+				list.push(value);
+		}
+		return list;
+	}
+
+	/**
+	 * Generate a hash code from an object
+	 * @param o Object from which to generate hash code
+	 */
+	export function hashCode(o: any): number {
+		let s = JSON.stringify(o);
+		let hash: number = 0
+		if (s.length === 0) return hash;
+		for (let x = 0; x < s.length; x++) {
+			hash = ((hash << 5) - hash) + (s.charCodeAt(x));
+			hash |= 0;
+		}
+		return hash;
 	}
 
 	//#endregion

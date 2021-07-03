@@ -47,6 +47,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="ClientApp\TypeScript\Components\Settings\SettingsBreadcrumbs.tsx">
+	    <SubType>Code</SubType>
+	  </None>
 	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentFileInfo.tsx">
 	    <SubType>Code</SubType>
 	  </None>

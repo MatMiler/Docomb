@@ -3,10 +3,11 @@ import { ThemeProvider } from '@fluentui/react/lib/Theme';
 import { SideBarNav } from './SideBarNav';
 import { MainNavWithRouter } from './MainNav';
 import { darkTheme, lightTheme } from '../Themes';
+import SettingsNav from './Settings/SettingsNav';
 export class Layout extends Component {
     constructor(props) {
         super(props);
-        this.state = { showMainNav: props.showMainNav };
+        this.state = { mainNavType: props.mainNavType };
     }
     render() {
         let isDark = false;
@@ -20,13 +21,23 @@ export class Layout extends Component {
         catch (e) { }
         let siteBarNavClassName = "sideBarNav";
         let mainNav = null;
-        if (this.state.showMainNav == true) {
-            mainNav = (React.createElement("div", { className: "mainNav" },
-                React.createElement(MainNavWithRouter, null)));
-            siteBarNavClassName += " collapsed";
-        }
-        else {
-            siteBarNavClassName += " expanded";
+        switch (this.state.mainNavType) {
+            case "workspace": {
+                mainNav = (React.createElement("div", { className: "mainNav" },
+                    React.createElement(MainNavWithRouter, null)));
+                siteBarNavClassName += " collapsed";
+                break;
+            }
+            case "settings": {
+                mainNav = (React.createElement("div", { className: "mainNav" },
+                    React.createElement(SettingsNav, null)));
+                siteBarNavClassName += " collapsed";
+                break;
+            }
+            default: {
+                siteBarNavClassName += " expanded";
+                break;
+            }
         }
         return (React.createElement(ThemeProvider, { theme: isDark ? darkTheme : lightTheme },
             React.createElement("div", { className: "adminRoot mainNavGrid" },

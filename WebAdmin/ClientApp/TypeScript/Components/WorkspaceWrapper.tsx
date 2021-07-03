@@ -42,7 +42,7 @@ export class WorkspaceWrapper extends Component<void, WorkspaceWrapperState> {
 
 	render() {
 		return (
-			<Layout showMainNav={true}>
+			<Layout mainNavType="workspace">
 				{WorkspaceWrapperController.getContent()}
 			</Layout>
 		);

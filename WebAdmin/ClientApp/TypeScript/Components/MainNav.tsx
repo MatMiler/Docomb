@@ -98,11 +98,11 @@ export class MainNav extends Component<{}, MainNavState> {
 				<PivotItem headerText="Content" >
 					{content}
 				</PivotItem>
-				<PivotItem headerText="Options" hidden={true} >
-					Workspace options
-				</PivotItem>
 			</Pivot>
 		);
+	//			<PivotItem headerText="Options" hidden={true} >
+	//				Workspace options
+	//			</PivotItem>
 	}
 
 

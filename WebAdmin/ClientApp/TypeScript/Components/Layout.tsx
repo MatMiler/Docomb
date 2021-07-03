@@ -4,17 +4,18 @@ import { SideBarNav } from './SideBarNav';
 import { MainNav, MainNavWithRouter } from './MainNav';
 
 import { darkTheme, lightTheme } from '../Themes';
+import SettingsNav from './Settings/SettingsNav';
 
 
 type LayoutData = {
-	showMainNav: boolean
+	mainNavType: string
 };
 
 
 export class Layout extends Component<LayoutData, LayoutData> {
 	constructor(props: LayoutData) {
 		super(props);
-		this.state = { showMainNav: props.showMainNav };
+		this.state = { mainNavType: props.mainNavType };
 	}
 
 	render() {
@@ -29,13 +30,25 @@ export class Layout extends Component<LayoutData, LayoutData> {
 		let siteBarNavClassName = "sideBarNav";
 
 		let mainNav: JSX.Element = null;
-		if (this.state.showMainNav == true) {
-			mainNav = (<div className="mainNav">
-				<MainNavWithRouter />
-			</div>);
-			siteBarNavClassName += " collapsed";
-		} else {
-			siteBarNavClassName += " expanded";
+		switch (this.state.mainNavType) {
+			case "workspace": {
+				mainNav = (<div className="mainNav">
+					<MainNavWithRouter />
+				</div>);
+				siteBarNavClassName += " collapsed";
+				break;
+			}
+			case "settings": {
+				mainNav = (<div className="mainNav">
+					<SettingsNav />
+				</div>);
+				siteBarNavClassName += " collapsed";
+				break;
+			}
+			default: {
+				siteBarNavClassName += " expanded";
+				break;
+			}
 		}
 
 		return (

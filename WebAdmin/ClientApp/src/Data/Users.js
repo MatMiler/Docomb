@@ -18,6 +18,17 @@ export var Users;
         UserAccessLevel["Editor"] = "Editor";
         UserAccessLevel["Admin"] = "Admin";
     })(UserAccessLevel = Users.UserAccessLevel || (Users.UserAccessLevel = {}));
+    function getUserAccessLevelName(level) {
+        switch (level) {
+            case UserAccessLevel.Admin: return "Administrator";
+            case UserAccessLevel.Editor: return "Editor";
+            case UserAccessLevel.Reader: return "Reader";
+            case UserAccessLevel.Admin: return "Admin";
+            case UserAccessLevel.None: return "No access";
+            default: return level;
+        }
+    }
+    Users.getUserAccessLevelName = getUserAccessLevelName;
     class UserInfo {
         constructor(source) {
             this.username = Utils.tryGetString(source, "username");
@@ -34,5 +45,14 @@ export var Users;
         });
     }
     Users.loadUserInfo = loadUserInfo;
+    function loadGlobalUsers() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let source = yield Apis.fetchJsonAsync("api/users/globalUsers", true);
+            let actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
+            let list = Utils.mapObjectValues(Utils.tryGet(source, "data"), x => Utils.parseEnum(x, UserAccessLevel, UserAccessLevel.None), null, false);
+            return new Apis.DataWithStatus(actionStatus, list);
+        });
+    }
+    Users.loadGlobalUsers = loadGlobalUsers;
 })(Users || (Users = {}));
 //# sourceMappingURL=Users.js.map

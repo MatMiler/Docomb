@@ -38,7 +38,7 @@ export class WorkspaceWrapper extends Component {
         this.setState({ hash: WorkspaceWrapperController.stateHash });
     }
     render() {
-        return (React.createElement(Layout, { showMainNav: true }, WorkspaceWrapperController.getContent()));
+        return (React.createElement(Layout, { mainNavType: "workspace" }, WorkspaceWrapperController.getContent()));
     }
 }
 var WorkspaceWrapperController;

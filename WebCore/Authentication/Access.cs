@@ -36,8 +36,13 @@ namespace Docomb.WebCore.Authentication
 
 			#region Username match
 			{
+				// Fixed user access (can't be altered)
 				AccessLevel foundLevel = AccessLevel.None;
 				if ((Configurations.MainConfig.Instance?.Authentication?.FixedUserAccess?.UserLevels?.TryGetValue(username, out foundLevel) == true) && (foundLevel >= level))
+					return true;
+
+				// Global user access
+				if ((Configurations.UsersConfig.Instance?.GlobalUserAccess?.UserLevels?.TryGetValue(username, out foundLevel) == true) && (foundLevel >= level))
 					return true;
 			}
 			#endregion
@@ -54,8 +59,13 @@ namespace Docomb.WebCore.Authentication
 
 			#region Username match
 			{
+				// Fixed user access (can't be altered)
 				AccessLevel foundLevel = AccessLevel.None;
 				if ((Configurations.MainConfig.Instance?.Authentication?.FixedUserAccess?.UserLevels?.TryGetValue(username, out foundLevel) == true) && (foundLevel > level))
+					level = foundLevel;
+
+				// Global user access
+				if ((Configurations.UsersConfig.Instance?.GlobalUserAccess?.UserLevels?.TryGetValue(username, out foundLevel) == true) && (foundLevel > level))
 					level = foundLevel;
 			}
 			#endregion

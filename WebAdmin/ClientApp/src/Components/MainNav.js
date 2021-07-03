@@ -85,8 +85,10 @@ export class MainNav extends Component {
         }
         this.instanceData.forceRefresh = false;
         return (React.createElement(Pivot, null,
-            React.createElement(PivotItem, { headerText: "Content" }, content),
-            React.createElement(PivotItem, { headerText: "Options", hidden: true }, "Workspace options")));
+            React.createElement(PivotItem, { headerText: "Content" }, content)));
+        //			<PivotItem headerText="Options" hidden={true} >
+        //				Workspace options
+        //			</PivotItem>
     }
     static itemChildrenToLinks(items, currentUrl) {
         if (!Utils.arrayHasValues(items))

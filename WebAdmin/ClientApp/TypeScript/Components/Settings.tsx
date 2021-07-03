@@ -12,7 +12,7 @@ export class Settings extends Component {
 
 	render() {
 		return (
-			<Layout showMainNav={false}>
+			<Layout mainNavType="settings">
 				<div className="adminHome emptyPage">
 					<div className="watermark"><FontIcon iconName="Settings" /></div>
 				</div>

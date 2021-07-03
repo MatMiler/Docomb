@@ -312,6 +312,8 @@ html .sideBarItem.selected a:before {
   .pageGrid .pageContent {
     flex: 1 1 100%;
     overflow: auto; }
+    .pageGrid .pageContent > .loadingSpinner {
+      padding: 20px; }
   .pageGrid .pageTitle + .pageCommands {
     margin-top: -10px; }
   .pageGrid .pageTitle + .pageContent, .pageGrid .pageCommands + .pageContent {
@@ -477,6 +479,15 @@ html .sideBarItem.selected a:before {
       overflow: auto;
       padding: 32px;
       background-color: transparent; }
+
+.usersEditor {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column; }
+  .usersEditor .list {
+    flex: 1 1 100%;
+    position: relative; }
 
 .invisibleUploadInput {
   width: 0;

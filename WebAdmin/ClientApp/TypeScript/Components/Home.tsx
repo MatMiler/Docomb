@@ -12,7 +12,7 @@ export class Home extends Component {
 
 	render() {
 		return (
-			<Layout showMainNav={false}>
+			<Layout mainNavType={null}>
 				<div className="adminHome emptyPage">
 					<div className="watermark"><FontIcon iconName="Library" /></div>
 				</div>

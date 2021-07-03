@@ -181,7 +181,7 @@ export var Utils;
     }
     Utils.lastStringPart = lastStringPart;
     //#endregion
-    //#region Arrays & Objects
+    //#region Paths
     function padWithSlash(value, atStart = true, atEnd = true) {
         value = trimString(value, "");
         if ((atStart == true) && (!value.startsWith("/")))
@@ -329,6 +329,24 @@ export var Utils;
         return list;
     }
     Utils.mapArray = mapArray;
+    function mapObjectValues(data, conversion, validation = null, includeNull = false) {
+        let o = {};
+        if (data == null)
+            return o;
+        for (let key in data) {
+            let value = null;
+            try {
+                value = conversion(data[key]);
+            }
+            catch (e) { }
+            if ((validation != null) && (validation(value) != true))
+                value = null;
+            if ((includeNull == true) || (value != null))
+                o[key] = value;
+        }
+        return o;
+    }
+    Utils.mapObjectValues = mapObjectValues;
     /**
      * Get array of all keys in an object
      * @param object Object from which to extract keys
@@ -364,6 +382,47 @@ export var Utils;
         return false;
     }
     Utils.hasObjectKey = hasObjectKey;
+    /**
+     * Convert all properties of an object into an array of values
+     * @param data
+     * @param conversion
+     * @param validation
+     * @param includeNull
+     */
+    function objectToArray(data, conversion, validation = null, includeNull = false) {
+        let list = [];
+        if (data == null)
+            return list;
+        for (let key in data) {
+            let value = null;
+            try {
+                value = conversion(key, data[key]);
+            }
+            catch (e) { }
+            if ((validation != null) && (validation(value) != true))
+                value = null;
+            if ((includeNull == true) || (value != null))
+                list.push(value);
+        }
+        return list;
+    }
+    Utils.objectToArray = objectToArray;
+    /**
+     * Generate a hash code from an object
+     * @param o Object from which to generate hash code
+     */
+    function hashCode(o) {
+        let s = JSON.stringify(o);
+        let hash = 0;
+        if (s.length === 0)
+            return hash;
+        for (let x = 0; x < s.length; x++) {
+            hash = ((hash << 5) - hash) + (s.charCodeAt(x));
+            hash |= 0;
+        }
+        return hash;
+    }
+    Utils.hashCode = hashCode;
     //#endregion
     //#region Try get property
     /**

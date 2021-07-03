@@ -76,6 +76,7 @@ namespace Docomb.WebCore.Authentication
 
 		public List<IScheme> Schemes { get; private set; }
 
+		/// <summary>User access list defined in config.json; Cannot be programmatically altered</summary>
 		internal UserAccessStorage FixedUserAccess { get; private set; }
 
 	}
