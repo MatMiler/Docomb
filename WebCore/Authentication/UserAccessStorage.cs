@@ -25,52 +25,71 @@ namespace Docomb.WebCore.Authentication
 
 		public void LoadData(IConfigurationSection configSource)
 		{
-			Dictionary<string, AccessLevel> dict = new();
+			Dictionary<string, AccessLevel> usernames = new();
+			Dictionary<AccessLevel, List<WildcardUserDefinition>> wildcards = new();
 
-			AddUserLevels(configSource?.GetSection("none")?.GetChildren()?.Select(x => x.Value), dict, AccessLevel.None);
-			AddUserLevels(configSource?.GetSection("reader")?.GetChildren()?.Select(x => x.Value), dict, AccessLevel.Reader);
-			AddUserLevels(configSource?.GetSection("editor")?.GetChildren()?.Select(x => x.Value), dict, AccessLevel.Editor);
-			AddUserLevels(configSource?.GetSection("admin")?.GetChildren()?.Select(x => x.Value), dict, AccessLevel.Admin);
+			AddUserLevels(configSource?.GetSection("none")?.GetChildren()?.Select(x => x.Value), usernames, wildcards, AccessLevel.None);
+			AddUserLevels(configSource?.GetSection("reader")?.GetChildren()?.Select(x => x.Value), usernames, wildcards, AccessLevel.Reader);
+			AddUserLevels(configSource?.GetSection("editor")?.GetChildren()?.Select(x => x.Value), usernames, wildcards, AccessLevel.Editor);
+			AddUserLevels(configSource?.GetSection("admin")?.GetChildren()?.Select(x => x.Value), usernames, wildcards, AccessLevel.Admin);
 
-			_userLevels = dict;
+			_userLevels = usernames;
+			_wildcardLevels = wildcards;
 		}
 
 		public void LoadData(JsonStructure jsonStructure)
 		{
-			Dictionary<string, AccessLevel> dict = new();
+			Dictionary<string, AccessLevel> usernames = new();
+			Dictionary<AccessLevel, List<WildcardUserDefinition>> wildcards = new();
 
-			AddUserLevels(jsonStructure?.None, dict, AccessLevel.None);
-			AddUserLevels(jsonStructure?.Reader, dict, AccessLevel.Reader);
-			AddUserLevels(jsonStructure?.Editor, dict, AccessLevel.Editor);
-			AddUserLevels(jsonStructure?.Admin, dict, AccessLevel.Admin);
+			AddUserLevels(jsonStructure?.None, usernames, wildcards, AccessLevel.None);
+			AddUserLevels(jsonStructure?.Reader, usernames, wildcards, AccessLevel.Reader);
+			AddUserLevels(jsonStructure?.Editor, usernames, wildcards, AccessLevel.Editor);
+			AddUserLevels(jsonStructure?.Admin, usernames, wildcards, AccessLevel.Admin);
 
-			_userLevels = dict;
+			_userLevels = usernames;
+			_wildcardLevels = wildcards;
 		}
 
-		private void AddUserLevels(IEnumerable<string> list, Dictionary<string, AccessLevel> dict, AccessLevel level)
+		private void AddUserLevels(IEnumerable<string> list, Dictionary<string, AccessLevel> usernames, Dictionary<AccessLevel, List<WildcardUserDefinition>> wildcards, AccessLevel level)
 		{
-			//List<string> list = usersSection?.GetChildren()?.Select(x => x.Value)?.ToList();
-
 			if (list?.Count() > 0)
 			{
 				foreach (string username in list)
 				{
-					if (dict.ContainsKey(username))
+					if ((username.Contains("*")) || (username.Contains("?")))
+					#region Wildcard
 					{
-						if (!(dict[username] >= level))
-							dict[username] = level;
+						if (!wildcards.ContainsKey(level))
+							wildcards.Add(level, new());
+						else
+							wildcards[level] ??= new();
+						wildcards[level].Add(new(username));
 					}
+					#endregion
 					else
+					#region Username
 					{
-						dict.Add(username, level);
+						if (usernames.ContainsKey(username))
+						{
+							if (!(usernames[username] >= level))
+								usernames[username] = level;
+						}
+						else
+						{
+							usernames.Add(username, level);
+						}
 					}
+					#endregion
 				}
 			}
-
 		}
 
 		public Dictionary<string, AccessLevel> UserLevels { get => _userLevels; }
 		private Dictionary<string, AccessLevel> _userLevels = null;
+
+		public Dictionary<AccessLevel, List<WildcardUserDefinition>> WildcardLevels { get => _wildcardLevels; }
+		private Dictionary<AccessLevel, List<WildcardUserDefinition>> _wildcardLevels = null;
 
 
 

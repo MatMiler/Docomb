@@ -47,6 +47,21 @@ namespace Docomb.WebCore.Authentication
 			}
 			#endregion
 
+			#region Wildcards
+			if (Configurations.UsersConfig.Instance?.GlobalUserAccess?.WildcardLevels?.Count > 0)
+			{
+				foreach (KeyValuePair<AccessLevel, List<WildcardUserDefinition>> group in Configurations.UsersConfig.Instance.GlobalUserAccess.WildcardLevels)
+				{
+					if (group.Key < level) continue;
+					foreach (WildcardUserDefinition definition in group.Value)
+					{
+						if (definition?.Pattern?.IsMatch(username) == true)
+							return true;
+					}
+				}
+			}
+			#endregion
+
 			return false;
 		}
 
@@ -59,14 +74,42 @@ namespace Docomb.WebCore.Authentication
 
 			#region Username match
 			{
+				bool hasFound = false;
+
 				// Fixed user access (can't be altered)
 				AccessLevel foundLevel = AccessLevel.None;
 				if ((Configurations.MainConfig.Instance?.Authentication?.FixedUserAccess?.UserLevels?.TryGetValue(username, out foundLevel) == true) && (foundLevel > level))
+				{
 					level = foundLevel;
+					hasFound = true;
+				}
 
 				// Global user access
 				if ((Configurations.UsersConfig.Instance?.GlobalUserAccess?.UserLevels?.TryGetValue(username, out foundLevel) == true) && (foundLevel > level))
+				{
 					level = foundLevel;
+					hasFound = true;
+				}
+
+				// Exact username match takes priority over wildcard
+				if (hasFound) return level;
+			}
+			#endregion
+
+			#region Wildcards
+			if (Configurations.UsersConfig.Instance?.GlobalUserAccess?.WildcardLevels?.Count > 0)
+			{
+				foreach (KeyValuePair<AccessLevel, List<WildcardUserDefinition>> group in Configurations.UsersConfig.Instance.GlobalUserAccess.WildcardLevels)
+				{
+					if (group.Key <= level) continue;
+					foreach (WildcardUserDefinition definition in group.Value)
+					{
+						if (definition?.Pattern?.IsMatch(username) == true)
+						{
+							level = group.Key;
+						}
+					}
+				}
 			}
 			#endregion
 
