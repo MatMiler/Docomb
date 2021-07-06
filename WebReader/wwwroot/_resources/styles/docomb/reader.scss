@@ -1,4 +1,8 @@
-﻿// Style reset & basics
+﻿@import "shared/theme.scss";
+
+
+
+// Style reset & basics
 body { border: none; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; min-height: 100vh; }
 h1, h2, h3, h4, h5, h6 { margin: 30px 0 15px 0; padding: 0; }
 h1 + h2, h1 + h3, h1 + h4, h1 + h5, h1 + h6,
@@ -14,32 +18,6 @@ figure > img { display: block; }
 ul, ol { margin-left: 30px; }
 li > ul, li > ol { margin-top: 0; margin-bottom: 0; }
 
-
-
-
-
-// Light/Dark theme setting and mixins
-$bgColor: ( 'dark': #222, 'light': #fff );
-$textColor: ( 'dark': #fff, 'light': #000 );
-$textColorLight: ( 'dark': #ccc, 'light': #666 );
-$menuBackgroundColor: ( 'dark': #444, 'light': #ddd );
-$menuBorderColor: ( 'dark': #666, 'light': #bbb );
-$linkColor: ( 'dark': #0bf, 'light': #36c );
-
-
-$codeHighlightBlack: $textColor;
-$codeHighlightGreen: ( 'dark': #57a64a, 'light': #008000 );
-$codeHighlightBlue: ( 'dark': #c8c8c8, 'light': #00f );
-$codeHighlightDullRed: ( 'dark': #d69d85, 'light': #a31515 );
-$codeHighlightRed: ( 'dark': #9cdcfe, 'light': #f00 );
-$codeHighlightGray: ( 'dark': #ffd68f, 'light': #808080 );
-$codeHighlightMediumTurquoise: ( 'dark': #4ec9b0, 'light': #48d1cc );
-$codeHighlightMagenta: ( 'dark': #c975d5, 'light': #f0f );
-$codeHighlightPowderBlue: ( 'dark': #92caf4, 'light': #b0e0e6 );
-$codeHighlightTeal: ( 'dark': #468cc6, 'light': #008080 );
-$codeHighlightOrangeRed: ( 'dark': #8c2f2f, 'light': #ff4500 );
-$codeHighlightNavy: ( 'dark': #468cc6, 'light': #000080 );
-$codeHighlightPurple: ( 'dark': #4ec9b0, 'light': #800080 );
 
 
 $tabletWidth: 800px;
@@ -237,3 +215,7 @@ main
 
 
 
+
+
+
+@import "auth.scss";

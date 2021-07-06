@@ -1,6 +1,7 @@
 ﻿using Docomb.CommonCore;
 using Docomb.ContentStorage;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,9 @@ namespace Docomb.WebReader
 		[HttpGet("/{**itemPath}")]
 		public IActionResult ViewContentItem(string itemPath)
 		{
+			if (!WebCore.Authentication.Access.HasAccess(User, WebCore.Authentication.AccessLevel.Reader))
+				return Redirect($"/account/login");
+
 			(Workspace workspace, List<string> remainingPath) = Docomb.WebCore.Configurations.WorkspacesConfig.FindFromPath(itemPath);
 			if ((workspace != null) && (remainingPath != null))
 			{
@@ -26,10 +30,6 @@ namespace Docomb.WebReader
 				}
 			}
 
-			// TODO: Redirect to an alternative URL (parent, root)
-
-			//return View();
-			//return Content($"No content at '{itemPath}'");
 			if (string.IsNullOrEmpty(itemPath?.Trim('/')))
 				return View("~/Areas/Reader/Pages/WorkspaceList.cshtml");
 			else
@@ -38,13 +38,12 @@ namespace Docomb.WebReader
 
 
 
-		[HttpGet("/__file/{**itemPath}")]
-		public IActionResult ViewContentFile(string itemPath, Workspace workspace = null, ContentFile file = null, List<string> remainingPath = null)
+		private IActionResult ViewContentFile(string itemPath, Workspace workspace = null, ContentFile file = null, List<string> remainingPath = null)
 		{
 			if (workspace == null) (workspace, remainingPath) = Docomb.WebCore.Configurations.WorkspacesConfig.FindFromPath(itemPath);
-			if (workspace == null) return Content($"No workspace at '{string.Join('/', remainingPath)}'");
+			if (workspace == null) return NotFound();
 			file ??= workspace.Content.FindItem(remainingPath, MatchType.Logical)?.AsFile;
-			if (file == null) return Content($"No content file at '{string.Join('/', remainingPath)}'");
+			if (file == null) return NotFound();
 
 
 			if ((itemPath?.Length > 0) && (!itemPath.EndsWith('/')) && (file.NeedsTrailingSlash))
@@ -59,31 +58,28 @@ namespace Docomb.WebReader
 			switch (file.FileType)
 			{
 				case FileType.Markdown:
-				case FileType.Html:
 				case FileType.PlainText:
 					return View("~/Areas/Reader/Pages/Article.cshtml", new ViewModels.Article(itemPath, workspace, file, remainingPath, ViewBag));
-				//case FileType.Html: return Content(file.TextContent, contentType: Docomb.ContentStorage.FormatInfo.HtmlInfo.MediaType);
 			}
 
 
+			var fileTypeProvider = new FileExtensionContentTypeProvider();
+			if (fileTypeProvider.TryGetContentType(file.FileName, out string contentType))
+				return PhysicalFile(file.FilePath, contentType);
 
-
-
-			return Content($"Workspace '{workspace.Name}', path '{string.Join('/', file.UrlParts)}', content '{file.FilePath}' ({file.FileType})");
+			return BadRequest();
 		}
 
 
 
-		[HttpGet("/__file/{**itemPath}")]
-		public IActionResult ViewContentDirectory(string itemPath, Workspace workspace = null, ContentDirectory directory = null, List<string> remainingPath = null)
+		private IActionResult ViewContentDirectory(string itemPath, Workspace workspace = null, ContentDirectory directory = null, List<string> remainingPath = null)
 		{
 			if (workspace == null) (workspace, remainingPath) = Docomb.WebCore.Configurations.WorkspacesConfig.FindFromPath(itemPath);
-			if (workspace == null) return NotFound(); // Content($"No workspace at '{string.Join('/', remainingPath)}'");
+			if (workspace == null) return NotFound();
 			directory ??= workspace.Content.FindItem(remainingPath, MatchType.Logical)?.AsDirectory;
-			if (directory == null) return NotFound(); //Content($"No content directory at '{string.Join('/', remainingPath)}'");
+			if (directory == null) return NotFound();
 
 			return View("~/Areas/Reader/Pages/Directory.cshtml", new ViewModels.DirectoryList(itemPath, workspace, directory, remainingPath, ViewBag));
-			//return Content($"Workspace '{workspace.Name}', URL path '{string.Join('/', directory.UrlParts)}', directory content '{directory.FilePath}'");
 		}
 
 
