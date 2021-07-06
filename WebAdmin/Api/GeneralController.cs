@@ -33,14 +33,5 @@ namespace Docomb.WebAdmin.Api
 			return data;
 		}
 
-
-		[HttpGet("userInfo")]
-		public UserInfo UserInfo()
-		{
-			return new UserInfo(User);
-		}
-
 	}
-
-
 }

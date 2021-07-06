@@ -1,4 +1,5 @@
 ﻿import { Apis } from "./Apis";
+import { SessionCache } from "./SessionCache";
 import { Utils } from "./Utils";
 
 
@@ -34,7 +35,7 @@ export module Users {
 	}
 
 	export async function loadUserInfo(): Promise<UserInfo> {
-		let data: any = await Apis.fetchJsonAsync("api/general/userInfo", true);
+		let data: any = await Apis.fetchJsonAsync("api/users/userInfo", true);
 		let item: UserInfo = new UserInfo(data);
 		return (item != null) ? item : null;
 	}
@@ -43,9 +44,38 @@ export module Users {
 	export type UserLevels = { [key: string]: UserAccessLevel };
 
 	export async function loadGlobalUsers(): Promise<Apis.DataWithStatus<UserLevels>> {
-		let source: any = await Apis.fetchJsonAsync("api/users/globalUsers", true);
+		let source: any = await Apis.fetchJsonAsync("api/users/globalUsers/list", true);
 		let actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
 		let list: UserLevels = Utils.mapObjectValues<UserAccessLevel>(Utils.tryGet(source, "data"), x => Utils.parseEnum(x, UserAccessLevel, UserAccessLevel.None), null, false);
+		return new Apis.DataWithStatus(actionStatus, list);
+	}
+
+
+	export class UserChange {
+		public username: string;
+		public accessLevel: UserAccessLevel;
+		public change: UserChangeCommand;
+
+		public constructor(username: string, accessLevel: UserAccessLevel, change: UserChangeCommand) {
+			this.username = username;
+			this.accessLevel = accessLevel;
+			this.change = change;
+		}
+	}
+
+	export enum UserChangeCommand {
+		None = "None",
+		Add = "Add",
+		Update = "Update",
+		Remove = "Remove"
+	}
+
+
+	export async function changeGlobalUsers(changes: UserChange[]): Promise<Apis.DataWithStatus<UserLevels>> {
+		let source = await Apis.postJsonAsync("api/users/globalUsers/update", changes);
+		let actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
+		let list: UserLevels = Utils.mapObjectValues<UserAccessLevel>(Utils.tryGet(source, "data"), x => Utils.parseEnum(x, UserAccessLevel, UserAccessLevel.None), null, false);
+		SessionCache.remove("api/users/globalUsers/list");
 		return new Apis.DataWithStatus(actionStatus, list);
 	}
 

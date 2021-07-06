@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { Apis } from "./Apis";
+import { SessionCache } from "./SessionCache";
 import { Utils } from "./Utils";
 export var Users;
 (function (Users) {
@@ -39,7 +40,7 @@ export var Users;
     Users.UserInfo = UserInfo;
     function loadUserInfo() {
         return __awaiter(this, void 0, void 0, function* () {
-            let data = yield Apis.fetchJsonAsync("api/general/userInfo", true);
+            let data = yield Apis.fetchJsonAsync("api/users/userInfo", true);
             let item = new UserInfo(data);
             return (item != null) ? item : null;
         });
@@ -47,12 +48,37 @@ export var Users;
     Users.loadUserInfo = loadUserInfo;
     function loadGlobalUsers() {
         return __awaiter(this, void 0, void 0, function* () {
-            let source = yield Apis.fetchJsonAsync("api/users/globalUsers", true);
+            let source = yield Apis.fetchJsonAsync("api/users/globalUsers/list", true);
             let actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
             let list = Utils.mapObjectValues(Utils.tryGet(source, "data"), x => Utils.parseEnum(x, UserAccessLevel, UserAccessLevel.None), null, false);
             return new Apis.DataWithStatus(actionStatus, list);
         });
     }
     Users.loadGlobalUsers = loadGlobalUsers;
+    class UserChange {
+        constructor(username, accessLevel, change) {
+            this.username = username;
+            this.accessLevel = accessLevel;
+            this.change = change;
+        }
+    }
+    Users.UserChange = UserChange;
+    let UserChangeCommand;
+    (function (UserChangeCommand) {
+        UserChangeCommand["None"] = "None";
+        UserChangeCommand["Add"] = "Add";
+        UserChangeCommand["Update"] = "Update";
+        UserChangeCommand["Remove"] = "Remove";
+    })(UserChangeCommand = Users.UserChangeCommand || (Users.UserChangeCommand = {}));
+    function changeGlobalUsers(changes) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let source = yield Apis.postJsonAsync("api/users/globalUsers/update", changes);
+            let actionStatus = new Apis.ActionStatus(Utils.tryGet(source, "actionStatus"));
+            let list = Utils.mapObjectValues(Utils.tryGet(source, "data"), x => Utils.parseEnum(x, UserAccessLevel, UserAccessLevel.None), null, false);
+            SessionCache.remove("api/users/globalUsers/list");
+            return new Apis.DataWithStatus(actionStatus, list);
+        });
+    }
+    Users.changeGlobalUsers = changeGlobalUsers;
 })(Users || (Users = {}));
 //# sourceMappingURL=Users.js.map

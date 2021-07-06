@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Docomb.WebAdmin.Authentication
+namespace Docomb.WebAdmin.Controllers
 {
 	[Route(AdminConfig.UrlPathPrefix + "/account")]
 	public class AuthenticationController : Controller

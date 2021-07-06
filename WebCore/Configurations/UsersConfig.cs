@@ -1,9 +1,11 @@
-﻿using Docomb.WebCore.Authentication;
+﻿using Docomb.CommonCore;
+using Docomb.WebCore.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Docomb.WebCore.Authentication.UserAccessStorage;
 
 namespace Docomb.WebCore.Configurations
 {
@@ -50,6 +52,27 @@ namespace Docomb.WebCore.Configurations
 		public UserAccessStorage GlobalUserAccess => _globalUserAccess;
 		private UserAccessStorage _globalUserAccess = null;
 
+
+
+
+		private readonly object _updateLock = new();
+		public ActionStatus UpdateUsersBulk(List<UserChangeItem> changes)
+		{
+			if ((changes == null) || (changes.Count <= 0)) return new ActionStatus(ActionStatus.StatusCode.OK);
+			try
+			{
+				lock (_updateLock)
+				{
+					_globalUserAccess.UpdateUsersBulk(changes);
+					SaveConfig();
+				}
+				return new ActionStatus(ActionStatus.StatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return new ActionStatus(ActionStatus.StatusCode.Error, exception: e);
+			}
+		}
 
 	}
 }

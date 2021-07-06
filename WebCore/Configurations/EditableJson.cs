@@ -87,24 +87,26 @@ namespace Docomb.WebCore.Configurations
 			 * 3. Create a new main config file and save content into it
 			 */
 
+			string runtimeDirectory = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
 			string renameTo = null;
 			bool isLastBackupFile = true;
 
 			for (int x = FileNameBackupQueue.Count - 1; x >= 0; x--)
 			{
-				string fileName = FileNameBackupQueue[x];
-				if (File.Exists(fileName))
+				string filePath = Path.Combine(runtimeDirectory, FileNameBackupQueue[x]);
+				if (File.Exists(filePath))
 				{
 					if (isLastBackupFile)
-					{ File.Delete(fileName); }
+					{ File.Delete(filePath); }
 					else if (renameTo != null)
-					{ File.Move(fileName, renameTo); }
+					{ File.Move(filePath, renameTo); }
 				}
-				renameTo = fileName;
+				renameTo = filePath;
 				isLastBackupFile = false;
 			}
 
-			File.WriteAllText(FileName, content, Encoding.UTF8);
+			string fullPath = Path.Combine(runtimeDirectory, FileName);
+			File.WriteAllText(fullPath, content, Encoding.UTF8);
 		}
 
 
