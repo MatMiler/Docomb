@@ -267,6 +267,23 @@ header {
     @media not all and (min-width: 800px) {
       header .pageTitle {
         padding: 10px; } }
+    header .pageTitle .user {
+      font-size: 12px;
+      padding: 0 0 5px 15px;
+      float: right;
+      position: relative;
+      z-index: 2; }
+      html header .pageTitle .user .command {
+        color: #666; }
+      .dark header .pageTitle .user .command {
+        color: #999; }
+      @media (prefers-color-scheme: dark) {
+        html header .pageTitle .user .command {
+          color: #999; }
+        .light header .pageTitle .user .command {
+          color: #666; } }
+      header .pageTitle .user .command a {
+        color: inherit; }
     header .pageTitle .breadcrumbs {
       margin: -5px;
       position: relative;
@@ -275,10 +292,10 @@ header {
       html header .pageTitle .breadcrumbs {
         color: #666; }
       .dark header .pageTitle .breadcrumbs {
-        color: #ccc; }
+        color: #999; }
       @media (prefers-color-scheme: dark) {
         html header .pageTitle .breadcrumbs {
-          color: #ccc; }
+          color: #999; }
         .light header .pageTitle .breadcrumbs {
           color: #666; } }
       header .pageTitle .breadcrumbs a {
@@ -400,10 +417,10 @@ main hr {
   html main hr {
     border-top-color: #666; }
   .dark main hr {
-    border-top-color: #ccc; }
+    border-top-color: #999; }
   @media (prefers-color-scheme: dark) {
     html main hr {
-      border-top-color: #ccc; }
+      border-top-color: #999; }
     .light main hr {
       border-top-color: #666; } }
 
@@ -446,12 +463,12 @@ html main table th {
   background: #eee; }
 
 .dark main table th {
-  border-bottom-color: #ccc;
+  border-bottom-color: #999;
   background: #333; }
 
 @media (prefers-color-scheme: dark) {
   html main table th {
-    border-bottom-color: #ccc;
+    border-bottom-color: #999;
     background: #333; }
   .light main table th {
     border-bottom-color: #666;
@@ -558,10 +575,10 @@ html main table th {
       html .authPage .loginSchemeSelection .label {
         color: #666; }
       .dark .authPage .loginSchemeSelection .label {
-        color: #ccc; }
+        color: #999; }
       @media (prefers-color-scheme: dark) {
         html .authPage .loginSchemeSelection .label {
-          color: #ccc; }
+          color: #999; }
         .light .authPage .loginSchemeSelection .label {
           color: #666; } }
     .authPage .loginSchemeSelection .schemes {

@@ -1,5 +1,6 @@
 ﻿using Docomb.CommonCore;
 using Docomb.ContentStorage;
+using Docomb.WebCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using System;
@@ -30,6 +31,7 @@ namespace Docomb.WebReader
 				}
 			}
 
+			ViewBag.User = new UserInfo(User);
 			if (string.IsNullOrEmpty(itemPath?.Trim('/')))
 				return View("~/Areas/Reader/Pages/WorkspaceList.cshtml");
 			else
@@ -59,7 +61,7 @@ namespace Docomb.WebReader
 			{
 				case FileType.Markdown:
 				case FileType.PlainText:
-					return View("~/Areas/Reader/Pages/Article.cshtml", new ViewModels.Article(itemPath, workspace, file, remainingPath, ViewBag));
+					return View("~/Areas/Reader/Pages/Article.cshtml", new ViewModels.Article(itemPath, workspace, file, remainingPath, ViewBag, User));
 			}
 
 
@@ -79,7 +81,7 @@ namespace Docomb.WebReader
 			directory ??= workspace.Content.FindItem(remainingPath, MatchType.Logical)?.AsDirectory;
 			if (directory == null) return NotFound();
 
-			return View("~/Areas/Reader/Pages/Directory.cshtml", new ViewModels.DirectoryList(itemPath, workspace, directory, remainingPath, ViewBag));
+			return View("~/Areas/Reader/Pages/Directory.cshtml", new ViewModels.DirectoryList(itemPath, workspace, directory, remainingPath, ViewBag, User));
 		}
 
 

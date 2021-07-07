@@ -128,6 +128,9 @@ header {
 	}
 	.pageTitle {
 		@include padding;
+		.user { font-size: 12px; padding: 0 0 5px 15px; float: right; position: relative; z-index: 2;
+			.command { @include themeMap("color", $textColorLight); a { color: inherit; } }
+		}
 		.breadcrumbs {
 			margin: -5px; position: relative; z-index: 1; font-size: 12px; @include themeMap("color", $textColorLight);
 			a { color: inherit; display: inline-block; padding: 5px; text-decoration: none; font-weight: 500; }
