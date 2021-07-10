@@ -1,0 +1,10 @@
+﻿@if ((Docomb.WebCore.Configurations.MainConfig.Instance.Authentication.AuthorizeReader) || (User?.Identity?.IsAuthenticated == true))
+{
+<div class="user">
+	<span class="name" title="@ViewBag.User?.Username">@ViewBag.User?.Name</span>
+	@if ((ViewBag.User?.AccessLevel >= Docomb.WebCore.Authentication.AccessLevel.Editor)) {
+		<span class="command"><a href="/_admin/@((string.IsNullOrEmpty(ViewBag.ItemPath)) ? "" : "workspace/" + ViewBag.ItemPath)">Admin</a></span>
+	}
+	<span class="command"><a href="/account/logout">Log out</a></span>
+</div>
+}

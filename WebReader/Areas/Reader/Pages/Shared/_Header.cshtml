@@ -11,13 +11,7 @@
 
 	<div class="pageTitle">
 		@{ List<Docomb.ContentStorage.ContentItemSummary> parents = ViewBag.Context?.GetParents(); }
-		@if (Docomb.WebCore.Configurations.MainConfig.Instance.Authentication.AuthorizeReader)
-		{
-			<div class="user">
-				<span class="name" title="@ViewBag.User?.Username">@ViewBag.User?.Name</span>
-				<span class="command"><a href="/account/logout">Log out</a></span>
-			</div>
-		}
+		@Html.Partial("~/Areas/Reader/Pages/Shared/_User.cshtml")
 		@if (parents?.Count > 0)
 		{
 			<nav class="breadcrumbs">

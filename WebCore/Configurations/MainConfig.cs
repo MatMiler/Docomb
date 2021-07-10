@@ -80,5 +80,20 @@ namespace Docomb.WebCore.Configurations
 
 		#endregion
 
+
+		#region Info for reader-editor interaction
+
+		public bool HasAdmin { get; private set; } = false;
+		public void SetHasAdmin(bool value) => HasAdmin = value;
+
+		public string AdminUrl { get; private set; } = "/_admin/";
+		public void SetAdminUrl(string value) => AdminUrl = value;
+
+		public bool HasReader { get; private set; } = false;
+		public void SetHasReader(bool value) => HasReader = value;
+
+		#endregion
+
+
 	}
 }

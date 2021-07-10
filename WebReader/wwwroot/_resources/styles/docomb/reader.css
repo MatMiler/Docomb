@@ -273,17 +273,21 @@ header {
       float: right;
       position: relative;
       z-index: 2; }
-      html header .pageTitle .user .command {
-        color: #666; }
-      .dark header .pageTitle .user .command {
-        color: #999; }
-      @media (prefers-color-scheme: dark) {
+      header .pageTitle .user .name {
+        font-weight: bold; }
+      header .pageTitle .user .command {
+        margin-left: 5px; }
         html header .pageTitle .user .command {
+          color: #666; }
+        .dark header .pageTitle .user .command {
           color: #999; }
-        .light header .pageTitle .user .command {
-          color: #666; } }
-      header .pageTitle .user .command a {
-        color: inherit; }
+        @media (prefers-color-scheme: dark) {
+          html header .pageTitle .user .command {
+            color: #999; }
+          .light header .pageTitle .user .command {
+            color: #666; } }
+        header .pageTitle .user .command a {
+          color: inherit; }
     header .pageTitle .breadcrumbs {
       margin: -5px;
       position: relative;

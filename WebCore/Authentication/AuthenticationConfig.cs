@@ -5,6 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 
 namespace Docomb.WebCore.Authentication
 {
@@ -79,5 +83,26 @@ namespace Docomb.WebCore.Authentication
 		/// <summary>User access list defined in config.json; Cannot be programmatically altered</summary>
 		internal UserAccessStorage FixedUserAccess { get; private set; }
 
+
+
+		private bool _authenticationsWereAdded = false;
+
+		public void AddAuthentications(IServiceCollection services, string loginUrl)
+		{
+			if (_authenticationsWereAdded) return;
+
+			List<IScheme> schemes = Configurations.MainConfig.Instance.Authentication.Schemes;
+			if (schemes?.Count > 0)
+			{
+				AuthenticationBuilder builder = services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme);
+				builder.AddCookie(item => item.LoginPath = new PathString(loginUrl));
+				foreach (var scheme in schemes)
+				{
+					scheme.AddToBuilder(builder);
+				}
+			}
+
+			_authenticationsWereAdded = true;
+		}
 	}
 }

@@ -17,8 +17,12 @@ namespace Docomb.WebReader
 		[HttpGet("/{**itemPath}")]
 		public IActionResult ViewContentItem(string itemPath)
 		{
-			if (!WebCore.Authentication.Access.HasAccess(User, WebCore.Authentication.AccessLevel.Reader))
+			UserInfo userInfo = new UserInfo(User);
+			if (userInfo?.AccessLevel < AccessLevel.Reader)
 				return Redirect($"/account/login");
+
+			ViewBag.User = userInfo;
+			ViewBag.ItemPath = itemPath;
 
 			(Workspace workspace, List<string> remainingPath) = Docomb.WebCore.Configurations.WorkspacesConfig.FindFromPath(itemPath);
 			if ((workspace != null) && (remainingPath != null))
@@ -31,7 +35,8 @@ namespace Docomb.WebReader
 				}
 			}
 
-			ViewBag.User = new UserInfo(User);
+			ViewBag.ItemPath = null;
+
 			if (string.IsNullOrEmpty(itemPath?.Trim('/')))
 				return View("~/Areas/Reader/Pages/WorkspaceList.cshtml");
 			else
