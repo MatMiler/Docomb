@@ -96,20 +96,63 @@ namespace Docomb.ContentStorage.Workspaces
 		public void RemoveDirectory(string path, ActionContext context)
 		{
 			if (!IsValid) return;
+			string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
+			RepositoryStatus status = Repository.RetrieveStatus(new StatusOptions() {
+				DetectRenamesInWorkDir = true,
+				DetectRenamesInIndex = true,
+				PathSpec = new string[] { relativePath },
+				IncludeUntracked = true,
+				RecurseUntrackedDirs = true
+			});
+			if (status?.Count() > 0)
+			{
+				//Commands.Stage(Repository, status.Select(x => x.FilePath));
+				foreach (var entry in status)
+				{
+					Commands.Stage(Repository, entry.FilePath);
+				}
+			}
+			Commit($"Removed '{relativePath}'", context);
 		}
 
-		public void MoveFile(string oldPath, string newPath, ActionContext context)
+		public bool MoveFile(string oldPath, string newPath, ActionContext context)
+		{
+			if (!IsValid) return false;
+			try
+			{
+				string relativeOldPath = Path.GetRelativePath(Workspace.ContentStoragePath, oldPath);
+				string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
+				Commands.Move(Repository, relativeOldPath, relativeNewPath);
+				Commit($"Renamed/Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
+				return true;
+			}
+			catch
+			{
+				return false;
+			}
+		}
+
+		public void MoveDirectory(string oldPath, string newPath, ActionContext context)
 		{
 			if (!IsValid) return;
 			string relativeOldPath = Path.GetRelativePath(Workspace.ContentStoragePath, oldPath);
 			string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
-			Commands.Move(Repository, relativeOldPath, relativeNewPath);
-			Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
-		}
-
-		public void RenameDirectory(string path)
-		{
-			if (!IsValid) return;
+			RepositoryStatus status = Repository.RetrieveStatus(new StatusOptions()
+			{
+				DetectRenamesInWorkDir = true,
+				DetectRenamesInIndex = true,
+				IncludeUntracked = true,
+				RecurseUntrackedDirs = true
+			});
+			if (status?.Count() > 0)
+			{
+				//Commands.Stage(Repository, status.Select(x => x.FilePath));
+				foreach (var entry in status)
+				{
+					Commands.Stage(Repository, entry.FilePath);
+				}
+			}
+			Commit($"Renamed/Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
 		}
 
 

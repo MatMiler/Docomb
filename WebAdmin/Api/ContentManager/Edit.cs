@@ -30,7 +30,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 		public static ActionStatus Save(SaveRequest request, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new ActionStatus(ActionStatus.StatusCode.AccessDenied);
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new ActionStatus(ActionStatus.StatusCode.AccessDenied);
 			if (request == null) return new ActionStatus(ActionStatus.StatusCode.MissingRequestData);
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request.Url);
 			if ((workspace == null) || (remainingPath == null)) return new ActionStatus(ActionStatus.StatusCode.NotFound);
@@ -94,7 +94,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 		public static MoveResponse RenameFile(MoveRequest request, AdminContext context) => RenameFile(request?.Url, request?.FileName, context);
 		public static MoveResponse RenameFile(string url, string newName, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
 			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 			ContentItem item = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical);
@@ -123,7 +123,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 		public static MoveResponse MoveFile(MoveRequest request, AdminContext context) => MoveFile(request?.Url, request?.Parent, context);
 		public static MoveResponse MoveFile(string url, string newParentPath, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
 			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 			ContentItem item = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical);
@@ -156,14 +156,14 @@ namespace Docomb.WebAdmin.Api.ContentManager
 		public static MoveResponse RenameDirectory(MoveRequest request, AdminContext context) => RenameDirectory(request?.Url, request?.FileName, context);
 		public static MoveResponse RenameDirectory(string url, string newName, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
 			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 			ContentItem item = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical);
 			ContentDirectory contentDirectory = item?.AsDirectory;
 			if (contentDirectory == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 
-			ActionStatus status = contentDirectory.Rename(newName) ?? new(ActionStatus.StatusCode.Error);
+			ActionStatus status = contentDirectory.Rename(newName, context.StorageContext) ?? new(ActionStatus.StatusCode.Error);
 			string newUrl = null;
 
 			if (status.IsOk == true)
@@ -185,14 +185,14 @@ namespace Docomb.WebAdmin.Api.ContentManager
 		public static MoveResponse MoveDirectory(MoveRequest request, AdminContext context) => MoveDirectory(request?.Url, request?.Parent, context);
 		public static MoveResponse MoveDirectory(string url, string newParentPath, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
 			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 			ContentItem item = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical);
 			ContentDirectory contentdirectory = item?.AsDirectory;
 			if (contentdirectory == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 
-			ActionStatus status = contentdirectory.Move(newParentPath) ?? new(ActionStatus.StatusCode.Error);
+			ActionStatus status = contentdirectory.Move(newParentPath, context.StorageContext) ?? new(ActionStatus.StatusCode.Error);
 			string newUrl = null;
 
 			if (status.IsOk == true)
@@ -228,7 +228,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 		public static DataWithStatus<ContentItemSummary> CreateFile(CreateFileRequest request, AdminContext context) => CreateFile(request?.Parent, request?.FileName, context);
 		public static DataWithStatus<ContentItemSummary> CreateFile(string parentUrl, string fileName, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(parentUrl);
 			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 			ContentDirectory parent = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsDirectory;
@@ -243,7 +243,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 		public static DataWithStatus<ContentItemSummary> CreateDirectory(CreateFileRequest request, AdminContext context) => CreateDirectory(request?.Parent, request?.FileName, context);
 		public static DataWithStatus<ContentItemSummary> CreateDirectory(string parentUrl, string fileName, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(parentUrl);
 			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 			ContentDirectory parent = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsDirectory;
@@ -291,7 +291,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 		public static DeleteItemResponse DeleteItem(DeleteItemRequest request, AdminContext context) => DeleteItem(request?.Url, context);
 		public static DeleteItemResponse DeleteItem(string url, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
 			if ((workspace == null) || (remainingPath == null)) return new(new ActionStatus(ActionStatus.StatusCode.NotFound));
 			ContentItem item = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical);
@@ -317,7 +317,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			if (item.Type == ContentItemType.File)
 				status = item.AsFile?.Delete(context.StorageContext);
 			else if (item.Type == ContentItemType.Directory)
-				status = item.AsDirectory?.Delete();
+				status = item.AsDirectory?.Delete(context.StorageContext);
 
 			return new(status, parentUrl, parentReactLocalUrl);
 		}
@@ -370,7 +370,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 		public static PreUploadCheckResponse PreUploadCheck(PreUploadCheckRequest request, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request?.ParentUrl);
 			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
 			ContentDirectory parent = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsDirectory;
@@ -420,7 +420,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 		public static DataWithStatus<ContentItemSummary> UploadFile(UploadFileRequest request, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			if (request?.File == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.MissingRequestData, "No file was sent") };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request?.ParentUrl);
 			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
@@ -457,7 +457,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 		public static DataWithStatus<string> PreviewMarkdown(SaveRequest request, AdminContext context)
 		{
-			if (!(context?.UserInfo?.AccessLevel < WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
+			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			if (request == null) return new(new ActionStatus(ActionStatus.StatusCode.MissingRequestData), null);
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request.Url);
 			if ((workspace == null) || (remainingPath == null)) return new(new ActionStatus(ActionStatus.StatusCode.NotFound), null);

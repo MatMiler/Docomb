@@ -157,9 +157,9 @@ namespace Docomb.ContentStorage
 				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"File '{newName}' already exists.");
 				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"Folder '{newName}' already exists.");
 				string oldPath = FilePath;
-				File.Move(FilePath, newPath);
+				if (Workspace.Git?.MoveFile(oldPath, newPath, context) != true)
+					File.Move(FilePath, newPath);
 				Workspace.Content.ClearCache();
-				Workspace.Git?.MoveFile(oldPath, newPath, context);
 				return new(ActionStatus.StatusCode.OK);
 			}
 			catch (Exception e)
@@ -179,9 +179,9 @@ namespace Docomb.ContentStorage
 				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"A file with the same name already exists in '{newParentPath}'.");
 				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"A folder with the same name already exists in '{newParentPath}'.");
 				string oldPath = FilePath;
-				File.Move(FilePath, newPath);
+				if (Workspace.Git?.MoveFile(oldPath, newPath, context) != true)
+					File.Move(FilePath, newPath);
 				Workspace.Content.ClearCache();
-				Workspace.Git?.MoveFile(oldPath, newPath, context);
 				return new(ActionStatus.StatusCode.OK);
 			}
 			catch (Exception e)
