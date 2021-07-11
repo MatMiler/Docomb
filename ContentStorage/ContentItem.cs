@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Docomb.ContentStorage.Workspaces;
 
 namespace Docomb.ContentStorage
 {
@@ -13,7 +14,6 @@ namespace Docomb.ContentStorage
 
 		public string FilePath { get; protected set; }
 
-		//public string FullUrl { get; protected set; }
 		public string Url { get => _url ??= string.Join('/', UrlParts) + (NeedsTrailingSlash ? '/' : null); protected set => _url = value; }
 		private string _url = null;
 
@@ -26,16 +26,9 @@ namespace Docomb.ContentStorage
 		public Workspace Workspace { get; protected set; }
 
 
-		//public string LastUrlPart { get; protected set; }
-
 		public List<string> UrlParts { get; protected set; }
 
-		//public Item(string filePath, string url)
-		//{
-		//	FilePath = filePath;
-		//	Url = url;
-		//	UrlParts = SplitPath(url);
-		//}
+
 		public ContentItem(Workspace workspace, string filePath, List<string> urlParts)
 		{
 			Workspace = workspace;
@@ -46,8 +39,6 @@ namespace Docomb.ContentStorage
 
 		public ContentFile AsFile => (this is ContentFile file) ? file : null;
 		public ContentDirectory AsDirectory => (this is ContentDirectory directory) ? directory : null;
-
-		//public ContentFolder Parent { get; protected set; }
 
 
 

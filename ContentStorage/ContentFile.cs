@@ -6,26 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Docomb.CommonCore;
+using Docomb.ContentStorage.Workspaces;
 
 namespace Docomb.ContentStorage
 {
 	public class ContentFile : ContentItem
 	{
-
-		//public string FilePath { get; protected set; }
-
-
-		//public string FileName { get; protected set; }
-
-
-		//public string FullUrl { get; protected set; }
-
-		//public string FileUrlPart { get; protected set; }
-
-		//public List<string> UrlParts { get; protected set; }
-
-		//public ContentFolder Parent { get; protected set; }
-
 
 		public override ContentItemType Type => ContentItemType.File;
 
@@ -126,7 +112,7 @@ namespace Docomb.ContentStorage
 		}
 
 
-		public bool SaveTextFile(string content)
+		public bool SaveTextFile(string content, ActionContext context)
 		{
 			try
 			{
@@ -135,13 +121,14 @@ namespace Docomb.ContentStorage
 				fileStream.Flush();
 				fileStream.Close();
 				Workspace.Content.ClearCache();
+				Workspace.Git?.UpdateFile(FilePath, context);
 				return true;
 			}
 			catch { return false; }
 		}
 
 
-		public ActionStatus SaveBinaryFile(Stream stream)
+		public ActionStatus SaveBinaryFile(Stream stream, ActionContext context)
 		{
 			try
 			{
@@ -150,6 +137,7 @@ namespace Docomb.ContentStorage
 					stream.CopyTo(fileStream);
 					stream.Close();
 				}
+				Workspace.Git?.UpdateFile(FilePath, context);
 				return new ActionStatus(ActionStatus.StatusCode.OK);
 			}
 			catch (Exception e)
@@ -159,7 +147,7 @@ namespace Docomb.ContentStorage
 		}
 
 
-		public ActionStatus Rename(string newName)
+		public ActionStatus Rename(string newName, ActionContext context)
 		{
 			try
 			{
@@ -168,8 +156,10 @@ namespace Docomb.ContentStorage
 				string newPath = Path.Combine(Path.GetDirectoryName(FilePath), newName);
 				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"File '{newName}' already exists.");
 				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"Folder '{newName}' already exists.");
+				string oldPath = FilePath;
 				File.Move(FilePath, newPath);
 				Workspace.Content.ClearCache();
+				Workspace.Git?.MoveFile(oldPath, newPath, context);
 				return new(ActionStatus.StatusCode.OK);
 			}
 			catch (Exception e)
@@ -178,7 +168,7 @@ namespace Docomb.ContentStorage
 			}
 		}
 
-		public ActionStatus Move(string newParentPath)
+		public ActionStatus Move(string newParentPath, ActionContext context)
 		{
 			try
 			{
@@ -188,8 +178,10 @@ namespace Docomb.ContentStorage
 				if (newPath == FilePath) return new(ActionStatus.StatusCode.InvalidRequestData, $"The file is already in '{newParentPath}'");
 				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"A file with the same name already exists in '{newParentPath}'.");
 				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"A folder with the same name already exists in '{newParentPath}'.");
+				string oldPath = FilePath;
 				File.Move(FilePath, newPath);
 				Workspace.Content.ClearCache();
+				Workspace.Git?.MoveFile(oldPath, newPath, context);
 				return new(ActionStatus.StatusCode.OK);
 			}
 			catch (Exception e)
@@ -198,12 +190,13 @@ namespace Docomb.ContentStorage
 			}
 		}
 
-		public ActionStatus Delete()
+		public ActionStatus Delete(ActionContext context)
 		{
 			try
 			{
 				File.Delete(FilePath);
 				Workspace.Content.ClearCache();
+				Workspace.Git?.RemoveFile(FilePath, context);
 				return new(ActionStatus.StatusCode.OK);
 			}
 			catch (Exception e)

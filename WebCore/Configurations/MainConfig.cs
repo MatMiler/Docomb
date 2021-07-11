@@ -14,15 +14,6 @@ namespace Docomb.WebCore.Configurations
 	public sealed class MainConfig
 	{
 
-		/*
-		 * Contents TODO
-		 * [-] Authentication method; TODO - For now rely on authentication being configured on site
-		 * [-] Credentials; TODO - For now use only local files and don't work with external services
-		 * [ ] Default workspace path
-		 * [-] Config locations (workspaces, user permissions); TODO - For now use workspaces.json and users.json in application directory
-		 */
-
-
 		/// <summary>Get the instance of the MainConfig</summary>
 		public static MainConfig Instance { get { return _lazy.Value; } }
 		private static readonly Lazy<MainConfig> _lazy = new Lazy<MainConfig>(() => new MainConfig());
@@ -51,7 +42,8 @@ namespace Docomb.WebCore.Configurations
 				if (string.IsNullOrWhiteSpace(SiteName)) SiteName = DefaultSiteName;
 				RootUrl = jsonConfig?.GetValue<string>("url") ?? DefaultRootUrl;
 
-				Authentication = new AuthenticationConfig(jsonConfig?.GetSection("authentication"));
+				Authentication = new(jsonConfig?.GetSection("authentication"));
+				Credentials = new(jsonConfig?.GetSection("credentials"));
 			}
 		}
 		/// <summary>Reload data from configuration sources</summary>
@@ -74,11 +66,15 @@ namespace Docomb.WebCore.Configurations
 		#endregion
 
 
-		#region Authentication
+
+		#region Authentication, credentials
 
 		public AuthenticationConfig Authentication { get; private set; }
 
+		public Credentials.CredentialsLibrary Credentials { get; private set; }
+
 		#endregion
+
 
 
 		#region Info for reader-editor interaction

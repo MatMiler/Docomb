@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using static Docomb.WebAdmin.Api.ContentManager.Info;
+using Docomb.ContentStorage.Workspaces;
 
 namespace Docomb.WebAdmin.Api.ContentManager
 {

@@ -1,4 +1,4 @@
-﻿using Docomb.ContentStorage;
+﻿using Docomb.ContentStorage.Workspaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,8 +48,6 @@ namespace Docomb.WebCore.Authentication
 			}
 			return level;
 		}
-		//[JsonPropertyName("workspaceAccess")]
-		//public Dictionary<string, AccessLevel> WorkspaceAccessLevels => _workspaceAccessLevels;
 		private Dictionary<string, AccessLevel> _workspaceAccessLevels = new();
 
 

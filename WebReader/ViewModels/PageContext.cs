@@ -1,4 +1,5 @@
 ﻿using Docomb.ContentStorage;
+using Docomb.ContentStorage.Workspaces;
 using Docomb.WebCore.Authentication;
 using System;
 using System.Collections.Generic;

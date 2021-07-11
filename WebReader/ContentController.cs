@@ -1,5 +1,6 @@
 ﻿using Docomb.CommonCore;
 using Docomb.ContentStorage;
+using Docomb.ContentStorage.Workspaces;
 using Docomb.WebCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;

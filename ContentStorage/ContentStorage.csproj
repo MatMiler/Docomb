@@ -11,9 +11,10 @@
 
 	<ItemGroup>
 	  <PackageReference Include="ColorCode.Portable" Version="1.0.3" />
+	  <PackageReference Include="LibGit2Sharp" Version="0.26.2" />
 	  <PackageReference Include="Markdig" Version="0.25.0" />
 	  <PackageReference Include="MarkdownSharp" Version="2.0.5" />
-	  <PackageReference Include="YamlDotNet" Version="11.2.0" />
+	  <PackageReference Include="YamlDotNet" Version="11.2.1" />
 	</ItemGroup>
 
 	<ItemGroup>

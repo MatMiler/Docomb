@@ -1,11 +1,11 @@
 ﻿using static Docomb.CommonCore.Utils;
-using Docomb.ContentStorage;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Docomb.ContentStorage.Workspaces;
 
 namespace Docomb.WebCore.Configurations
 {
@@ -29,20 +29,34 @@ namespace Docomb.WebCore.Configurations
 
 		#region Load & save settings
 
-		private EditableJson<List<Workspace>> JsonManager = null;
+		private EditableJson<List<Dtos.WorkspaceDto>> JsonManager = null;
 
 		private static readonly object _loadLock = new();
 		private void LoadConfig()
 		{
 			lock (_loadLock)
 			{
-				_workspaces = JsonManager.Read()?.Where(x => x != null).ToList();
-				string parentUrl = MainConfig.Instance?.RootUrl;
-				if (_workspaces?.Count > 0)
+				_workspaces = new();
+				var dtos = JsonManager.Read()?.Where(x => x != null).ToList();
+				if (dtos?.Count > 0)
 				{
-					foreach (Workspace workspace in _workspaces)
+					string parentUrl = MainConfig.Instance?.RootUrl;
+					foreach (Dtos.WorkspaceDto dto in dtos)
 					{
+						Workspace workspace = dto?.ToWorkspace();
+						if (workspace == null) continue;
 						workspace.ParentUrl = parentUrl;
+						workspace.Initialize();
+						if (!string.IsNullOrWhiteSpace(workspace.Git?.CredentialsKey))
+						{
+							Credentials.CredentialSet credentialsSet = MainConfig.Instance?.Credentials?.Get(workspace.Git.CredentialsKey);
+							if (credentialsSet != null)
+							{
+								workspace.Git.Username = credentialsSet.Username;
+								workspace.Git.Password = credentialsSet.Password;
+							}
+						}
+						_workspaces.Add(workspace);
 					}
 				}
 
@@ -53,7 +67,8 @@ namespace Docomb.WebCore.Configurations
 		}
 		private void SaveConfig()
 		{
-			lock (_loadLock) { JsonManager.Write(_workspaces); }
+			List<Dtos.WorkspaceDto> list = _workspaces?.Select(x => Dtos.WorkspaceDto.FromWorkspace(x)).ToList();
+			lock (_loadLock) { JsonManager.Write(list); }
 		}
 
 		public static void Reload() => Instance.LoadConfig();
