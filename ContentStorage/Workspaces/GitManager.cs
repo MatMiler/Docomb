@@ -71,10 +71,6 @@ namespace Docomb.ContentStorage.Workspaces
 
 		public void AddDirectory(string path, ActionContext context)
 		{
-			if (!IsValid) return;
-			string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
-			Commands.Stage(Repository, "*");
-			Commit($"Added '{relativePath}'", context);
 		}
 
 		public void UpdateFile(string path, ActionContext context)
@@ -98,19 +94,15 @@ namespace Docomb.ContentStorage.Workspaces
 			if (!IsValid) return;
 			string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
 			RepositoryStatus status = Repository.RetrieveStatus(new StatusOptions() {
-				DetectRenamesInWorkDir = true,
-				DetectRenamesInIndex = true,
+				DetectRenamesInWorkDir = false,
+				DetectRenamesInIndex = false,
 				PathSpec = new string[] { relativePath },
 				IncludeUntracked = true,
 				RecurseUntrackedDirs = true
 			});
 			if (status?.Count() > 0)
 			{
-				//Commands.Stage(Repository, status.Select(x => x.FilePath));
-				foreach (var entry in status)
-				{
-					Commands.Stage(Repository, entry.FilePath);
-				}
+				Commands.Stage(Repository, status.Select(x => x.FilePath));
 			}
 			Commit($"Removed '{relativePath}'", context);
 		}
@@ -123,7 +115,7 @@ namespace Docomb.ContentStorage.Workspaces
 				string relativeOldPath = Path.GetRelativePath(Workspace.ContentStoragePath, oldPath);
 				string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
 				Commands.Move(Repository, relativeOldPath, relativeNewPath);
-				Commit($"Renamed/Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
+				Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
 				return true;
 			}
 			catch
@@ -139,20 +131,17 @@ namespace Docomb.ContentStorage.Workspaces
 			string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
 			RepositoryStatus status = Repository.RetrieveStatus(new StatusOptions()
 			{
-				DetectRenamesInWorkDir = true,
-				DetectRenamesInIndex = true,
+				DetectRenamesInWorkDir = false,
+				DetectRenamesInIndex = false,
+				PathSpec = new string[] { relativeOldPath, relativeNewPath },
 				IncludeUntracked = true,
 				RecurseUntrackedDirs = true
 			});
 			if (status?.Count() > 0)
 			{
-				//Commands.Stage(Repository, status.Select(x => x.FilePath));
-				foreach (var entry in status)
-				{
-					Commands.Stage(Repository, entry.FilePath);
-				}
+				Commands.Stage(Repository, status.Select(x => x.FilePath));
 			}
-			Commit($"Renamed/Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
+			Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
 		}
 
 
@@ -172,10 +161,7 @@ namespace Docomb.ContentStorage.Workspaces
 				options.CredentialsProvider = (url, user, cred) => credentials;
 				Repository.Network.Push(branch, options);
 			}
-			catch (Exception e)
-			{
-				int a = 1;
-			}
+			catch { }
 		}
 
 
