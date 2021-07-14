@@ -10,7 +10,7 @@ using static Docomb.WebAdmin.Api.ContentManager.Info;
 
 namespace Docomb.WebAdmin.Api
 {
-	[Route(AdminConfig.UrlPathPrefix + "/api/general")]
+	[Route(WebCore.Configurations.UiConfig.UrlPathPrefix + "/api/general")]
 	public class GeneralController : Controller
 	{
 		[HttpGet("workspaces")]

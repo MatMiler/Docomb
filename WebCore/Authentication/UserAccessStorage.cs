@@ -18,9 +18,9 @@ namespace Docomb.WebCore.Authentication
 			LoadData(configSource);
 		}
 
-		public UserAccessStorage(JsonStructure jsonStructure)
+		public UserAccessStorage(UserAccessStorageDto dto)
 		{
-			LoadData(jsonStructure);
+			LoadData(dto);
 		}
 
 		public void LoadData(IConfigurationSection configSource)
@@ -37,20 +37,21 @@ namespace Docomb.WebCore.Authentication
 			_wildcardLevels = wildcards;
 		}
 
-		public void LoadData(JsonStructure jsonStructure)
+		public void LoadData(UserAccessStorageDto dto)
 		{
 			Dictionary<string, AccessLevel> usernames = new();
 			Dictionary<AccessLevel, List<WildcardUserDefinition>> wildcards = new();
 
-			AddUserLevels(jsonStructure?.None, usernames, wildcards, AccessLevel.None);
-			AddUserLevels(jsonStructure?.Reader, usernames, wildcards, AccessLevel.Reader);
-			AddUserLevels(jsonStructure?.Editor, usernames, wildcards, AccessLevel.Editor);
-			AddUserLevels(jsonStructure?.Admin, usernames, wildcards, AccessLevel.Admin);
+			AddUserLevels(dto?.None, usernames, wildcards, AccessLevel.None);
+			AddUserLevels(dto?.Reader, usernames, wildcards, AccessLevel.Reader);
+			AddUserLevels(dto?.Editor, usernames, wildcards, AccessLevel.Editor);
+			AddUserLevels(dto?.Admin, usernames, wildcards, AccessLevel.Admin);
 
 			_userLevels = usernames;
 			_wildcardLevels = wildcards;
 		}
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
 		private void AddUserLevels(IEnumerable<string> list, Dictionary<string, AccessLevel> usernames, Dictionary<AccessLevel, List<WildcardUserDefinition>> wildcards, AccessLevel level)
 		{
 			if (list?.Count() > 0)
@@ -93,9 +94,9 @@ namespace Docomb.WebCore.Authentication
 
 
 
-		public JsonStructure ToJsonStructure()
+		public UserAccessStorageDto ToDto()
 		{
-			JsonStructure data = new();
+			UserAccessStorageDto data = new();
 			if (UserLevels == null) return data;
 			data.None ??= new();
 			data.Reader ??= new();
@@ -120,7 +121,7 @@ namespace Docomb.WebCore.Authentication
 			return data;
 		}
 
-		public class JsonStructure
+		public class UserAccessStorageDto
 		{
 			[JsonPropertyName("none")]
 			public List<string> None { get; set; } = new();

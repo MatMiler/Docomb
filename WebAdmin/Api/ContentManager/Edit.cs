@@ -109,7 +109,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 				try
 				{
 					List<string> parts = new(item.UrlParts);
-					if (parts?.Count > 0) parts[parts.Count - 1] = newName;
+					if (parts?.Count > 0) parts[^1] = newName;
 					newUrl = CombineUrlPaths("", CombineUrlPaths(workspace.UrlPath, string.Join("/", parts)));
 				}
 				catch { }
@@ -171,7 +171,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 				try
 				{
 					List<string> parts = new(item.UrlParts);
-					if (parts?.Count > 0) parts[parts.Count - 1] = newName;
+					if (parts?.Count > 0) parts[^1] = newName;
 					newUrl = CombineUrlPaths("", CombineUrlPaths(workspace.UrlPath, string.Join("/", parts)));
 				}
 				catch { }
@@ -303,7 +303,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			try
 			{
 				List<string> parentParts = remainingPath.GetRange(0, remainingPath.Count - 1);
-				ContentItemSummary parent = new ContentItemSummary(workspace.Content.FindItem(parentParts, ContentStorage.MatchType.Physical));
+				ContentItemSummary parent = new(workspace.Content.FindItem(parentParts, ContentStorage.MatchType.Physical));
 				if (parent != null)
 				{
 					parentUrl = parent.Url;
@@ -373,7 +373,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.AccessDenied) };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request?.ParentUrl);
 			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
-			ContentDirectory parent = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsDirectory;
+			ContentDirectory parent = workspace.Content.FindItem(remainingPath, MatchType.Physical)?.AsDirectory;
 			if (parent == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound, message: "Can't find target folder") };
 
 			try
@@ -424,7 +424,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			if (request?.File == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.MissingRequestData, "No file was sent") };
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request?.ParentUrl);
 			if ((workspace == null) || (remainingPath == null)) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound) };
-			ContentDirectory parent = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsDirectory;
+			ContentDirectory parent = workspace.Content.FindItem(remainingPath, MatchType.Physical)?.AsDirectory;
 			if (parent == null) return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.NotFound, message: "Can't find target folder") };
 
 			try
@@ -461,7 +461,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			if (request == null) return new(new ActionStatus(ActionStatus.StatusCode.MissingRequestData), null);
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(request.Url);
 			if ((workspace == null) || (remainingPath == null)) return new(new ActionStatus(ActionStatus.StatusCode.NotFound), null);
-			ContentFile contentFile = workspace.Content.FindItem(remainingPath, ContentStorage.MatchType.Physical)?.AsFile;
+			ContentFile contentFile = workspace.Content.FindItem(remainingPath, MatchType.Physical)?.AsFile;
 			if (contentFile == null) return new(new ActionStatus(ActionStatus.StatusCode.NotFound), null);
 
 			try

@@ -47,7 +47,7 @@ namespace Docomb.WebCore.Authentication
 				option.ClientId = _clientId;
 				option.ClientSecret = _clientSecret;
 				option.SaveTokens = true;
-				option.AccessDeniedPath = "/_admin/account/failed";
+				option.AccessDeniedPath = $"/{Configurations.UiConfig.UrlPathPrefix}/account/failed";
 			});
 		}
 	}

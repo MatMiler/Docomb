@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
 
 namespace Docomb.WebCore.Authentication
 {
@@ -86,6 +87,7 @@ namespace Docomb.WebCore.Authentication
 
 
 		private bool _authenticationsWereAdded = false;
+		private bool _authenticationsWereUsed = false;
 
 		public void AddAuthentications(IServiceCollection services, string loginUrl)
 		{
@@ -104,5 +106,21 @@ namespace Docomb.WebCore.Authentication
 
 			_authenticationsWereAdded = true;
 		}
+
+
+		public void UseAuthentication(IApplicationBuilder app)
+		{
+			if (_authenticationsWereUsed) return;
+
+			List<IScheme> schemes = Configurations.MainConfig.Instance.Authentication.Schemes;
+			if (schemes?.Count > 0)
+			{
+				app.UseAuthentication();
+				app.UseAuthorization();
+			}
+
+			_authenticationsWereUsed = true;
+		}
+
 	}
 }

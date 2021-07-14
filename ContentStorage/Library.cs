@@ -347,7 +347,7 @@ namespace Docomb.ContentStorage
 				using FileStream stream = File.Create(filePath);
 				stream.Close();
 				if (content?.Length > 0) File.WriteAllText(filePath, content, Encoding.UTF8);
-				List<string> fileParts = new List<string>(parent.UrlParts);
+				List<string> fileParts = new(parent.UrlParts);
 				fileParts.Add(fileName);
 				ContentItem item = FindItem(fileParts, MatchType.Physical);
 				Workspace.Git?.AddFile(item.FilePath, context);
@@ -373,7 +373,7 @@ namespace Docomb.ContentStorage
 			try
 			{
 				Directory.CreateDirectory(filePath);
-				List<string> fileParts = new List<string>(parent.UrlParts);
+				List<string> fileParts = new(parent.UrlParts);
 				fileParts.Add(fileName);
 				ContentItem item = FindItem(fileParts, MatchType.Physical);
 				Workspace.Git?.AddDirectory(item.FilePath, context);

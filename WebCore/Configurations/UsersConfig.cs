@@ -14,7 +14,7 @@ namespace Docomb.WebCore.Configurations
 
 		/// <summary>Get the instance of the UsersConfig</summary>
 		public static UsersConfig Instance { get { return _lazy.Value; } }
-		private static readonly Lazy<UsersConfig> _lazy = new Lazy<UsersConfig>(() => new UsersConfig());
+		private static readonly Lazy<UsersConfig> _lazy = new(() => new UsersConfig());
 
 		private UsersConfig()
 		{
@@ -26,7 +26,8 @@ namespace Docomb.WebCore.Configurations
 
 		#region Load & save settings
 
-		private EditableJson<UserAccessStorage.JsonStructure> JsonManager = null;
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "<Pending>")]
+		private EditableJson<UserAccessStorageDto> JsonManager = null;
 
 		private static readonly object _loadLock = new();
 		private void LoadConfig()
@@ -38,7 +39,7 @@ namespace Docomb.WebCore.Configurations
 		}
 		private void SaveConfig()
 		{
-			lock (_loadLock) { JsonManager.Write(_globalUserAccess?.ToJsonStructure()); }
+			lock (_loadLock) { JsonManager.Write(_globalUserAccess?.ToDto()); }
 		}
 
 		public static void Reload() => Instance.LoadConfig();

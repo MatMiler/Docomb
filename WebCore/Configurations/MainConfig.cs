@@ -16,7 +16,7 @@ namespace Docomb.WebCore.Configurations
 
 		/// <summary>Get the instance of the MainConfig</summary>
 		public static MainConfig Instance { get { return _lazy.Value; } }
-		private static readonly Lazy<MainConfig> _lazy = new Lazy<MainConfig>(() => new MainConfig());
+		private static readonly Lazy<MainConfig> _lazy = new(() => new MainConfig());
 
 		private MainConfig()
 		{
@@ -67,26 +67,13 @@ namespace Docomb.WebCore.Configurations
 
 
 
+
+
 		#region Authentication, credentials
 
 		public AuthenticationConfig Authentication { get; private set; }
 
 		public Credentials.CredentialsLibrary Credentials { get; private set; }
-
-		#endregion
-
-
-
-		#region Info for reader-editor interaction
-
-		public bool HasAdmin { get; private set; } = false;
-		public void SetHasAdmin(bool value) => HasAdmin = value;
-
-		public string AdminUrl { get; private set; } = "/_admin/";
-		public void SetAdminUrl(string value) => AdminUrl = value;
-
-		public bool HasReader { get; private set; } = false;
-		public void SetHasReader(bool value) => HasReader = value;
 
 		#endregion
 

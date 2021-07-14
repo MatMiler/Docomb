@@ -50,7 +50,12 @@ namespace Docomb.WebReader
 
 			WebCore.Configurations.MainConfig.Instance?.Authentication?.AddAuthentications(services, $"/account/login");
 
-			WebCore.Configurations.MainConfig.Instance?.SetHasReader(true);
+			WebCore.Configurations.UiConfig.SetHasReader(true);
+		}
+
+		public static void UseDocombReader(this IApplicationBuilder app)
+		{
+			WebCore.Configurations.MainConfig.Instance?.Authentication?.UseAuthentication(app);
 		}
 	}
 

@@ -25,7 +25,7 @@ namespace Docomb.WebCore.Configurations
 		public string FileName { get; private set; } = null;
 		public int BackupVersions { get; private set; } = 3;
 
-		public static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+		public static readonly JsonSerializerOptions JsonOptions = new()
 		{
 			WriteIndented = true,
 			PropertyNameCaseInsensitive = true,
@@ -72,7 +72,7 @@ namespace Docomb.WebCore.Configurations
 					if (data != null)
 						return data;
 				}
-				catch (Exception e) { }
+				catch { }
 			}
 			return null;
 		}

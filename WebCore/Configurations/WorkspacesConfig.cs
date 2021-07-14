@@ -13,7 +13,7 @@ namespace Docomb.WebCore.Configurations
 	{
 		/// <summary>Get the instance of the MainConfig</summary>
 		public static WorkspacesConfig Instance { get { return _lazy.Value; } }
-		private static readonly Lazy<WorkspacesConfig> _lazy = new Lazy<WorkspacesConfig>(() => new WorkspacesConfig());
+		private static readonly Lazy<WorkspacesConfig> _lazy = new(() => new WorkspacesConfig());
 
 		private WorkspacesConfig()
 		{
@@ -29,6 +29,7 @@ namespace Docomb.WebCore.Configurations
 
 		#region Load & save settings
 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "<Pending>")]
 		private EditableJson<List<Dtos.WorkspaceDto>> JsonManager = null;
 
 		private static readonly object _loadLock = new();
@@ -102,13 +103,13 @@ namespace Docomb.WebCore.Configurations
 			// Re-join path for consistency in comparison
 			string path = string.Join('/', pathParts) + "/";
 
-			foreach (var item in list)
+			foreach (var (url, workspace) in list)
 			{
-				if (path.StartsWith(item.url))
+				if (path.StartsWith(url))
 				{
-					if (pathParts.Count < item.workspace.UrlParts.Count) continue; // Something went wrong with comparison
-					List<string> remainingParts = (pathParts.Count == item.workspace.UrlParts.Count) ? new() : pathParts.GetRange(item.workspace.UrlParts.Count, pathParts.Count - item.workspace.UrlParts.Count);
-					return (item.workspace, remainingParts);
+					if (pathParts.Count < workspace.UrlParts.Count) continue; // Something went wrong with comparison
+					List<string> remainingParts = (pathParts.Count == workspace.UrlParts.Count) ? new() : pathParts.GetRange(workspace.UrlParts.Count, pathParts.Count - workspace.UrlParts.Count);
+					return (workspace, remainingParts);
 				}
 			}
 

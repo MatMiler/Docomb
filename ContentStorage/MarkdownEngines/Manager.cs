@@ -29,14 +29,7 @@ namespace Docomb.ContentStorage.MarkdownEngines
 				Dictionary<string, MarkdownEngine> dict = engines.ToDictionary(x => x.Code);
 				return dict;
 			}
-			catch (Exception e)
-			{
-
-			}
-			//foreach (var engine in engines)
-			//{
-
-			//}
+			catch { }
 			return null;
 		}
 

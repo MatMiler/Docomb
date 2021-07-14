@@ -16,6 +16,8 @@ namespace Docomb.ContentStorage
 		public override ContentItemType Type => ContentItemType.File;
 
 		public override bool NeedsTrailingSlash => _needsTrailingslash;
+
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "<Pending>")]
 		private bool _needsTrailingslash = false;
 
 
@@ -116,7 +118,7 @@ namespace Docomb.ContentStorage
 		{
 			try
 			{
-				StreamWriter fileStream = new StreamWriter(FilePath);
+				StreamWriter fileStream = new(FilePath);
 				fileStream.Write(content);
 				fileStream.Flush();
 				fileStream.Close();

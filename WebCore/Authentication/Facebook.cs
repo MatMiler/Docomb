@@ -16,14 +16,18 @@ namespace Docomb.WebCore.Authentication
 		private string _code;
 
 		public string Name => _name;
+#pragma warning disable IDE0044 // Add readonly modifier
 		private string _name;
+#pragma warning restore IDE0044 // Add readonly modifier
 
 		public string ButtonLogo => "facebook-color";
 
 		public bool IsValid { get; private set; }
 
+#pragma warning disable IDE0044 // Add readonly modifier
 		private string _appId = null;
 		private string _appSecret = null;
+#pragma warning restore IDE0044 // Add readonly modifier
 
 
 		public Facebook(IConfigurationSection configSource)
@@ -47,7 +51,7 @@ namespace Docomb.WebCore.Authentication
 				option.AppId = _appId;
 				option.AppSecret = _appSecret;
 				option.ReturnUrlParameter = "ReturnUrl";
-				option.AccessDeniedPath = "/_admin/account/failed";
+				option.AccessDeniedPath = $"/{Configurations.UiConfig.UrlPathPrefix}/account/failed";
 			});
 		}
 	}

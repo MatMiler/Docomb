@@ -57,23 +57,14 @@ namespace Docomb.WebAdmin
 			services.ConfigureOptions(typeof(ConfigureOptions));
 
 
-			WebCore.Configurations.MainConfig.Instance?.Authentication?.AddAuthentications(services, $"/{AdminConfig.UrlPathPrefix}/account/login");
+			WebCore.Configurations.MainConfig.Instance?.Authentication?.AddAuthentications(services, $"/{WebCore.Configurations.UiConfig.UrlPathPrefix}/account/login");
 
-			WebCore.Configurations.MainConfig.Instance?.SetHasAdmin(true);
+			WebCore.Configurations.UiConfig.SetHasAdmin(true);
 		}
 
 		public static void UseDocombAdmin(this IApplicationBuilder app)
 		{
-			#region Authentication
-			{
-				List<WebCore.Authentication.IScheme> schemes = WebCore.Configurations.MainConfig.Instance.Authentication.Schemes;
-				if (schemes?.Count > 0)
-				{
-					app.UseAuthentication();
-					app.UseAuthorization();
-				}
-			}
-			#endregion
+			WebCore.Configurations.MainConfig.Instance?.Authentication?.UseAuthentication(app);
 		}
 	}
 

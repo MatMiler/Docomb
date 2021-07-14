@@ -11,7 +11,7 @@ using static Docomb.WebCore.Authentication.UserAccessStorage;
 
 namespace Docomb.WebAdmin.Api
 {
-	[Route(AdminConfig.UrlPathPrefix + "/api/users")]
+	[Route(WebCore.Configurations.UiConfig.UrlPathPrefix + "/api/users")]
 	public class UsersController : Controller
 	{
 		[HttpGet("userInfo")]
