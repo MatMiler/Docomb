@@ -56,6 +56,9 @@
 	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentDirectory.tsx">
 	    <SubType>Code</SubType>
 	  </None>
+	  <None Update="ClientApp\TypeScript\Components\Workspace\OptionsBreadcrumbs.tsx">
+	    <SubType>Code</SubType>
+	  </None>
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">

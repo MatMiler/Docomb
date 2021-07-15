@@ -24,13 +24,8 @@ export class MainNav extends Component<{}, MainNavState> {
 		this.state = { loading: true, lastLoadedTimestamp: LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl)), currentWorkspaceUrl: workspaceUrl, selectedKey: selectedKey };
 	}
 
-	instanceData: { treeData: Array<Workspaces.ContentItem>, forceRefresh: boolean } = {
-		treeData: null,
-		forceRefresh: false
-	};
-
 	componentDidMount() {
-		this.populateContent();
+		MainNavController.prepData(this);
 		this.navUpdateCall = this.onNavUpdate.bind(this);
 		EventBus.on("navUpdate", this.navUpdateCall);
 		this.fileStructChangedCall = this.fileStructChanged.bind(this);
@@ -43,7 +38,7 @@ export class MainNav extends Component<{}, MainNavState> {
 	}
 
 	shouldComponentUpdate(nextProps, nextState: MainNavState) {
-		if (this.instanceData.forceRefresh) return true;
+		if (MainNavController.forceRefresh) return true;
 		let currentWorkspaceUrl: string = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
 		if ((currentWorkspaceUrl != this.state.currentWorkspaceUrl)
 			|| (this.state.loading != nextState.loading)
@@ -59,9 +54,9 @@ export class MainNav extends Component<{}, MainNavState> {
 		let lastLoadedTimestamp = LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl));
 		let selectedKey: string = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
 		if ((workspaceUrl != this.state.currentWorkspaceUrl) || (lastLoadedTimestamp != this.state.lastLoadedTimestamp)) {
-			this.instanceData.treeData = null;
+			MainNavController.treeData = null;
 			this.setState({ loading: true, selectedKey: selectedKey });
-			this.populateContent();
+			MainNavController.loadData();
 		}
 		else if (selectedKey != this.state.selectedKey) {
 			this.setState({ selectedKey: selectedKey });
@@ -70,39 +65,23 @@ export class MainNav extends Component<{}, MainNavState> {
 
 	fileStructChangedCall = null;
 	fileStructChanged() {
-		this.instanceData.forceRefresh = true;
-		this.populateContent();
+		MainNavController.forceRefresh = true;
+		MainNavController.loadData();
 	}
 
 
 	render() {
-		let content: JSX.Element = null;
-		if (this.state.loading) {
-			content = <div className="loadingSpinner"><Spinner label="Loading..." labelPosition="right" size={SpinnerSize.large} /></div>;
-		} else {
-			let selectedKey = this.state.selectedKey;
-			if (selectedKey.endsWith("/")) selectedKey = selectedKey.slice(0, -1);
-			let navLinkGroups: INavLinkGroup[] = [
-				{
-					links: MainNav.itemChildrenToLinks(this.instanceData.treeData, selectedKey)
-				}
-			];
-			content = <Nav groups={navLinkGroups} selectedKey={selectedKey} onLinkClick={this.onLinkClick.bind(this)} />;
-		}
-
-
-
-		this.instanceData.forceRefresh = false;
+		MainNavController.forceRefresh = false;
 		return (
 			<Pivot>
-				<PivotItem headerText="Content" >
-					{content}
+				<PivotItem headerText="Content">
+					{MainNavController.getContent()}
+				</PivotItem>
+				<PivotItem headerText="Options">
+					{MainNavController.getOptionsContent()}
 				</PivotItem>
 			</Pivot>
 		);
-	//			<PivotItem headerText="Options" hidden={true} >
-	//				Workspace options
-	//			</PivotItem>
 	}
 
 
@@ -134,24 +113,90 @@ export class MainNav extends Component<{}, MainNavState> {
 			isExpanded: isExpanded
 		};
 	}
+}
 
-	onLinkClick(ev?: React.MouseEvent<HTMLElement>, item?: INavLink) {
+
+export const MainNavWithRouter = withRouter(MainNav);
+
+
+
+module MainNavController {
+
+	let instance: MainNav = null;
+	export let treeData: Array<Workspaces.ContentItem> = null;
+	export let forceRefresh: boolean = false;
+	export let hasLoaded: boolean = false;
+
+	export let workspace: Workspaces.Workspace = null;
+
+	export function prepData(
+		navInstance: MainNav
+	): void {
+		instance = navInstance;
+
+
+
+		loadData();
+	}
+
+
+	export function getContent(): JSX.Element {
+		if (hasLoaded != true) {
+			return (<div className="loadingSpinner"><Spinner label="Loading..." labelPosition="right" size={SpinnerSize.large} /></div>);
+		}
+
+		let selectedKey = instance.state.selectedKey;
+		if (selectedKey.endsWith("/")) selectedKey = selectedKey.slice(0, -1);
+		let navLinkGroups: INavLinkGroup[] = [
+			{
+				links: MainNav.itemChildrenToLinks(MainNavController.treeData, selectedKey)
+			}
+		];
+		return (<Nav groups={navLinkGroups} selectedKey={selectedKey} onLinkClick={onLinkClick} />);
+	}
+
+	export function getOptionsContent(): JSX.Element {
+		if (hasLoaded != true) {
+			return (<div className="loadingSpinner"><Spinner label="Loading..." labelPosition="right" size={SpinnerSize.large} /></div>);
+		}
+
+		let selectedKey = instance.state.selectedKey;
+		if (selectedKey.endsWith("/")) selectedKey = selectedKey.slice(0, -1);
+		let groups: INavLinkGroup[] = [];
+
+		if (workspace?.storage?.hasGit == true) {
+			groups.push({
+				name: "Storage",
+				links: [
+					{ name: "Git repository", key: "_options/git", url: "workspace" + workspace?.reactLocalUrl + "?options=git", icon: "GitGraph" }
+				]
+			});
+
+		}
+
+
+		return (<Nav groups={groups} selectedKey={selectedKey} onLinkClick={onLinkClick} />);
+	}
+
+
+	export function onLinkClick(ev ?: React.MouseEvent < HTMLElement >, item ?: INavLink) {
 		ev.preventDefault();
-		Utils.tryGet(this.props, "history").push(Utils.padWithSlash(item.url, true, false));
+		Utils.tryGet(instance.props, "history").push(Utils.padWithSlash(item.url, true, false));
 		EventBus.dispatch("navChange");
 	}
 
 
-	async populateContent() {
-		let workspaceUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
+	export async function loadData(): Promise<void> {
+		hasLoaded = false;
+		workspace = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData);
+		let workspaceUrl = workspace?.url;
 		if ((workspaceUrl == null) || (workspaceUrl == "")) return;
-		let data: Array<Workspaces.ContentItem> = await Workspaces.loadTree(workspaceUrl);
-		this.instanceData.treeData = data;
-		this.setState({ loading: false, currentWorkspaceUrl: workspaceUrl, lastLoadedTimestamp: LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl)) });
+		treeData = await Workspaces.loadTree(workspaceUrl);
+		hasLoaded = true;
+		instance.setState({ loading: false, currentWorkspaceUrl: workspaceUrl, lastLoadedTimestamp: LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl)) });
 	}
 
 }
 
 
-export const MainNavWithRouter = withRouter(MainNav);
 

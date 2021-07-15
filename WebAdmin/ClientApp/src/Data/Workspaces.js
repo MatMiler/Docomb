@@ -86,11 +86,14 @@ export var Workspaces;
             this.initials = null;
             /** Representation of the workspace */
             this.icon = null;
+            /** Information about how the workspace content is stored */
+            this.storage = null;
             this.name = Utils.tryGetString(source, "name");
             this.url = Utils.tryGetString(source, "url");
             this.reactLocalUrl = Utils.tryGetString(source, "reactLocalUrl");
             this.initials = Utils.tryGetString(source, "initials");
             this.icon = Utils.tryGetString(source, "icon");
+            this.storage = new WorkspaceStorage(Utils.tryGet(source, "storage"));
         }
         /** Quick check if data is valid */
         isValid() {
@@ -102,6 +105,14 @@ export var Workspaces;
         }
     }
     Workspaces.Workspace = Workspace;
+    class WorkspaceStorage {
+        constructor(source) {
+            /** Whether workspace has a Git repository */
+            this.hasGit = false;
+            this.hasGit = Utils.tryGetBool(source, "hasGit", false);
+        }
+    }
+    Workspaces.WorkspaceStorage = WorkspaceStorage;
     let ContentItemType;
     (function (ContentItemType) {
         ContentItemType["Directory"] = "Directory";

@@ -33,6 +33,9 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			[JsonPropertyName("icon")]
 			public string Icon { get; set; }
 
+			[JsonPropertyName("storage")]
+			public WorkspaceStorageInfo Storage { get; set; }
+
 			public WorkspaceSummary()
 			{
 
@@ -45,7 +48,17 @@ namespace Docomb.WebAdmin.Api.ContentManager
 				Url = workspace.UrlPath;
 				ReactLocalUrl = Utils.CombineUrlPaths("", workspace.UrlPath);
 				Initials = (Name?.Length > 0) ? Name[0..1] : "?";
+				Storage = new()
+				{
+					HasGit = workspace.Git?.IsValid ?? false
+				};
 			}
+		}
+
+		public class WorkspaceStorageInfo
+		{
+			[JsonPropertyName("hasGit")]
+			public bool HasGit { get; set; }
 		}
 
 

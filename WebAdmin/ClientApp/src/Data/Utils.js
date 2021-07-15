@@ -294,6 +294,83 @@ export var Utils;
         }
     }
     Utils.UrlParts = UrlParts;
+    /**
+     * Process query parameters into an object.
+     * If a parameter has multiple values, the first one is used.
+     * @param query Query string
+     */
+    function breakUrlParams(query) {
+        let items = breakUrlParamsArrayed(query);
+        let dict = {};
+        if (items == null)
+            return dict;
+        for (let key in items) {
+            let value = items[key];
+            if (value instanceof Array)
+                dict[key] = (value.length >= 1) ? value[0] : null;
+            else if (typeof value == "string")
+                dict[key] = value;
+        }
+        return dict;
+    }
+    Utils.breakUrlParams = breakUrlParams;
+    /**
+     * Process query parameters into an object.
+     * If a parameter has multiple values, they are separated by a comma.
+     * @param query Query string
+     */
+    function breakUrlParamsCsv(query) {
+        let items = breakUrlParamsArrayed(query);
+        let dict = {};
+        if (items == null)
+            return dict;
+        for (let key in items) {
+            let value = items[key];
+            if (value instanceof Array)
+                dict[key] = value.join(",");
+            else if (typeof value == "string")
+                dict[key] = value;
+        }
+        return dict;
+    }
+    Utils.breakUrlParamsCsv = breakUrlParamsCsv;
+    /**
+     * Process query parameters into an object.
+     * If a parameter has multiple values, they are returned as an array.
+     * @param query Query string
+     */
+    function breakUrlParamsArrayed(query) {
+        query = trimString(query, "");
+        if (query == "")
+            return {};
+        let dict = {};
+        if (query.startsWith("?"))
+            query = query.substr(1);
+        let items = query.split("&");
+        if ((items == null) || (items.length <= 0))
+            return {};
+        for (let x = 0; x < items.length; x++) {
+            let item = items[x].split("=");
+            if ((item == null) || (item.length < 1))
+                continue;
+            let key = item[0];
+            let value = (item.length >= 2) ? item[1] : null;
+            if ((value != null) && (typeof value == "string"))
+                value = decodeURIComponent(parseString(value, "").replace("+", " "));
+            let oldValue = dict[key];
+            if (oldValue === undefined) {
+                dict[key] = value;
+            }
+            else {
+                if (oldValue instanceof Array)
+                    oldValue.push(value);
+                else
+                    dict[key] = [oldValue, value];
+            }
+        }
+        return dict;
+    }
+    Utils.breakUrlParamsArrayed = breakUrlParamsArrayed;
     //#endregion
     //#region Arrays & Objects
     /**

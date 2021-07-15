@@ -8,6 +8,7 @@ import ContentDirectory from './Workspace/ContentDirectory';
 import ContentFileInfo from './Workspace/ContentFileInfo';
 import EditTextFile from './Workspace/EditTextFile';
 import { NotFound } from './NotFound';
+import GitManager from './Workspace/GitManager';
 
 
 
@@ -81,9 +82,11 @@ module WorkspaceWrapperController {
 	}
 
 	export async function loadData(): Promise<void> {
-		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
 		requestedPath = getInstancePath();
 		requestedQuery = getInstanceQuery();
+		workspace = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData);
+
+		LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
 		isLoading = true;
 		let data: Workspaces.WorkspacePageInfo = await Workspaces.loadPageInfo(requestedPath, requestedQuery);
 
@@ -121,6 +124,14 @@ module WorkspaceWrapperController {
 
 	export function getContent(): JSX.Element {
 		if (isLoading) return null;
+
+		let query = Utils.breakUrlParams(requestedQuery);
+		let optionsCode: string = Utils.tryGetString(query, "options");
+		if (optionsCode != null) {
+			switch (optionsCode) {
+				case "git": return (<GitManager />);
+			}
+		}
 
 		if (pageInfo?.contentItem?.type == Workspaces.ContentItemType.Directory) {
 			return (<ContentDirectory />);

@@ -288,6 +288,83 @@
 
 	}
 
+	/**
+	 * Process query parameters into an object.
+	 * If a parameter has multiple values, the first one is used.
+	 * @param query Query string
+	 */
+	export function breakUrlParams(query: string): { [key: string]: string }
+	{
+		let items: { [key: string]: string | Array<string> } = breakUrlParamsArrayed(query);
+		let dict: { [key: string]: string } = {};
+		if (items == null) return dict;
+		for (let key in items)
+		{
+			let value: string | string[] = items[key];
+			if (value instanceof Array)
+				dict[key] = (value.length >= 1) ? value[0] : null;
+			else if (typeof value == "string")
+				dict[key] = value;
+		}
+		return dict;
+	}
+	/**
+	 * Process query parameters into an object.
+	 * If a parameter has multiple values, they are separated by a comma.
+	 * @param query Query string
+	 */
+	export function breakUrlParamsCsv(query: string): { [key: string]: string }
+	{
+		let items: { [key: string]: string | string[] } = breakUrlParamsArrayed(query);
+		let dict: { [key: string]: string } = {};
+		if (items == null) return dict;
+		for (let key in items)
+		{
+			let value: string | Array<string> = items[key];
+			if (value instanceof Array)
+				dict[key] = value.join(",");
+			else if (typeof value == "string")
+				dict[key] = value;
+		}
+		return dict;
+	}
+	/**
+	 * Process query parameters into an object.
+	 * If a parameter has multiple values, they are returned as an array.
+	 * @param query Query string
+	 */
+	export function breakUrlParamsArrayed(query: string): { [key: string]: string | Array<string> }
+	{
+		query = trimString(query, "");
+		if (query == "") return {};
+		let dict: { [key: string]: string | Array<string> } = {};
+		if (query.startsWith("?")) query = query.substr(1);
+		let items: Array<string> = query.split("&");
+		if ((items == null) || (items.length <= 0)) return {};
+		for (let x = 0; x < items.length; x++)
+		{
+			let item: Array<string> = items[x].split("=");
+			if ((item == null) || (item.length < 1)) continue;
+			let key: string = item[0];
+			let value: string = (item.length >= 2) ? item[1] : null;
+			if ((value != null) && (typeof value == "string")) value = decodeURIComponent(parseString(value, "").replace("+", " "));
+			let oldValue = dict[key];
+			if (oldValue === undefined)
+			{
+				dict[key] = value;
+			}
+			else
+			{
+				if (oldValue instanceof Array)
+					oldValue.push(value);
+				else
+					dict[key] = [ oldValue, value ];
+			}
+		}
+		return dict;
+	}
+
+
 	//#endregion
 
 

@@ -17,6 +17,7 @@ import ContentDirectory from './Workspace/ContentDirectory';
 import ContentFileInfo from './Workspace/ContentFileInfo';
 import EditTextFile from './Workspace/EditTextFile';
 import { NotFound } from './NotFound';
+import GitManager from './Workspace/GitManager';
 export class WorkspaceWrapper extends Component {
     constructor(props) {
         super(props);
@@ -63,9 +64,10 @@ var WorkspaceWrapperController;
     WorkspaceWrapperController.prep = prep;
     function loadData() {
         return __awaiter(this, void 0, void 0, function* () {
-            LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
             WorkspaceWrapperController.requestedPath = getInstancePath();
             WorkspaceWrapperController.requestedQuery = getInstanceQuery();
+            WorkspaceWrapperController.workspace = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData);
+            LayoutUtils.WindowData.set(LayoutUtils.WindowData.ItemKey.WorkspaceData, null);
             WorkspaceWrapperController.isLoading = true;
             let data = yield Workspaces.loadPageInfo(WorkspaceWrapperController.requestedPath, WorkspaceWrapperController.requestedQuery);
             WorkspaceWrapperController.pageInfo = data;
@@ -104,6 +106,13 @@ var WorkspaceWrapperController;
         var _a, _b, _c, _d;
         if (WorkspaceWrapperController.isLoading)
             return null;
+        let query = Utils.breakUrlParams(WorkspaceWrapperController.requestedQuery);
+        let optionsCode = Utils.tryGetString(query, "options");
+        if (optionsCode != null) {
+            switch (optionsCode) {
+                case "git": return (React.createElement(GitManager, null));
+            }
+        }
         if (((_a = WorkspaceWrapperController.pageInfo === null || WorkspaceWrapperController.pageInfo === void 0 ? void 0 : WorkspaceWrapperController.pageInfo.contentItem) === null || _a === void 0 ? void 0 : _a.type) == Workspaces.ContentItemType.Directory) {
             return (React.createElement(ContentDirectory, null));
         }
