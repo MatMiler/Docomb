@@ -69,46 +69,46 @@ namespace Docomb.ContentStorage.Workspaces
 		private readonly object _originLock = new();
 
 
-		public void AddFile(string path, ActionContext context)
+		public void AddFile(string path, ActionContext context, bool push = true)
 		{
 			if (!IsValid) return;
 			lock (_localLock)
 			{
 				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
 				Commands.Stage(Repository, relativePath);
-				Commit($"Added '{relativePath}'", context);
+				Commit($"Added '{relativePath}'", context, push);
 			}
 		}
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
-		public void AddDirectory(string path, ActionContext context)
+		public void AddDirectory(string path, ActionContext context, bool push = true)
 		{
 		}
 
-		public void UpdateFile(string path, ActionContext context)
-		{
-			if (!IsValid) return;
-			lock (_localLock)
-			{
-				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
-				Commands.Stage(Repository, relativePath);
-				Commit($"Updated '{relativePath}'", context);
-			}
-		}
-
-		public void RemoveFile(string path, ActionContext context)
+		public void UpdateFile(string path, ActionContext context, bool push = true)
 		{
 			if (!IsValid) return;
 			lock (_localLock)
 			{
 				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
 				Commands.Stage(Repository, relativePath);
-				Commit($"Removed '{relativePath}'", context);
+				Commit($"Updated '{relativePath}'", context, push);
 			}
 		}
 
-		public void RemoveDirectory(string path, ActionContext context)
+		public void RemoveFile(string path, ActionContext context, bool push = true)
+		{
+			if (!IsValid) return;
+			lock (_localLock)
+			{
+				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
+				Commands.Stage(Repository, relativePath);
+				Commit($"Removed '{relativePath}'", context, push);
+			}
+		}
+
+		public void RemoveDirectory(string path, ActionContext context, bool push = true)
 		{
 			if (!IsValid) return;
 			lock (_localLock)
@@ -126,11 +126,11 @@ namespace Docomb.ContentStorage.Workspaces
 				{
 					Commands.Stage(Repository, status.Select(x => x.FilePath));
 				}
-				Commit($"Removed '{relativePath}'", context);
+				Commit($"Removed '{relativePath}'", context, push);
 			}
 		}
 
-		public bool MoveFile(string oldPath, string newPath, ActionContext context)
+		public bool MoveFile(string oldPath, string newPath, ActionContext context, bool push = true)
 		{
 			if (!IsValid) return false;
 			lock (_localLock)
@@ -140,7 +140,7 @@ namespace Docomb.ContentStorage.Workspaces
 					string relativeOldPath = Path.GetRelativePath(Workspace.ContentStoragePath, oldPath);
 					string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
 					Commands.Move(Repository, relativeOldPath, relativeNewPath);
-					Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
+					Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context, push);
 					return true;
 				}
 				catch
@@ -150,7 +150,7 @@ namespace Docomb.ContentStorage.Workspaces
 			}
 		}
 
-		public void MoveDirectory(string oldPath, string newPath, ActionContext context)
+		public void MoveDirectory(string oldPath, string newPath, ActionContext context, bool push = true)
 		{
 			if (!IsValid) return;
 			lock (_localLock)
@@ -169,22 +169,22 @@ namespace Docomb.ContentStorage.Workspaces
 				{
 					Commands.Stage(Repository, status.Select(x => x.FilePath));
 				}
-				Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
+				Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context, push);
 			}
 		}
 
-		public void CommitAll(ActionContext context)
+		public void CommitAll(ActionContext context, bool push = true)
 		{
 			if (!IsValid) return;
 			lock (_localLock)
 			{
 				Commands.Stage(Repository, "*");
-				Commit($"Sync", context);
+				Commit($"Sync", context, push);
 			}
 		}
 
 
-		public void Commit(string message, ActionContext context)
+		public void Commit(string message, ActionContext context, bool push = true)
 		{
 			if (!IsValid) return;
 			try
@@ -193,7 +193,11 @@ namespace Docomb.ContentStorage.Workspaces
 				Signature commiter = new(CommiterName, CommiterEmail, DateTime.Now);
 				Repository.Commit(message, author, commiter);
 
-				Push();
+				if (push)
+				{
+					Task.Run(Pull);
+					Task.Run(Push);
+				}
 			}
 			catch { }
 		}
@@ -231,6 +235,14 @@ namespace Docomb.ContentStorage.Workspaces
 			}
 		}
 
+
+		public void Sync(ActionContext context)
+		{
+			if (!IsValid) return;
+			CommitAll(context, false);
+			Pull();
+			Push();
+		}
 
 	}
 }

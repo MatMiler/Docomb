@@ -21,9 +21,14 @@ namespace Docomb.WebAdmin.Api
 			(Workspace workspace, _) = WebCore.Configurations.WorkspacesConfig.FindFromPath(workspaceUrl);
 			if (workspace == null) return new ActionStatus(ActionStatus.StatusCode.NotFound);
 
-			workspace.Git?.CommitAll(context.StorageContext);
-			workspace.Git?.Pull();
-			workspace.Git?.Push();
+			try
+			{
+				workspace.Git.Sync(context.StorageContext);
+			}
+			catch (Exception e)
+			{
+				return new ActionStatus(ActionStatus.StatusCode.Error, exception: e);
+			}
 
 			return new ActionStatus(ActionStatus.StatusCode.OK);
 		}
