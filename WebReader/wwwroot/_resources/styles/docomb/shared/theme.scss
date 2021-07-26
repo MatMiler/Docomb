@@ -1,0 +1,59 @@
+﻿// Light/Dark theme setting and mixins
+$bgColor: ( 'dark': #191919, 'light': #fff );
+$textColor: ( 'dark': #fff, 'light': #000 );
+$textColorLight: ( 'dark': #999, 'light': #666 );
+$menuBackgroundColor: ( 'dark': #333, 'light': #eee );
+$sideBarBackgroundColor: ( 'dark': #222, 'light': #e9e9e9 );
+$menuBorderColor: ( 'dark': #494949, 'light': #c9c9c9 );
+$menuBorderColorMultiply: ( 'dark': rgba(255, 255, 255, .2), 'light': rgba(0, 0, 0, .2) );
+$linkColor: ( 'dark': #0bf, 'light': #03f );
+$accentColor: ( 'dark': #0bf, 'light': #03f );
+$buttonHoverColor: ( 'dark': rgba(255, 255, 255, .1), 'light': rgba(0, 0, 0, .1) );
+$buttonActiveColor: ( 'dark': rgba(255, 255, 255, .13), 'light': rgba(0, 0, 0, .13) );
+$errorColor: ( 'dark': #c00, 'light': #c00 );
+
+$fontFamily: "Segoe UI", "Segoe UI Web (West European)", "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+$fontFamilyMono: Monaco, Menlo, Consolas, "Droid Sans Mono", Inconsolata, "Courier New", monospace;
+
+$codeHighlightBlack: $textColor;
+$codeHighlightGreen: ( 'dark': #57a64a, 'light': #008000 );
+$codeHighlightBlue: ( 'dark': #c8c8c8, 'light': #00f );
+$codeHighlightDullRed: ( 'dark': #d69d85, 'light': #a31515 );
+$codeHighlightRed: ( 'dark': #9cdcfe, 'light': #f00 );
+$codeHighlightGray: ( 'dark': #ffd68f, 'light': #808080 );
+$codeHighlightMediumTurquoise: ( 'dark': #4ec9b0, 'light': #48d1cc );
+$codeHighlightMagenta: ( 'dark': #c975d5, 'light': #f0f );
+$codeHighlightPowderBlue: ( 'dark': #92caf4, 'light': #b0e0e6 );
+$codeHighlightTeal: ( 'dark': #468cc6, 'light': #008080 );
+$codeHighlightOrangeRed: ( 'dark': #8c2f2f, 'light': #ff4500 );
+$codeHighlightNavy: ( 'dark': #468cc6, 'light': #000080 );
+$codeHighlightPurple: ( 'dark': #4ec9b0, 'light': #800080 );
+
+
+@mixin themeMaps($values) {
+	html & {
+		@each $property, $value in $values { #{$property}: map-get($value, 'light'); }
+	}
+
+	.dark & {
+		@each $property, $value in $values { #{$property}: map-get($value, 'dark'); }
+	}
+
+	@media (prefers-color-scheme: dark) {
+		html & {
+			@each $property, $value in $values { #{$property}: map-get($value, 'dark'); }
+		}
+		.light & {
+			@each $property, $value in $values { #{$property}: map-get($value, 'light'); }
+		}
+	}
+}
+
+@mixin themeMap($property, $value) {
+	html & { #{$property}: map-get($value, 'light'); }
+	.dark & { #{$property}: map-get($value, 'dark'); }
+	@media (prefers-color-scheme: dark) {
+		html & { #{$property}: map-get($value, 'dark'); }
+		.light & { #{$property}: map-get($value, 'light'); }
+	}
+}

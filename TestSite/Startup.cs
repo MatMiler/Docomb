@@ -23,14 +23,6 @@ namespace TestSite
 			services.AddDocombAdmin();
 			services.AddDocombReader();
 			services.AddMvc();
-
-			//services.AddCors(options =>
-			//{
-			//	options.AddPolicy("CorsPolicy1", builder =>
-			//	{
-			//		builder.WithMethods("POST", "GET", "PUT", "DELETE").WithHeaders(HeaderNames.ContentType);
-			//	});
-			//});
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -41,9 +33,8 @@ namespace TestSite
 				app.UseDeveloperExceptionPage();
 			}
 
-			//app.UseCors("CorsPolicy1");
-
 			app.UseDocombAdmin();
+			app.UseDocombReader();
 
 			app.UseStaticFiles();
 
@@ -53,15 +44,6 @@ namespace TestSite
 				endpoints.MapControllers();
 				endpoints.MapRazorPages();
 			});
-
-
-			//app.UseEndpoints(endpoints =>
-			//{
-			//	endpoints.MapGet("/", async context =>
-			//	{
-			//		await context.Response.WriteAsync("Hello World!");
-			//	});
-			//});
 		}
 	}
 }

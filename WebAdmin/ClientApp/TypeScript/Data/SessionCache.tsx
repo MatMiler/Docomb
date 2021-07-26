@@ -25,7 +25,7 @@ export module SessionCache {
 			this.key = key;
 			this.value = value;
 			this.expiry = (expiry instanceof Date) ? expiry.getTime() : expiry;
-			this.hash = hashCode(value);
+			this.hash = Utils.hashCode(value);
 			this.timestamp = Date.now();
 		}
 
@@ -105,19 +105,5 @@ export module SessionCache {
 		window.sessionStorage.removeItem(keyPrefix + key);
 	}
 
-	/**
-	 * Generate a hash code from an object
-	 * @param o Object from which to generate hash code
-	 */
-	function hashCode(o: any): number {
-		let s = JSON.stringify(o);
-		let hash: number = 0
-		if (s.length === 0) return hash;
-		for (let x = 0; x < s.length; x++) {
-			hash = ((hash << 5) - hash) + (s.charCodeAt(x));
-			hash |= 0;
-		}
-		return hash;
-	}
 
 }

@@ -78,6 +78,8 @@ export module Workspaces {
 		public initials: string = null;
 		/** Representation of the workspace */
 		public icon: string = null;
+		/** Information about how the workspace content is stored */
+		public storage: WorkspaceStorage = null;
 
 		/** Quick check if data is valid */
 		public isValid(): boolean {
@@ -90,11 +92,20 @@ export module Workspaces {
 			this.reactLocalUrl = Utils.tryGetString(source, "reactLocalUrl");
 			this.initials = Utils.tryGetString(source, "initials");
 			this.icon = Utils.tryGetString(source, "icon");
+			this.storage = new WorkspaceStorage(Utils.tryGet(source, "storage"));
 		}
 
 		public static create(source: any): Workspace {
 			let item = new Workspace(source);
 			return (item?.isValid() == true) ? item : null;
+		}
+	}
+	export class WorkspaceStorage {
+		/** Whether workspace has a Git repository */
+		public hasGit: boolean = false;
+
+		public constructor(source: any) {
+			this.hasGit = Utils.tryGetBool(source, "hasGit", false);
 		}
 	}
 
@@ -378,6 +389,12 @@ export module Workspaces {
 		if (actionStatus?.isOk == true)
 			item = new ContentItem(Utils.tryGet(response, "data"));
 		return new Apis.DataWithStatus(actionStatus, item);
+	}
+
+
+	export async function gitSync(workspaceUrl: string): Promise<Apis.ActionStatus> {
+		let data: any = await Apis.fetchJsonAsync("api/storage/gitSync?workspaceUrl=" + encodeURI(workspaceUrl), false);
+		return new Apis.ActionStatus(data);
 	}
 
 }

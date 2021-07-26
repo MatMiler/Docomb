@@ -1,11 +1,11 @@
 ﻿using static Docomb.CommonCore.Utils;
-using Docomb.ContentStorage;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Docomb.ContentStorage.Workspaces;
 
 namespace Docomb.WebCore.Configurations
 {
@@ -13,7 +13,7 @@ namespace Docomb.WebCore.Configurations
 	{
 		/// <summary>Get the instance of the MainConfig</summary>
 		public static WorkspacesConfig Instance { get { return _lazy.Value; } }
-		private static readonly Lazy<WorkspacesConfig> _lazy = new Lazy<WorkspacesConfig>(() => new WorkspacesConfig());
+		private static readonly Lazy<WorkspacesConfig> _lazy = new(() => new WorkspacesConfig());
 
 		private WorkspacesConfig()
 		{
@@ -29,20 +29,35 @@ namespace Docomb.WebCore.Configurations
 
 		#region Load & save settings
 
-		private EditableJson<List<Workspace>> JsonManager = null;
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "<Pending>")]
+		private EditableJson<List<Dtos.WorkspaceDto>> JsonManager = null;
 
 		private static readonly object _loadLock = new();
 		private void LoadConfig()
 		{
 			lock (_loadLock)
 			{
-				_workspaces = JsonManager.Read()?.Where(x => x != null).ToList();
-				string parentUrl = MainConfig.Instance?.RootUrl;
-				if (_workspaces?.Count > 0)
+				_workspaces = new();
+				var dtos = JsonManager.Read()?.Where(x => x != null).ToList();
+				if (dtos?.Count > 0)
 				{
-					foreach (Workspace workspace in _workspaces)
+					string parentUrl = MainConfig.Instance?.RootUrl;
+					foreach (Dtos.WorkspaceDto dto in dtos)
 					{
+						Workspace workspace = dto?.ToWorkspace();
+						if (workspace == null) continue;
 						workspace.ParentUrl = parentUrl;
+						workspace.Initialize();
+						if (!string.IsNullOrWhiteSpace(workspace.Git?.CredentialsKey))
+						{
+							Credentials.CredentialSet credentialsSet = MainConfig.Instance?.Credentials?.Get(workspace.Git.CredentialsKey);
+							if (credentialsSet != null)
+							{
+								workspace.Git.Username = credentialsSet.Username;
+								workspace.Git.Password = credentialsSet.Password;
+							}
+						}
+						_workspaces.Add(workspace);
 					}
 				}
 
@@ -53,7 +68,8 @@ namespace Docomb.WebCore.Configurations
 		}
 		private void SaveConfig()
 		{
-			lock (_loadLock) { JsonManager.Write(_workspaces); }
+			List<Dtos.WorkspaceDto> list = _workspaces?.Select(x => Dtos.WorkspaceDto.FromWorkspace(x)).ToList();
+			lock (_loadLock) { JsonManager.Write(list); }
 		}
 
 		public static void Reload() => Instance.LoadConfig();
@@ -87,13 +103,13 @@ namespace Docomb.WebCore.Configurations
 			// Re-join path for consistency in comparison
 			string path = string.Join('/', pathParts) + "/";
 
-			foreach (var item in list)
+			foreach (var (url, workspace) in list)
 			{
-				if (path.StartsWith(item.url))
+				if (path.StartsWith(url))
 				{
-					if (pathParts.Count < item.workspace.UrlParts.Count) continue; // Something went wrong with comparison
-					List<string> remainingParts = (pathParts.Count == item.workspace.UrlParts.Count) ? new() : pathParts.GetRange(item.workspace.UrlParts.Count, pathParts.Count - item.workspace.UrlParts.Count);
-					return (item.workspace, remainingParts);
+					if (pathParts.Count < workspace.UrlParts.Count) continue; // Something went wrong with comparison
+					List<string> remainingParts = (pathParts.Count == workspace.UrlParts.Count) ? new() : pathParts.GetRange(workspace.UrlParts.Count, pathParts.Count - workspace.UrlParts.Count);
+					return (workspace, remainingParts);
 				}
 			}
 

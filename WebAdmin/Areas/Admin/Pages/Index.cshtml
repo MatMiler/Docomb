@@ -7,6 +7,7 @@
 	<base href="@ViewBag.baseHref" />
 	<link rel="stylesheet" href="~/_resources/styles/docomb/admin.css" />
 	<script>
+		window["layoutType"] = "admin";
 		window["basePath"] = @Json.Serialize(ViewBag.basePath);
 		window["readerBasePath"] = @Json.Serialize(ViewBag.readerBasePath);
 	</script>

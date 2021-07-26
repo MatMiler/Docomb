@@ -21,7 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.7" />
+		<PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="5.0.8" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -30,7 +30,10 @@
 
 	<ItemGroup>
 	  <Content Remove="compilerconfig.json" />
+	  <Content Remove="wwwroot\_resources\images\facebook-color.svg" />
+	  <Content Remove="wwwroot\_resources\images\microsoft-color.svg" />
 	  <Content Remove="wwwroot\_resources\styles\article.scss" />
+	  <Content Remove="wwwroot\_resources\styles\docomb\auth.scss" />
 	  <Content Remove="wwwroot\_resources\styles\docomb\shared\base.scss" />
 	  <Content Remove="wwwroot\_resources\styles\docomb\theme.scss" />
 	</ItemGroup>
@@ -44,10 +47,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="ClientApp\TypeScript\Components\Settings\SettingsBreadcrumbs.tsx">
+	    <SubType>Code</SubType>
+	  </None>
 	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentFileInfo.tsx">
 	    <SubType>Code</SubType>
 	  </None>
 	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentDirectory.tsx">
+	    <SubType>Code</SubType>
+	  </None>
+	  <None Update="ClientApp\TypeScript\Components\Workspace\OptionsBreadcrumbs.tsx">
 	    <SubType>Code</SubType>
 	  </None>
 	</ItemGroup>

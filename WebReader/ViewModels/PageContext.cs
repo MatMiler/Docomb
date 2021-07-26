@@ -1,7 +1,10 @@
 ﻿using Docomb.ContentStorage;
+using Docomb.ContentStorage.Workspaces;
+using Docomb.WebCore.Authentication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,20 +12,21 @@ namespace Docomb.WebReader.ViewModels
 {
 	public class PageContext
 	{
-		public PageContext(string urlPath, Workspace workspace, ContentItem item, List<string> contentPathParts, dynamic viewBag)
+		public PageContext(string urlPath, Workspace workspace, ContentItem item, List<string> contentPathParts, dynamic viewBag, ClaimsPrincipal user)
 		{
 			UrlPath = urlPath;
 			Workspace = workspace;
 			ContentItem = item;
 			PathParts = contentPathParts;
-			PrepareViewbag(viewBag);
+			PrepareViewbag(viewBag, user);
 		}
 
-		public void PrepareViewbag(dynamic viewBag)
+		public void PrepareViewbag(dynamic viewBag, ClaimsPrincipal user)
 		{
 			viewBag.Title = ContentItem.Title;
 			viewBag.Context = this;
 			viewBag.HasPageData = (ContentItem != null);
+			viewBag.User = new UserInfo(user);
 		}
 
 

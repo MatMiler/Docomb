@@ -11,6 +11,7 @@
 
 	<div class="pageTitle">
 		@{ List<Docomb.ContentStorage.ContentItemSummary> parents = ViewBag.Context?.GetParents(); }
+		@Html.Partial("~/Areas/Reader/Pages/Shared/_User.cshtml")
 		@if (parents?.Count > 0)
 		{
 			<nav class="breadcrumbs">

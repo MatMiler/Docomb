@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Docomb.CommonCore;
+using Docomb.ContentStorage.Workspaces;
 
 namespace Docomb.ContentStorage
 {
@@ -331,7 +332,7 @@ namespace Docomb.ContentStorage
 
 		#region New items
 
-		public DataWithStatus<ContentItemSummary> CreateFile(ContentDirectory parent, string fileName, string content = null)
+		public DataWithStatus<ContentItemSummary> CreateFile(ContentDirectory parent, string fileName, ActionContext context, string content = null)
 		{
 			if (string.IsNullOrWhiteSpace(fileName)) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, "File name cannot be empty."), null);
 			if (string.IsNullOrWhiteSpace(GetFileNameWithoutExtension(fileName))) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, "File name cannot be empty."), null);
@@ -346,9 +347,10 @@ namespace Docomb.ContentStorage
 				using FileStream stream = File.Create(filePath);
 				stream.Close();
 				if (content?.Length > 0) File.WriteAllText(filePath, content, Encoding.UTF8);
-				List<string> fileParts = new List<string>(parent.UrlParts);
+				List<string> fileParts = new(parent.UrlParts);
 				fileParts.Add(fileName);
 				ContentItem item = FindItem(fileParts, MatchType.Physical);
+				Workspace.Git?.AddFile(item.FilePath, context);
 				ClearCache();
 				return new DataWithStatus<ContentItemSummary>(new ActionStatus(ActionStatus.StatusCode.OK), new ContentItemSummary(item));
 			}
@@ -358,7 +360,7 @@ namespace Docomb.ContentStorage
 			}
 		}
 
-		public DataWithStatus<ContentItemSummary> CreateDirectory(ContentDirectory parent, string fileName)
+		public DataWithStatus<ContentItemSummary> CreateDirectory(ContentDirectory parent, string fileName, ActionContext context)
 		{
 			if (string.IsNullOrWhiteSpace(fileName)) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, "Folder name cannot be empty."), null);
 			if (string.IsNullOrWhiteSpace(GetFileNameWithoutExtension(fileName))) return new(new ActionStatus(ActionStatus.StatusCode.InvalidRequestData, "Folder name cannot be empty."), null);
@@ -371,9 +373,10 @@ namespace Docomb.ContentStorage
 			try
 			{
 				Directory.CreateDirectory(filePath);
-				List<string> fileParts = new List<string>(parent.UrlParts);
+				List<string> fileParts = new(parent.UrlParts);
 				fileParts.Add(fileName);
 				ContentItem item = FindItem(fileParts, MatchType.Physical);
+				Workspace.Git?.AddDirectory(item.FilePath, context);
 				ClearCache();
 				return new DataWithStatus<ContentItemSummary>(new ActionStatus(ActionStatus.StatusCode.OK), new ContentItemSummary(item));
 			}

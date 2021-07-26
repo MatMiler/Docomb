@@ -17,10 +17,6 @@ import { withRouter } from "react-router";
 export class MainNav extends Component {
     constructor(props) {
         super(props);
-        this.instanceData = {
-            treeData: null,
-            forceRefresh: false
-        };
         this.navUpdateCall = null;
         this.fileStructChangedCall = null;
         let workspaceUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
@@ -28,7 +24,7 @@ export class MainNav extends Component {
         this.state = { loading: true, lastLoadedTimestamp: LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl)), currentWorkspaceUrl: workspaceUrl, selectedKey: selectedKey };
     }
     componentDidMount() {
-        this.populateContent();
+        MainNavController.prepData(this);
         this.navUpdateCall = this.onNavUpdate.bind(this);
         EventBus.on("navUpdate", this.navUpdateCall);
         this.fileStructChangedCall = this.fileStructChanged.bind(this);
@@ -39,7 +35,7 @@ export class MainNav extends Component {
         EventBus.remove("fileStructChanged", this.fileStructChangedCall);
     }
     shouldComponentUpdate(nextProps, nextState) {
-        if (this.instanceData.forceRefresh)
+        if (MainNavController.forceRefresh)
             return true;
         let currentWorkspaceUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
         if ((currentWorkspaceUrl != this.state.currentWorkspaceUrl)
@@ -54,39 +50,23 @@ export class MainNav extends Component {
         let lastLoadedTimestamp = LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl));
         let selectedKey = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
         if ((workspaceUrl != this.state.currentWorkspaceUrl) || (lastLoadedTimestamp != this.state.lastLoadedTimestamp)) {
-            this.instanceData.treeData = null;
+            MainNavController.treeData = null;
             this.setState({ loading: true, selectedKey: selectedKey });
-            this.populateContent();
+            MainNavController.loadData();
         }
         else if (selectedKey != this.state.selectedKey) {
             this.setState({ selectedKey: selectedKey });
         }
     }
     fileStructChanged() {
-        this.instanceData.forceRefresh = true;
-        this.populateContent();
+        MainNavController.forceRefresh = true;
+        MainNavController.loadData();
     }
     render() {
-        let content = null;
-        if (this.state.loading) {
-            content = React.createElement("div", { className: "loadingSpinner" },
-                React.createElement(Spinner, { label: "Loading...", labelPosition: "right", size: SpinnerSize.large }));
-        }
-        else {
-            let selectedKey = this.state.selectedKey;
-            if (selectedKey.endsWith("/"))
-                selectedKey = selectedKey.slice(0, -1);
-            let navLinkGroups = [
-                {
-                    links: MainNav.itemChildrenToLinks(this.instanceData.treeData, selectedKey)
-                }
-            ];
-            content = React.createElement(Nav, { groups: navLinkGroups, selectedKey: selectedKey, onLinkClick: this.onLinkClick.bind(this) });
-        }
-        this.instanceData.forceRefresh = false;
+        MainNavController.forceRefresh = false;
         return (React.createElement(Pivot, null,
-            React.createElement(PivotItem, { headerText: "Content" }, content),
-            React.createElement(PivotItem, { headerText: "Options", hidden: true }, "Workspace options")));
+            React.createElement(PivotItem, { headerText: "Content" }, MainNavController.getContent()),
+            React.createElement(PivotItem, { headerText: "Options" }, MainNavController.getOptionsContent())));
     }
     static itemChildrenToLinks(items, currentUrl) {
         if (!Utils.arrayHasValues(items))
@@ -117,21 +97,75 @@ export class MainNav extends Component {
             isExpanded: isExpanded
         };
     }
-    onLinkClick(ev, item) {
-        ev.preventDefault();
-        Utils.tryGet(this.props, "history").push(Utils.padWithSlash(item.url, true, false));
-        EventBus.dispatch("navChange");
-    }
-    populateContent() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let workspaceUrl = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData), "url");
-            if ((workspaceUrl == null) || (workspaceUrl == ""))
-                return;
-            let data = yield Workspaces.loadTree(workspaceUrl);
-            this.instanceData.treeData = data;
-            this.setState({ loading: false, currentWorkspaceUrl: workspaceUrl, lastLoadedTimestamp: LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl)) });
-        });
-    }
 }
 export const MainNavWithRouter = withRouter(MainNav);
+var MainNavController;
+(function (MainNavController) {
+    let instance = null;
+    MainNavController.treeData = null;
+    MainNavController.forceRefresh = false;
+    MainNavController.hasLoaded = false;
+    MainNavController.workspace = null;
+    function prepData(navInstance) {
+        instance = navInstance;
+        loadData();
+    }
+    MainNavController.prepData = prepData;
+    function getContent() {
+        if (MainNavController.hasLoaded != true) {
+            return (React.createElement("div", { className: "loadingSpinner" },
+                React.createElement(Spinner, { label: "Loading...", labelPosition: "right", size: SpinnerSize.large })));
+        }
+        let selectedKey = instance.state.selectedKey;
+        if (selectedKey.endsWith("/"))
+            selectedKey = selectedKey.slice(0, -1);
+        let navLinkGroups = [
+            {
+                links: MainNav.itemChildrenToLinks(MainNavController.treeData, selectedKey)
+            }
+        ];
+        return (React.createElement(Nav, { groups: navLinkGroups, selectedKey: selectedKey, onLinkClick: onLinkClick }));
+    }
+    MainNavController.getContent = getContent;
+    function getOptionsContent() {
+        var _a;
+        if (MainNavController.hasLoaded != true) {
+            return (React.createElement("div", { className: "loadingSpinner" },
+                React.createElement(Spinner, { label: "Loading...", labelPosition: "right", size: SpinnerSize.large })));
+        }
+        let selectedKey = instance.state.selectedKey;
+        if (selectedKey.endsWith("/"))
+            selectedKey = selectedKey.slice(0, -1);
+        let groups = [];
+        if (((_a = MainNavController.workspace === null || MainNavController.workspace === void 0 ? void 0 : MainNavController.workspace.storage) === null || _a === void 0 ? void 0 : _a.hasGit) == true) {
+            groups.push({
+                name: "Storage",
+                links: [
+                    { name: "Git repository", key: "_options/git", url: "workspace" + (MainNavController.workspace === null || MainNavController.workspace === void 0 ? void 0 : MainNavController.workspace.reactLocalUrl) + "?options=git", icon: "GitGraph" }
+                ]
+            });
+        }
+        return (React.createElement(Nav, { groups: groups, selectedKey: selectedKey, onLinkClick: onLinkClick }));
+    }
+    MainNavController.getOptionsContent = getOptionsContent;
+    function onLinkClick(ev, item) {
+        ev.preventDefault();
+        Utils.tryGet(instance.props, "history").push(Utils.padWithSlash(item.url, true, false));
+        EventBus.dispatch("navChange");
+    }
+    MainNavController.onLinkClick = onLinkClick;
+    function loadData() {
+        return __awaiter(this, void 0, void 0, function* () {
+            MainNavController.hasLoaded = false;
+            MainNavController.workspace = LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspaceData);
+            let workspaceUrl = MainNavController.workspace === null || MainNavController.workspace === void 0 ? void 0 : MainNavController.workspace.url;
+            if ((workspaceUrl == null) || (workspaceUrl == ""))
+                return;
+            MainNavController.treeData = yield Workspaces.loadTree(workspaceUrl);
+            MainNavController.hasLoaded = true;
+            instance.setState({ loading: false, currentWorkspaceUrl: workspaceUrl, lastLoadedTimestamp: LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl)) });
+        });
+    }
+    MainNavController.loadData = loadData;
+})(MainNavController || (MainNavController = {}));
 //# sourceMappingURL=MainNav.js.map

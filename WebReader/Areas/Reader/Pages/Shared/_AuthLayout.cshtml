@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+	<title>@(Docomb.WebCore.Configurations.MainConfig.Instance.SiteName)</title>
+	<base href="@ViewBag.baseHref" />
+	<link rel="stylesheet" href="~/_resources/styles/docomb/reader.css" />
+</head>
+<body>
+	<div class="authPage">
+		<div class="title"><h1>@(Docomb.WebCore.Configurations.MainConfig.Instance.SiteName)</h1></div>
+		<div class="authContent">
+			@RenderBody()
+		</div>
+	</div>
+</body>
+</html>

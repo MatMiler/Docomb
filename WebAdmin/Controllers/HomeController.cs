@@ -3,17 +3,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Docomb.WebCore.Configurations.UiConfig;
 
 namespace Docomb.WebAdmin.Controllers
 {
-	[Route(AdminConfig.UrlPathPrefix)]
+	[Route(UrlPathPrefix)]
 	public class HomeController : Controller
 	{
 		[HttpGet("{**itemPath}")]
 		public IActionResult Index()
 		{
-			ViewBag.baseHref = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/{AdminConfig.UrlPathPrefix}/";
-			ViewBag.basePath = $"{Request.PathBase}/{AdminConfig.UrlPathPrefix}/";
+			if (!WebCore.Authentication.Access.HasAccess(User, WebCore.Authentication.AccessLevel.Editor))
+				return Redirect($"/{UrlPathPrefix}/account/login");
+
+			ViewBag.baseHref = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/{UrlPathPrefix}/";
+			ViewBag.basePath = $"{Request.PathBase}/{UrlPathPrefix}/";
 			ViewBag.readerBasePath = $"{Request.PathBase}/";
 			return View("~/Areas/Admin/Pages/Index.cshtml");
 		}

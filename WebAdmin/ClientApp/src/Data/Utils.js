@@ -181,7 +181,7 @@ export var Utils;
     }
     Utils.lastStringPart = lastStringPart;
     //#endregion
-    //#region Arrays & Objects
+    //#region Paths
     function padWithSlash(value, atStart = true, atEnd = true) {
         value = trimString(value, "");
         if ((atStart == true) && (!value.startsWith("/")))
@@ -294,6 +294,83 @@ export var Utils;
         }
     }
     Utils.UrlParts = UrlParts;
+    /**
+     * Process query parameters into an object.
+     * If a parameter has multiple values, the first one is used.
+     * @param query Query string
+     */
+    function breakUrlParams(query) {
+        let items = breakUrlParamsArrayed(query);
+        let dict = {};
+        if (items == null)
+            return dict;
+        for (let key in items) {
+            let value = items[key];
+            if (value instanceof Array)
+                dict[key] = (value.length >= 1) ? value[0] : null;
+            else if (typeof value == "string")
+                dict[key] = value;
+        }
+        return dict;
+    }
+    Utils.breakUrlParams = breakUrlParams;
+    /**
+     * Process query parameters into an object.
+     * If a parameter has multiple values, they are separated by a comma.
+     * @param query Query string
+     */
+    function breakUrlParamsCsv(query) {
+        let items = breakUrlParamsArrayed(query);
+        let dict = {};
+        if (items == null)
+            return dict;
+        for (let key in items) {
+            let value = items[key];
+            if (value instanceof Array)
+                dict[key] = value.join(",");
+            else if (typeof value == "string")
+                dict[key] = value;
+        }
+        return dict;
+    }
+    Utils.breakUrlParamsCsv = breakUrlParamsCsv;
+    /**
+     * Process query parameters into an object.
+     * If a parameter has multiple values, they are returned as an array.
+     * @param query Query string
+     */
+    function breakUrlParamsArrayed(query) {
+        query = trimString(query, "");
+        if (query == "")
+            return {};
+        let dict = {};
+        if (query.startsWith("?"))
+            query = query.substr(1);
+        let items = query.split("&");
+        if ((items == null) || (items.length <= 0))
+            return {};
+        for (let x = 0; x < items.length; x++) {
+            let item = items[x].split("=");
+            if ((item == null) || (item.length < 1))
+                continue;
+            let key = item[0];
+            let value = (item.length >= 2) ? item[1] : null;
+            if ((value != null) && (typeof value == "string"))
+                value = decodeURIComponent(parseString(value, "").replace("+", " "));
+            let oldValue = dict[key];
+            if (oldValue === undefined) {
+                dict[key] = value;
+            }
+            else {
+                if (oldValue instanceof Array)
+                    oldValue.push(value);
+                else
+                    dict[key] = [oldValue, value];
+            }
+        }
+        return dict;
+    }
+    Utils.breakUrlParamsArrayed = breakUrlParamsArrayed;
     //#endregion
     //#region Arrays & Objects
     /**
@@ -329,6 +406,24 @@ export var Utils;
         return list;
     }
     Utils.mapArray = mapArray;
+    function mapObjectValues(data, conversion, validation = null, includeNull = false) {
+        let o = {};
+        if (data == null)
+            return o;
+        for (let key in data) {
+            let value = null;
+            try {
+                value = conversion(data[key]);
+            }
+            catch (e) { }
+            if ((validation != null) && (validation(value) != true))
+                value = null;
+            if ((includeNull == true) || (value != null))
+                o[key] = value;
+        }
+        return o;
+    }
+    Utils.mapObjectValues = mapObjectValues;
     /**
      * Get array of all keys in an object
      * @param object Object from which to extract keys
@@ -364,6 +459,47 @@ export var Utils;
         return false;
     }
     Utils.hasObjectKey = hasObjectKey;
+    /**
+     * Convert all properties of an object into an array of values
+     * @param data
+     * @param conversion
+     * @param validation
+     * @param includeNull
+     */
+    function objectToArray(data, conversion, validation = null, includeNull = false) {
+        let list = [];
+        if (data == null)
+            return list;
+        for (let key in data) {
+            let value = null;
+            try {
+                value = conversion(key, data[key]);
+            }
+            catch (e) { }
+            if ((validation != null) && (validation(value) != true))
+                value = null;
+            if ((includeNull == true) || (value != null))
+                list.push(value);
+        }
+        return list;
+    }
+    Utils.objectToArray = objectToArray;
+    /**
+     * Generate a hash code from an object
+     * @param o Object from which to generate hash code
+     */
+    function hashCode(o) {
+        let s = JSON.stringify(o);
+        let hash = 0;
+        if (s.length === 0)
+            return hash;
+        for (let x = 0; x < s.length; x++) {
+            hash = ((hash << 5) - hash) + (s.charCodeAt(x));
+            hash |= 0;
+        }
+        return hash;
+    }
+    Utils.hashCode = hashCode;
     //#endregion
     //#region Try get property
     /**

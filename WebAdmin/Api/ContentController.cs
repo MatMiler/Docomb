@@ -10,18 +10,16 @@ using static Docomb.WebAdmin.Api.ContentManager.Edit;
 
 namespace Docomb.WebAdmin.Api
 {
-	[Route(AdminConfig.UrlPathPrefix + "/api/content")]
+	[Route(WebCore.Configurations.UiConfig.UrlPathPrefix + "/api/content")]
 	public class ContentController : Controller
 	{
-
-		//[HttpGet("fileDetails")]
-		//public ActionResult<FileDetails> GetFileDetails(string url) => FileDetails.Get(url);
 
 
 		[HttpPost("saveTextFile")]
 		public ActionStatus SaveTextFile([FromBody] SaveRequest request)
 		{
-			ActionStatus status = ContentManager.Edit.Save(request) ?? new ActionStatus(ActionStatus.StatusCode.Error);
+			AdminContext context = new(User);
+			ActionStatus status = Edit.Save(request, context) ?? new ActionStatus(ActionStatus.StatusCode.Error);
 			Response.StatusCode = status.GetHttpStatusCode();
 			return status;
 		}
@@ -30,7 +28,8 @@ namespace Docomb.WebAdmin.Api
 		[HttpPost("renameFile")]
 		public MoveResponse RenameFile([FromBody] MoveRequest request)
 		{
-			MoveResponse response = ContentManager.Edit.RenameFile(request);
+			AdminContext context = new(User);
+			MoveResponse response = Edit.RenameFile(request, context);
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
 		}
@@ -39,7 +38,8 @@ namespace Docomb.WebAdmin.Api
 		[HttpPost("moveFile")]
 		public MoveResponse MoveFile([FromBody] MoveRequest request)
 		{
-			MoveResponse response = ContentManager.Edit.MoveFile(request);
+			AdminContext context = new(User);
+			MoveResponse response = Edit.MoveFile(request, context);
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
 		}
@@ -48,7 +48,8 @@ namespace Docomb.WebAdmin.Api
 		[HttpPost("renameDirectory")]
 		public MoveResponse RenameDirectory([FromBody] MoveRequest request)
 		{
-			MoveResponse response = ContentManager.Edit.RenameDirectory(request);
+			AdminContext context = new(User);
+			MoveResponse response = Edit.RenameDirectory(request, context);
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
 		}
@@ -57,7 +58,8 @@ namespace Docomb.WebAdmin.Api
 		[HttpPost("moveDirectory")]
 		public MoveResponse MoveDirectory([FromBody] MoveRequest request)
 		{
-			MoveResponse response = ContentManager.Edit.MoveDirectory(request);
+			AdminContext context = new(User);
+			MoveResponse response = Edit.MoveDirectory(request, context);
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
 		}
@@ -66,7 +68,8 @@ namespace Docomb.WebAdmin.Api
 		[HttpPost("createFile")]
 		public DataWithStatus<ContentItemSummary> CreateFile([FromBody] CreateFileRequest request)
 		{
-			DataWithStatus<ContentItemSummary> response = ContentManager.Edit.CreateFile(request);
+			AdminContext context = new(User);
+			DataWithStatus<ContentItemSummary> response = Edit.CreateFile(request, context);
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
 		}
@@ -75,7 +78,8 @@ namespace Docomb.WebAdmin.Api
 		[HttpPost("createDirectory")]
 		public DataWithStatus<ContentItemSummary> CreateDirectory([FromBody] CreateFileRequest request)
 		{
-			DataWithStatus<ContentItemSummary> response = ContentManager.Edit.CreateDirectory(request);
+			AdminContext context = new(User);
+			DataWithStatus<ContentItemSummary> response = Edit.CreateDirectory(request, context);
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
 		}
@@ -84,7 +88,8 @@ namespace Docomb.WebAdmin.Api
 		[HttpPost("deleteItem")]
 		public DeleteItemResponse DeleteItem([FromBody] DeleteItemRequest request)
 		{
-			DeleteItemResponse response = ContentManager.Edit.DeleteItem(request);
+			AdminContext context = new(User);
+			DeleteItemResponse response = Edit.DeleteItem(request, context);
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
 		}
@@ -93,7 +98,8 @@ namespace Docomb.WebAdmin.Api
 		[HttpPost("preUploadCheck")]
 		public PreUploadCheckResponse PreUploadCheck([FromBody] PreUploadCheckRequest request)
 		{
-			PreUploadCheckResponse response = ContentManager.Edit.PreUploadCheck(request);
+			AdminContext context = new(User);
+			PreUploadCheckResponse response = Edit.PreUploadCheck(request, context);
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
 		}
@@ -102,21 +108,21 @@ namespace Docomb.WebAdmin.Api
 		[HttpPost("uploadFile")]
 		public DataWithStatus<ContentItemSummary> UploadFile()
 		{
-			//int a = 1;
-			UploadFileRequest request = new UploadFileRequest();
+			AdminContext context = new(User);
+			UploadFileRequest request = new();
 			request.ParentUrl = Request.Form["parentUrl"];
-			request.File = Request.Form.Files.FirstOrDefault();
-			DataWithStatus<ContentItemSummary> response = ContentManager.Edit.UploadFile(request);
+			request.File = (Request.Form?.Files?.Count > 0) ? Request.Form.Files[0] : null;
+			DataWithStatus <ContentItemSummary> response = Edit.UploadFile(request, context);
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
-			//return new DataWithStatus<ContentItemSummary>(new ActionStatus(ActionStatus.StatusCode.ActionNotSupported), null);
 		}
 
 
 		[HttpPost("previewMarkdown")]
 		public DataWithStatus<string> PreviewMarkdown([FromBody] SaveRequest request)
 		{
-			DataWithStatus<string> response = ContentManager.Edit.PreviewMarkdown(request) ?? new(new ActionStatus(ActionStatus.StatusCode.Error), null);
+			AdminContext context = new(User);
+			DataWithStatus<string> response = Edit.PreviewMarkdown(request, context) ?? new(new ActionStatus(ActionStatus.StatusCode.Error), null);
 			if (response?.ActionStatus != null) Response.StatusCode = response.ActionStatus.GetHttpStatusCode();
 			return response;
 		}

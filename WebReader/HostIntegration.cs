@@ -47,6 +47,15 @@ namespace Docomb.WebReader
 		public static void AddDocombReader(this IServiceCollection services)
 		{
 			services.ConfigureOptions(typeof(ConfigureOptions));
+
+			WebCore.Configurations.MainConfig.Instance?.Authentication?.AddAuthentications(services, $"/account/login");
+
+			WebCore.Configurations.UiConfig.SetHasReader(true);
+		}
+
+		public static void UseDocombReader(this IApplicationBuilder app)
+		{
+			WebCore.Configurations.MainConfig.Instance?.Authentication?.UseAuthentication(app);
 		}
 	}
 

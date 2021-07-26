@@ -93,7 +93,11 @@ namespace Docomb.CommonCore
 			[StatusCode("Data is not supported", StatusCategory.ClientIssue, 400)]
 			DataNotSupported,
 			[StatusCode("Resources are in conflict", StatusCategory.ClientIssue, 409)]
-			Conflict
+			Conflict,
+			[StatusCode("Access to this resource is denied", StatusCategory.SecurityIssue, 403)]
+			AccessDenied,
+			[StatusCode("Authorization is required to access this resource", StatusCategory.SecurityIssue, 401)]
+			AuthorizationNeeded
 		}
 
 

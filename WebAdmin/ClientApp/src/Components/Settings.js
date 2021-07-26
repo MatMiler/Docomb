@@ -9,7 +9,7 @@ export class Settings extends Component {
         EventBus.dispatch("navUpdate");
     }
     render() {
-        return (React.createElement(Layout, { showMainNav: false },
+        return (React.createElement(Layout, { mainNavType: "settings" },
             React.createElement("div", { className: "adminHome emptyPage" },
                 React.createElement("div", { className: "watermark" },
                     React.createElement(FontIcon, { iconName: "Settings" })))));

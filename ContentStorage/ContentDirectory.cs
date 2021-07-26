@@ -1,4 +1,5 @@
 ﻿using Docomb.CommonCore;
+using Docomb.ContentStorage.Workspaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,7 @@ namespace Docomb.ContentStorage
 		}
 
 
-		public ActionStatus Rename(string newName)
+		public ActionStatus Rename(string newName, ActionContext context)
 		{
 			try
 			{
@@ -28,8 +29,10 @@ namespace Docomb.ContentStorage
 				string newPath = Path.Combine(Directory.GetParent(FilePath).FullName, newName);
 				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"File '{newName}' already exists.");
 				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"Folder '{newName}' already exists.");
+				string oldPath = FilePath;
 				Directory.Move(FilePath, newPath);
 				Workspace.Content.ClearCache();
+				Workspace.Git?.MoveDirectory(oldPath, newPath, context);
 				return new(ActionStatus.StatusCode.OK);
 			}
 			catch (Exception e)
@@ -38,7 +41,7 @@ namespace Docomb.ContentStorage
 			}
 		}
 
-		public ActionStatus Move(string newParentPath)
+		public ActionStatus Move(string newParentPath, ActionContext context)
 		{
 			try
 			{
@@ -48,8 +51,10 @@ namespace Docomb.ContentStorage
 				if (newPath == FilePath) return new(ActionStatus.StatusCode.InvalidRequestData, $"The folder is already in '{newParentPath}'");
 				if (File.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"A file with the same name already exists in '{newParentPath}'.");
 				if (Directory.Exists(newPath)) return new(ActionStatus.StatusCode.Conflict, $"A folder with the same name already exists in '{newParentPath}'.");
+				string oldPath = FilePath;
 				Directory.Move(FilePath, newPath);
 				Workspace.Content.ClearCache();
+				Workspace.Git?.MoveDirectory(oldPath, newPath, context);
 				return new(ActionStatus.StatusCode.OK);
 			}
 			catch (Exception e)
@@ -58,12 +63,13 @@ namespace Docomb.ContentStorage
 			}
 		}
 
-		public ActionStatus Delete()
+		public ActionStatus Delete(ActionContext context)
 		{
 			try
 			{
-				Directory.Delete(FilePath);
+				Directory.Delete(FilePath, true);
 				Workspace.Content.ClearCache();
+				Workspace.Git?.RemoveDirectory(FilePath, context);
 				return new(ActionStatus.StatusCode.OK);
 			}
 			catch (Exception e)

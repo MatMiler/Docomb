@@ -182,7 +182,7 @@
 
 
 
-	//#region Arrays & Objects
+	//#region Paths
 
 	export function padWithSlash(value: string, atStart: boolean = true, atEnd: boolean = true): string {
 		value = trimString(value, "");
@@ -288,6 +288,83 @@
 
 	}
 
+	/**
+	 * Process query parameters into an object.
+	 * If a parameter has multiple values, the first one is used.
+	 * @param query Query string
+	 */
+	export function breakUrlParams(query: string): { [key: string]: string }
+	{
+		let items: { [key: string]: string | Array<string> } = breakUrlParamsArrayed(query);
+		let dict: { [key: string]: string } = {};
+		if (items == null) return dict;
+		for (let key in items)
+		{
+			let value: string | string[] = items[key];
+			if (value instanceof Array)
+				dict[key] = (value.length >= 1) ? value[0] : null;
+			else if (typeof value == "string")
+				dict[key] = value;
+		}
+		return dict;
+	}
+	/**
+	 * Process query parameters into an object.
+	 * If a parameter has multiple values, they are separated by a comma.
+	 * @param query Query string
+	 */
+	export function breakUrlParamsCsv(query: string): { [key: string]: string }
+	{
+		let items: { [key: string]: string | string[] } = breakUrlParamsArrayed(query);
+		let dict: { [key: string]: string } = {};
+		if (items == null) return dict;
+		for (let key in items)
+		{
+			let value: string | Array<string> = items[key];
+			if (value instanceof Array)
+				dict[key] = value.join(",");
+			else if (typeof value == "string")
+				dict[key] = value;
+		}
+		return dict;
+	}
+	/**
+	 * Process query parameters into an object.
+	 * If a parameter has multiple values, they are returned as an array.
+	 * @param query Query string
+	 */
+	export function breakUrlParamsArrayed(query: string): { [key: string]: string | Array<string> }
+	{
+		query = trimString(query, "");
+		if (query == "") return {};
+		let dict: { [key: string]: string | Array<string> } = {};
+		if (query.startsWith("?")) query = query.substr(1);
+		let items: Array<string> = query.split("&");
+		if ((items == null) || (items.length <= 0)) return {};
+		for (let x = 0; x < items.length; x++)
+		{
+			let item: Array<string> = items[x].split("=");
+			if ((item == null) || (item.length < 1)) continue;
+			let key: string = item[0];
+			let value: string = (item.length >= 2) ? item[1] : null;
+			if ((value != null) && (typeof value == "string")) value = decodeURIComponent(parseString(value, "").replace("+", " "));
+			let oldValue = dict[key];
+			if (oldValue === undefined)
+			{
+				dict[key] = value;
+			}
+			else
+			{
+				if (oldValue instanceof Array)
+					oldValue.push(value);
+				else
+					dict[key] = [ oldValue, value ];
+			}
+		}
+		return dict;
+	}
+
+
 	//#endregion
 
 
@@ -329,6 +406,19 @@
 		return list;
 	}
 
+	export function mapObjectValues<T>(data: any, conversion: (source: any) => T, validation: (item: T) => boolean = null, includeNull: boolean = false): { [key: string]: T} {
+		let o = {};
+		if (data == null) return o;
+		for (let key in data) {
+			let value: T = null;
+			try { value = conversion(data[key]); } catch (e) { }
+			if ((validation != null) && (validation(value) != true)) value = null;
+			if ((includeNull == true) || (value != null))
+				o[key] = value;
+		}
+		return o;
+	}
+
 	/**
 	 * Get array of all keys in an object
 	 * @param object Object from which to extract keys
@@ -362,6 +452,41 @@
 			if (s == key)
 				return true;
 		return false;
+	}
+
+	/**
+	 * Convert all properties of an object into an array of values
+	 * @param data
+	 * @param conversion
+	 * @param validation
+	 * @param includeNull
+	 */
+	export function objectToArray<T>(data: any, conversion: (key: string, value: any) => T, validation: (item: T) => boolean = null, includeNull: boolean = false): Array<T> {
+		let list: T[] = [];
+		if (data == null) return list;
+		for (let key in data) {
+			let value: T = null;
+			try { value = conversion(key, data[key]); } catch (e) { }
+			if ((validation != null) && (validation(value) != true)) value = null;
+			if ((includeNull == true) || (value != null))
+				list.push(value);
+		}
+		return list;
+	}
+
+	/**
+	 * Generate a hash code from an object
+	 * @param o Object from which to generate hash code
+	 */
+	export function hashCode(o: any): number {
+		let s = JSON.stringify(o);
+		let hash: number = 0
+		if (s.length === 0) return hash;
+		for (let x = 0; x < s.length; x++) {
+			hash = ((hash << 5) - hash) + (s.charCodeAt(x));
+			hash |= 0;
+		}
+		return hash;
 	}
 
 	//#endregion

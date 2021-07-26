@@ -12,6 +12,7 @@ import { SideBarItem } from './SideBarItem';
 import { Workspaces } from "../Data/Workspaces";
 import { LayoutUtils } from '../LayoutUtils';
 import { EventBus } from '../EventBus';
+import SideBarUser from './SideBarUser';
 export class SideBarNav extends Component {
     constructor(props) {
         super(props);
@@ -52,6 +53,7 @@ export class SideBarNav extends Component {
                 React.createElement(SideBarItem, { name: "Home", url: "/", initials: "H", icon: "Home", itemKey: LayoutUtils.NavBar.ItemKey.Home }),
                 contents),
             React.createElement("div", { className: "system" },
+                React.createElement(SideBarUser, null),
                 React.createElement(SideBarItem, { name: "Settings", url: "/settings", initials: "S", icon: "Settings", itemKey: LayoutUtils.NavBar.ItemKey.Settings }))));
     }
     populateWorkspaces() {

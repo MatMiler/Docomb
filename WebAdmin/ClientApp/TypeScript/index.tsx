@@ -4,13 +4,19 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import registerServiceWorker from '../src/registerServiceWorker';
 
+import { initializeIcons } from '@fluentui/font-icons-mdl2';
+initializeIcons("/_resources/admin/fluenticons/");
+
+
 const baseUrl = window["basePath"];
 const rootElement = document.getElementById('root');
 
-ReactDOM.render(
-	<BrowserRouter basename={baseUrl}>
-		<App />
-	</BrowserRouter>,
-	rootElement);
+if (window["layoutType"] == "admin") {
+	ReactDOM.render(
+		<BrowserRouter basename={baseUrl}>
+			<App />
+		</BrowserRouter>,
+		rootElement);
+}
 
 registerServiceWorker();

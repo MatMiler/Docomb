@@ -85,6 +85,15 @@ html a {
   .mainNavGrid > .sideBarNav {
     border-right: 1px solid;
     box-sizing: content-box; }
+    html .mainNavGrid > .sideBarNav {
+      background: #e9e9e9; }
+    .dark .mainNavGrid > .sideBarNav {
+      background: #222; }
+    @media (prefers-color-scheme: dark) {
+      html .mainNavGrid > .sideBarNav {
+        background: #222; }
+      .light .mainNavGrid > .sideBarNav {
+        background: #e9e9e9; } }
     .mainNavGrid > .sideBarNav .sideBar {
       display: flex;
       flex-direction: column;
@@ -207,7 +216,8 @@ html a {
   padding: 10px;
   color: inherit;
   text-decoration: none;
-  position: relative; }
+  position: relative;
+  cursor: pointer; }
   html .sideBarItem a:hover {
     color: #03f;
     background: rgba(0, 0, 0, 0.1); }
@@ -302,6 +312,8 @@ html .sideBarItem.selected a:before {
   .pageGrid .pageContent {
     flex: 1 1 100%;
     overflow: auto; }
+    .pageGrid .pageContent > .loadingSpinner {
+      padding: 20px; }
   .pageGrid .pageTitle + .pageCommands {
     margin-top: -10px; }
   .pageGrid .pageTitle + .pageContent, .pageGrid .pageCommands + .pageContent {
@@ -468,6 +480,15 @@ html .sideBarItem.selected a:before {
       padding: 32px;
       background-color: transparent; }
 
+.usersEditor {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column; }
+  .usersEditor .list {
+    flex: 1 1 100%;
+    position: relative; }
+
 .invisibleUploadInput {
   width: 0;
   height: 0;
@@ -602,3 +623,148 @@ html .articleContent table th {
 
 .articleContent > :last-child, .articleContent blockquote > :last-child {
   margin-bottom: 0; }
+
+.authPage {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: auto; }
+  .authPage > .title {
+    flex: 0 0 auto;
+    text-align: center; }
+    .authPage > .title h1 {
+      margin: 0;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: bold;
+      border-bottom: 1px solid; }
+      html .authPage > .title h1 {
+        border-color: #c9c9c9;
+        background: #eee; }
+      .dark .authPage > .title h1 {
+        border-color: #494949;
+        background: #333; }
+      @media (prefers-color-scheme: dark) {
+        html .authPage > .title h1 {
+          border-color: #494949;
+          background: #333; }
+        .light .authPage > .title h1 {
+          border-color: #c9c9c9;
+          background: #eee; } }
+  .authPage .authContent {
+    flex: 1 1 100%; }
+    .authPage .authContent > .inner {
+      position: relative;
+      z-index: 2;
+      min-width: 100%;
+      min-height: 90%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center; }
+  .authPage .actionStatus {
+    padding: 32px; }
+    .authPage .actionStatus .title {
+      font-size: 24px;
+      text-align: center; }
+    .authPage .actionStatus.error .title {
+      font-weight: bold; }
+      html .authPage .actionStatus.error .title {
+        color: #c00; }
+      .dark .authPage .actionStatus.error .title {
+        color: #c00; }
+      @media (prefers-color-scheme: dark) {
+        html .authPage .actionStatus.error .title {
+          color: #c00; }
+        .light .authPage .actionStatus.error .title {
+          color: #c00; } }
+  .authPage .otherActions {
+    padding: 20px; }
+    .authPage .otherActions .links {
+      display: flex;
+      flex-wrap: wrap; }
+    .authPage .otherActions a {
+      color: inherit;
+      font-size: 16px;
+      padding: 12px;
+      text-decoration: none; }
+      html .authPage .otherActions a:hover, html .authPage .otherActions a:focus {
+        color: #03f;
+        background: rgba(0, 0, 0, 0.1); }
+      .dark .authPage .otherActions a:hover, .dark .authPage .otherActions a:focus {
+        color: #0bf;
+        background: rgba(255, 255, 255, 0.1); }
+      @media (prefers-color-scheme: dark) {
+        html .authPage .otherActions a:hover, html .authPage .otherActions a:focus {
+          color: #0bf;
+          background: rgba(255, 255, 255, 0.1); }
+        .light .authPage .otherActions a:hover, .light .authPage .otherActions a:focus {
+          color: #03f;
+          background: rgba(0, 0, 0, 0.1); } }
+      html .authPage .otherActions a:active {
+        background: rgba(0, 0, 0, 0.13); }
+      .dark .authPage .otherActions a:active {
+        background: rgba(255, 255, 255, 0.13); }
+      @media (prefers-color-scheme: dark) {
+        html .authPage .otherActions a:active {
+          background: rgba(255, 255, 255, 0.13); }
+        .light .authPage .otherActions a:active {
+          background: rgba(0, 0, 0, 0.13); } }
+  .authPage .loginSchemeSelection {
+    padding: 20px 20px 24px 20px; }
+    .authPage .loginSchemeSelection .label {
+      font-size: 14px;
+      padding: 8px 12px; }
+      html .authPage .loginSchemeSelection .label {
+        color: #666; }
+      .dark .authPage .loginSchemeSelection .label {
+        color: #ccc; }
+      @media (prefers-color-scheme: dark) {
+        html .authPage .loginSchemeSelection .label {
+          color: #ccc; }
+        .light .authPage .loginSchemeSelection .label {
+          color: #666; } }
+    .authPage .loginSchemeSelection .schemes {
+      font-size: 0; }
+      .authPage .loginSchemeSelection .schemes form button {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        background: transparent;
+        color: inherit;
+        font-family: inherit;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 0;
+        padding: 12px;
+        text-align: left;
+        cursor: pointer; }
+        html .authPage .loginSchemeSelection .schemes form button:hover, html .authPage .loginSchemeSelection .schemes form button:focus {
+          color: #03f;
+          background: rgba(0, 0, 0, 0.1); }
+        .dark .authPage .loginSchemeSelection .schemes form button:hover, .dark .authPage .loginSchemeSelection .schemes form button:focus {
+          color: #0bf;
+          background: rgba(255, 255, 255, 0.1); }
+        @media (prefers-color-scheme: dark) {
+          html .authPage .loginSchemeSelection .schemes form button:hover, html .authPage .loginSchemeSelection .schemes form button:focus {
+            color: #0bf;
+            background: rgba(255, 255, 255, 0.1); }
+          .light .authPage .loginSchemeSelection .schemes form button:hover, .light .authPage .loginSchemeSelection .schemes form button:focus {
+            color: #03f;
+            background: rgba(0, 0, 0, 0.1); } }
+        html .authPage .loginSchemeSelection .schemes form button:active {
+          background: rgba(0, 0, 0, 0.13); }
+        .dark .authPage .loginSchemeSelection .schemes form button:active {
+          background: rgba(255, 255, 255, 0.13); }
+        @media (prefers-color-scheme: dark) {
+          html .authPage .loginSchemeSelection .schemes form button:active {
+            background: rgba(255, 255, 255, 0.13); }
+          .light .authPage .loginSchemeSelection .schemes form button:active {
+            background: rgba(0, 0, 0, 0.13); } }
+        .authPage .loginSchemeSelection .schemes form button img {
+          display: block;
+          width: 1.2em;
+          height: 1.2em;
+          margin-right: .5em; }

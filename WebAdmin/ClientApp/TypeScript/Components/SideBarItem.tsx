@@ -6,7 +6,7 @@ import { LayoutUtils } from '../LayoutUtils';
 
 type SideBarItemData = {
 	name: string,
-	url: string,
+	url?: string,
 	initials: string,
 	icon?: string,
 	exactMatch?: boolean,

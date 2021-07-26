@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Docomb.ContentStorage.Workspaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -28,14 +29,7 @@ namespace Docomb.ContentStorage.MarkdownEngines
 				Dictionary<string, MarkdownEngine> dict = engines.ToDictionary(x => x.Code);
 				return dict;
 			}
-			catch (Exception e)
-			{
-
-			}
-			//foreach (var engine in engines)
-			//{
-
-			//}
+			catch { }
 			return null;
 		}
 

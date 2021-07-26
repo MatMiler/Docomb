@@ -9,7 +9,7 @@ export class Home extends Component {
         EventBus.dispatch("navUpdate");
     }
     render() {
-        return (React.createElement(Layout, { showMainNav: false },
+        return (React.createElement(Layout, { mainNavType: null },
             React.createElement("div", { className: "adminHome emptyPage" },
                 React.createElement("div", { className: "watermark" },
                     React.createElement(FontIcon, { iconName: "Library" })))));
