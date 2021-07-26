@@ -391,4 +391,10 @@ export module Workspaces {
 		return new Apis.DataWithStatus(actionStatus, item);
 	}
 
+
+	export async function gitSync(workspaceUrl: string): Promise<Apis.ActionStatus> {
+		let data: any = await Apis.fetchJsonAsync("api/storage/gitSync?workspaceUrl=" + encodeURI(workspaceUrl), false);
+		return new Apis.ActionStatus(data);
+	}
+
 }

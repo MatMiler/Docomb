@@ -358,5 +358,12 @@ export var Workspaces;
         });
     }
     Workspaces.uploadFile = uploadFile;
+    function gitSync(workspaceUrl) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data = yield Apis.fetchJsonAsync("api/storage/gitSync?workspaceUrl=" + encodeURI(workspaceUrl), false);
+            return new Apis.ActionStatus(data);
+        });
+    }
+    Workspaces.gitSync = gitSync;
 })(Workspaces || (Workspaces = {}));
 //# sourceMappingURL=Workspaces.js.map

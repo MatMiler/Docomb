@@ -61,12 +61,23 @@ namespace Docomb.ContentStorage.Workspaces
 		private Repository _repository = null;
 
 
+
+
+
+
+		private readonly object _localLock = new();
+		private readonly object _originLock = new();
+
+
 		public void AddFile(string path, ActionContext context)
 		{
 			if (!IsValid) return;
-			string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
-			Commands.Stage(Repository, relativePath);
-			Commit($"Added '{relativePath}'", context);
+			lock (_localLock)
+			{
+				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
+				Commands.Stage(Repository, relativePath);
+				Commit($"Added '{relativePath}'", context);
+			}
 		}
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>")]
@@ -78,72 +89,98 @@ namespace Docomb.ContentStorage.Workspaces
 		public void UpdateFile(string path, ActionContext context)
 		{
 			if (!IsValid) return;
-			string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
-			Commands.Stage(Repository, relativePath);
-			Commit($"Updated '{relativePath}'", context);
+			lock (_localLock)
+			{
+				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
+				Commands.Stage(Repository, relativePath);
+				Commit($"Updated '{relativePath}'", context);
+			}
 		}
 
 		public void RemoveFile(string path, ActionContext context)
 		{
 			if (!IsValid) return;
-			string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
-			Commands.Stage(Repository, relativePath);
-			Commit($"Removed '{relativePath}'", context);
+			lock (_localLock)
+			{
+				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
+				Commands.Stage(Repository, relativePath);
+				Commit($"Removed '{relativePath}'", context);
+			}
 		}
 
 		public void RemoveDirectory(string path, ActionContext context)
 		{
 			if (!IsValid) return;
-			string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
-			RepositoryStatus status = Repository.RetrieveStatus(new StatusOptions() {
-				DetectRenamesInWorkDir = false,
-				DetectRenamesInIndex = false,
-				PathSpec = new string[] { relativePath },
-				IncludeUntracked = true,
-				RecurseUntrackedDirs = true
-			});
-			if (status?.Count() > 0)
+			lock (_localLock)
 			{
-				Commands.Stage(Repository, status.Select(x => x.FilePath));
+				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
+				RepositoryStatus status = Repository.RetrieveStatus(new StatusOptions()
+				{
+					DetectRenamesInWorkDir = false,
+					DetectRenamesInIndex = false,
+					PathSpec = new string[] { relativePath },
+					IncludeUntracked = true,
+					RecurseUntrackedDirs = true
+				});
+				if (status?.Count() > 0)
+				{
+					Commands.Stage(Repository, status.Select(x => x.FilePath));
+				}
+				Commit($"Removed '{relativePath}'", context);
 			}
-			Commit($"Removed '{relativePath}'", context);
 		}
 
 		public bool MoveFile(string oldPath, string newPath, ActionContext context)
 		{
 			if (!IsValid) return false;
-			try
+			lock (_localLock)
 			{
-				string relativeOldPath = Path.GetRelativePath(Workspace.ContentStoragePath, oldPath);
-				string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
-				Commands.Move(Repository, relativeOldPath, relativeNewPath);
-				Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
-				return true;
-			}
-			catch
-			{
-				return false;
+				try
+				{
+					string relativeOldPath = Path.GetRelativePath(Workspace.ContentStoragePath, oldPath);
+					string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
+					Commands.Move(Repository, relativeOldPath, relativeNewPath);
+					Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
+					return true;
+				}
+				catch
+				{
+					return false;
+				}
 			}
 		}
 
 		public void MoveDirectory(string oldPath, string newPath, ActionContext context)
 		{
 			if (!IsValid) return;
-			string relativeOldPath = Path.GetRelativePath(Workspace.ContentStoragePath, oldPath);
-			string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
-			RepositoryStatus status = Repository.RetrieveStatus(new StatusOptions()
+			lock (_localLock)
 			{
-				DetectRenamesInWorkDir = false,
-				DetectRenamesInIndex = false,
-				PathSpec = new string[] { relativeOldPath, relativeNewPath },
-				IncludeUntracked = true,
-				RecurseUntrackedDirs = true
-			});
-			if (status?.Count() > 0)
-			{
-				Commands.Stage(Repository, status.Select(x => x.FilePath));
+				string relativeOldPath = Path.GetRelativePath(Workspace.ContentStoragePath, oldPath);
+				string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
+				RepositoryStatus status = Repository.RetrieveStatus(new StatusOptions()
+				{
+					DetectRenamesInWorkDir = false,
+					DetectRenamesInIndex = false,
+					PathSpec = new string[] { relativeOldPath, relativeNewPath },
+					IncludeUntracked = true,
+					RecurseUntrackedDirs = true
+				});
+				if (status?.Count() > 0)
+				{
+					Commands.Stage(Repository, status.Select(x => x.FilePath));
+				}
+				Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
 			}
-			Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context);
+		}
+
+		public void CommitAll(ActionContext context)
+		{
+			if (!IsValid) return;
+			lock (_localLock)
+			{
+				Commands.Stage(Repository, "*");
+				Commit($"Sync", context);
+			}
 		}
 
 
@@ -156,14 +193,42 @@ namespace Docomb.ContentStorage.Workspaces
 				Signature commiter = new(CommiterName, CommiterEmail, DateTime.Now);
 				Repository.Commit(message, author, commiter);
 
+				Push();
+			}
+			catch { }
+		}
+
+
+		public void Pull()
+		{
+			if (!IsValid) return;
+			lock (_originLock)
+			{
+				try
+				{
+					var branch = Repository.Branches[Branch];
+					var options = new PullOptions();
+					Signature merger = new(CommiterName, CommiterEmail, DateTime.Now);
+
+					var credentials = new UsernamePasswordCredentials { Username = Username, Password = Password };
+					options.FetchOptions ??= new();
+					options.FetchOptions.CredentialsProvider = (url, user, cred) => credentials;
+					Commands.Pull(Repository, merger, options);
+				}
+				catch { }
+			}
+		}
+
+		public void Push()
+		{
+			lock (_originLock)
+			{
 				var branch = Repository.Branches[Branch];
 				var options = new PushOptions();
-
 				var credentials = new UsernamePasswordCredentials { Username = Username, Password = Password };
 				options.CredentialsProvider = (url, user, cred) => credentials;
 				Repository.Network.Push(branch, options);
 			}
-			catch { }
 		}
 
 
