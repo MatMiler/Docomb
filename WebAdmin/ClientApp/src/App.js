@@ -10,6 +10,7 @@ export default class App extends Component {
             React.createElement(Route, { exact: true, path: '/', component: Home }),
             React.createElement(Route, { exact: true, path: '/settings', component: Settings }),
             React.createElement(Route, { exact: true, path: '/settings/users', component: GlobalUsers }),
+            React.createElement(Route, { exact: true, path: '/workspace', component: WorkspaceWrapper }),
             React.createElement(Route, { exact: true, path: '/workspace/:itemPath+', component: WorkspaceWrapper })));
     }
 }
