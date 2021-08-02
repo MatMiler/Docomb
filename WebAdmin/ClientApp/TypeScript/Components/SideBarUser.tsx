@@ -13,7 +13,7 @@ const SideBarUser: FC<{}> = (): ReactElement => {
 
 	SideBarUserController.prepData(setUsername);
 
-	return (
+	return SideBarUserController.hasUser() ? (
 		<div className="sideBarItem" title={SideBarUserController.name + "\n" + SideBarUserController.username}>
 			<a ref={linkRef} onClick={showMenu}>
 				<span className="icon" aria-hidden="true"><FontIcon iconName="Contact" /></span>
@@ -21,7 +21,7 @@ const SideBarUser: FC<{}> = (): ReactElement => {
 			</a>
 			<ContextualMenu items={SideBarUserController.getMenuItems()} hidden={!menuIsVisible} target={linkRef} onItemClick={hideMenu} onDismiss={hideMenu} isBeakVisible={true} directionalHint={DirectionalHint.topCenter} />
 		</div>
-	);
+	) : null;
 };
 
 export default SideBarUser;
@@ -44,6 +44,16 @@ module SideBarUserController {
 		load();
 	}
 
+
+	export function hasUser(): boolean {
+		switch (userInfo?.globalAccess) {
+			case Users.UserAccessLevel.Admin: return true;
+			case Users.UserAccessLevel.Editor: return true;
+			case Users.UserAccessLevel.Reader: return true;
+			case Users.UserAccessLevel.None: return false;
+			default: return false;
+		}
+	}
 
 	export function getMenuItems(): IContextualMenuItem[] {
 		let items: IContextualMenuItem[] = [

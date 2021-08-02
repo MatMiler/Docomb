@@ -17,7 +17,7 @@ namespace Docomb.WebAdmin.Api
 		public ActionStatus GitSync(string workspaceUrl)
 		{
 			AdminContext context = new(User);
-			if (!(context?.UserInfo?.AccessLevel >= WebCore.Authentication.AccessLevel.Editor)) return new ActionStatus(ActionStatus.StatusCode.AccessDenied);
+			if (context?.HasAccess(WebCore.Authentication.AccessLevel.Editor) != true) return new ActionStatus(ActionStatus.StatusCode.AccessDenied);
 			(Workspace workspace, _) = WebCore.Configurations.WorkspacesConfig.FindFromPath(workspaceUrl);
 			if (workspace == null) return new ActionStatus(ActionStatus.StatusCode.NotFound);
 

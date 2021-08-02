@@ -17,12 +17,12 @@ const SideBarUser = () => {
     const hideMenu = React.useCallback(() => setMenuIsVisible(false), []);
     const linkRef = React.useRef(null);
     SideBarUserController.prepData(setUsername);
-    return (React.createElement("div", { className: "sideBarItem", title: SideBarUserController.name + "\n" + SideBarUserController.username },
+    return SideBarUserController.hasUser() ? (React.createElement("div", { className: "sideBarItem", title: SideBarUserController.name + "\n" + SideBarUserController.username },
         React.createElement("a", { ref: linkRef, onClick: showMenu },
             React.createElement("span", { className: "icon", "aria-hidden": "true" },
                 React.createElement(FontIcon, { iconName: "Contact" })),
             React.createElement("span", { className: "name" }, SideBarUserController.name)),
-        React.createElement(ContextualMenu, { items: SideBarUserController.getMenuItems(), hidden: !menuIsVisible, target: linkRef, onItemClick: hideMenu, onDismiss: hideMenu, isBeakVisible: true, directionalHint: DirectionalHint.topCenter })));
+        React.createElement(ContextualMenu, { items: SideBarUserController.getMenuItems(), hidden: !menuIsVisible, target: linkRef, onItemClick: hideMenu, onDismiss: hideMenu, isBeakVisible: true, directionalHint: DirectionalHint.topCenter }))) : null;
 };
 export default SideBarUser;
 var SideBarUserController;
@@ -36,6 +36,16 @@ var SideBarUserController;
         load();
     }
     SideBarUserController.prepData = prepData;
+    function hasUser() {
+        switch (SideBarUserController.userInfo === null || SideBarUserController.userInfo === void 0 ? void 0 : SideBarUserController.userInfo.globalAccess) {
+            case Users.UserAccessLevel.Admin: return true;
+            case Users.UserAccessLevel.Editor: return true;
+            case Users.UserAccessLevel.Reader: return true;
+            case Users.UserAccessLevel.None: return false;
+            default: return false;
+        }
+    }
+    SideBarUserController.hasUser = hasUser;
     function getMenuItems() {
         let items = [
             {

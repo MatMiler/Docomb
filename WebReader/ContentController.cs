@@ -19,7 +19,7 @@ namespace Docomb.WebReader
 		public IActionResult ViewContentItem(string itemPath)
 		{
 			UserInfo userInfo = new UserInfo(User);
-			if (userInfo?.AccessLevel < AccessLevel.Reader)
+			if (!Access.HasAccess(User, WebCore.Authentication.AccessLevel.Reader))
 				return Redirect($"/account/login");
 
 			ViewBag.User = userInfo;

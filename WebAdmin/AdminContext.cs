@@ -33,5 +33,7 @@ namespace Docomb.WebAdmin
 			};
 		}
 
+		public bool HasAccess(AccessLevel accessLevel) => Access.HasAccess(User, accessLevel);
+
 	}
 }
