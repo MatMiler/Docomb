@@ -39,6 +39,7 @@ namespace Docomb.WebCore.Authentication
 						{
 							"MicrosoftAccount" => new MicrosoftAccount(child),
 							"Facebook" => new Facebook(child),
+							"Google" => new Google(child),
 							_ => null
 						};
 						if (scheme?.IsValid == true)
