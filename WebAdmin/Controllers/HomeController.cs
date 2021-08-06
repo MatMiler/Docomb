@@ -14,7 +14,7 @@ namespace Docomb.WebAdmin.Controllers
 		public IActionResult Index()
 		{
 			if (!WebCore.Authentication.Access.HasAccess(User, WebCore.Authentication.AccessLevel.Editor))
-				return Redirect($"/{UrlPathPrefix}/account/login");
+				return Redirect($"/{UrlPathPrefix}/account/{(User.Identity.IsAuthenticated ? "denied" : "login")}");
 
 			ViewBag.baseHref = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/{UrlPathPrefix}/";
 			ViewBag.basePath = $"{Request.PathBase}/{UrlPathPrefix}/";

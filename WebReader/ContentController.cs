@@ -20,7 +20,9 @@ namespace Docomb.WebReader
 		{
 			UserInfo userInfo = new UserInfo(User);
 			if (!Access.HasAccess(User, WebCore.Authentication.AccessLevel.Reader))
-				return Redirect($"/account/login");
+			{
+				return Redirect(User.Identity.IsAuthenticated ? "/account/denied" : "/account/login");
+			}
 
 			ViewBag.User = userInfo;
 			ViewBag.ItemPath = itemPath;
