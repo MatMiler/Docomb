@@ -45,6 +45,17 @@ li > ul, li > ol {
   margin-top: 0;
   margin-bottom: 0; }
 
+sub, sup {
+  font-size: .75em;
+  position: relative;
+  vertical-align: baseline; }
+
+sup {
+  top: -0.55em; }
+
+sub {
+  bottom: -0.3em; }
+
 * {
   box-sizing: border-box; }
 
@@ -263,10 +274,10 @@ html a {
   html .sideBarItem .name {
     color: #666; }
   .dark .sideBarItem .name {
-    color: #ccc; }
+    color: #999; }
   @media (prefers-color-scheme: dark) {
     html .sideBarItem .name {
-      color: #ccc; }
+      color: #999; }
     .light .sideBarItem .name {
       color: #666; } }
 
@@ -555,10 +566,10 @@ html .sideBarItem.selected a:before {
   html .articleContent hr {
     border-top-color: #666; }
   .dark .articleContent hr {
-    border-top-color: #ccc; }
+    border-top-color: #999; }
   @media (prefers-color-scheme: dark) {
     html .articleContent hr {
-      border-top-color: #ccc; }
+      border-top-color: #999; }
     .light .articleContent hr {
       border-top-color: #666; } }
 
@@ -601,12 +612,12 @@ html .articleContent table th {
   background: #eee; }
 
 .dark .articleContent table th {
-  border-left-color: #ccc;
+  border-left-color: #999;
   background: #333; }
 
 @media (prefers-color-scheme: dark) {
   html .articleContent table th {
-    border-left-color: #ccc;
+    border-left-color: #999;
     background: #333; }
   .light .articleContent table th {
     border-left-color: #666;
@@ -719,10 +730,10 @@ html .articleContent table th {
       html .authPage .loginSchemeSelection .label {
         color: #666; }
       .dark .authPage .loginSchemeSelection .label {
-        color: #ccc; }
+        color: #999; }
       @media (prefers-color-scheme: dark) {
         html .authPage .loginSchemeSelection .label {
-          color: #ccc; }
+          color: #999; }
         .light .authPage .loginSchemeSelection .label {
           color: #666; } }
     .authPage .loginSchemeSelection .schemes {

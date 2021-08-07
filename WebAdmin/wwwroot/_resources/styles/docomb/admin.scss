@@ -18,6 +18,9 @@ img { max-width: 100%; vertical-align: middle; }
 figure > img { display: block; }
 ul, ol { margin-left: 30px; }
 li > ul, li > ol { margin-top: 0; margin-bottom: 0; }
+sub, sup { font-size: .75em; position: relative; vertical-align: baseline; }
+sup { top: -0.55em; }
+sub { bottom: -0.3em; }
 
 * { box-sizing: border-box; }
 

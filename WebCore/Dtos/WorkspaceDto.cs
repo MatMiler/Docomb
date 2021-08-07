@@ -33,6 +33,11 @@ namespace Docomb.WebCore.Dtos
 		public string MarkdownEngineCode { get; set; }
 
 
+		/// <summary>Representation icon</summary>
+		[JsonPropertyName("icon")]
+		public string Icon { get; set; }
+
+
 		[JsonPropertyName("git")]
 		public GitConfigDto Git { get; set; }
 
@@ -43,6 +48,7 @@ namespace Docomb.WebCore.Dtos
 			{
 				Description = Description,
 				MarkdownEngineCode = MarkdownEngineCode,
+				Icon = Icon,
 				Git = Git?.ToGitManager()
 			};
 			workspace.Initialize();

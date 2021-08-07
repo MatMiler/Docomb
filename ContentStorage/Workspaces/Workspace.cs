@@ -58,6 +58,10 @@ namespace Docomb.ContentStorage.Workspaces
 		public string MarkdownEngineCode { get; set; }
 
 
+		/// <summary>Representation icon</summary>
+		public string Icon { get; set; }
+
+
 		public GitManager Git { get; set; }
 
 
