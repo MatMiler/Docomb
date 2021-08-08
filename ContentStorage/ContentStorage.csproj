@@ -6,7 +6,14 @@
 		<RootNamespace>Docomb.ContentStorage</RootNamespace>
 		<Product>Docomb</Product>
 		<Authors>Matjaž Miler</Authors>
-		<Version>0.0.1</Version>
+		<Version>0.1.1</Version>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Copyright>Copyright © Matjaž Miler 2021</Copyright>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageProjectUrl>https://github.com/MatMiler/Docomb</PackageProjectUrl>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageIconUrl />
+		<Description>Storage handling for Docomb projects</Description>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -15,6 +22,17 @@
 	  <PackageReference Include="Markdig" Version="0.25.0" />
 	  <PackageReference Include="MarkdownSharp" Version="2.0.5" />
 	  <PackageReference Include="YamlDotNet" Version="11.2.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="..\icon.png">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
+	  <None Include="..\LICENSE">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
 	</ItemGroup>
 
 	<ItemGroup>

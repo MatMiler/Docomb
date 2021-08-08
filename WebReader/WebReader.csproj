@@ -5,10 +5,18 @@
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<AssemblyName>Docomb.WebReader</AssemblyName>
 		<RootNamespace>Docomb.WebReader</RootNamespace>
-		<Version>0.0.1</Version>
+		<Version>0.1.2</Version>
 		<Authors>Matjaž Miler</Authors>
 		<Product>Docomb</Product>
 		<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+		<Description>Docomb reader web interface</Description>
+		<PackageProjectUrl>https://github.com/MatMiler/Docomb</PackageProjectUrl>
+		<Copyright>Copyright © Matjaž Miler 2021</Copyright>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageIconUrl />
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -28,6 +36,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include="..\icon.png">
+		  <Pack>True</Pack>
+		  <PackagePath></PackagePath>
+		</None>
+		<None Include="..\LICENSE">
+		  <Pack>True</Pack>
+		  <PackagePath></PackagePath>
+		</None>
 		<None Include="compilerconfig.json" />
 	</ItemGroup>
 

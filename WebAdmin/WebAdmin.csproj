@@ -5,10 +5,19 @@
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<AssemblyName>Docomb.WebAdmin</AssemblyName>
 		<RootNamespace>Docomb.WebAdmin</RootNamespace>
-		<Version>0.0.1</Version>
+		<Version>0.1.2</Version>
 		<Authors>Matjaž Miler</Authors>
 		<Product>Docomb</Product>
 		<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Description>Docomb admin web interface</Description>
+		<PackageProjectUrl>https://github.com/MatMiler/Docomb</PackageProjectUrl>
+		<Copyright>Copyright © Matjaž Miler 2021</Copyright>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageIconUrl />
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   
@@ -29,7 +38,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Content Remove="ClientApp\package-lock.json" />
+	  <Content Remove="ClientApp\package.json" />
 	  <Content Remove="compilerconfig.json" />
+	  <Content Remove="tsconfig.json" />
 	  <Content Remove="wwwroot\_resources\images\facebook-color.svg" />
 	  <Content Remove="wwwroot\_resources\images\microsoft-color.svg" />
 	  <Content Remove="wwwroot\_resources\styles\article.scss" />
@@ -43,7 +55,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Include="..\icon.png">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
+	  <None Include="..\LICENSE">
+	    <Pack>True</Pack>
+	    <PackagePath></PackagePath>
+	  </None>
+	  <None Include="ClientApp\package-lock.json" />
+	  <None Include="ClientApp\package.json" />
 	  <None Include="compilerconfig.json" />
+	  <None Include="tsconfig.json" />
 	</ItemGroup>
 
 	<ItemGroup>

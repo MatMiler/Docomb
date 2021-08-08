@@ -10,9 +10,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\WebAdmin\WebAdmin.csproj" />
-	  <ProjectReference Include="..\WebCore\WebCore.csproj" />
-	  <ProjectReference Include="..\WebReader\WebReader.csproj" />
+		<ProjectReference Include="..\WebAdmin\WebAdmin.csproj" />
+		<ProjectReference Include="..\WebReader\WebReader.csproj" />
 	</ItemGroup>
 
 </Project>
