@@ -25,6 +25,7 @@ export module SessionCache {
 			this.key = key;
 			this.value = value;
 			this.expiry = (expiry instanceof Date) ? expiry.getTime() : expiry;
+			if ((this.expiry != null) && (this.expiry < 86400000)) this.expiry = Date.now() + this.expiry;
 			this.hash = Utils.hashCode(value);
 			this.timestamp = Date.now();
 		}

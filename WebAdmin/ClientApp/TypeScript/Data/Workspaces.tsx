@@ -7,7 +7,7 @@ export module Workspaces {
 	/** Load a list of workspaces */
 	export async function loadWorkspaceList(): Promise<Array<Workspace>> {
 		let list: Array<Workspace> = [];
-		let data = await Apis.fetchJsonAsync("api/general/workspaces", true);
+		let data = await Apis.fetchJsonAsync("api/general/workspaces", true, { expiry: 900000 });
 		if (Utils.arrayHasValues(data)) {
 			for (let x = 0; x < data.length; x++) {
 				let item: Workspace = new Workspace(data[x]);
@@ -42,7 +42,7 @@ export module Workspaces {
 		if ((storedItem != null) && (storedItem.value != null)) {
 			data = storedItem.value;
 		} else {
-			data = await Apis.fetchJsonAsync(url, true);
+			data = await Apis.fetchJsonAsync(url, true, { expiry: 900000 });
 			LayoutUtils.WindowData.set("workspaceTreeTimestamp-" + encodeURI(workspaceUrl), Date.now());
 		}
 
