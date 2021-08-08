@@ -1,4 +1,4 @@
-﻿import { CommandBar, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from "@fluentui/react";
+﻿import { CommandBar, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, mergeStyles, PrimaryButton, ScrollablePane, Spinner, SpinnerSize, Stack, Sticky, StickyPositionType, TextField } from "@fluentui/react";
 import React, { FC, ReactElement, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
@@ -98,6 +98,9 @@ module EditTextFileController {
 		if (hasPreview) {
 			farItems.push({ key: "togglePreview", text: "Toggle preview", iconOnly: true, ariaLabel: "Toggle preview", iconProps: { iconName: "EntryView" }, onClick: togglePreviewPanel });
 		}
+		if (fileDetails?.type == Workspaces.FileType.Markdown) {
+			farItems.push({ key: "toggleMarkdownHelp", text: "Toggle help", iconOnly: true, ariaLabel: "Toggle help", iconProps: { iconName: "Unknown" }, onClick: toggleHelpPanel });
+		}
 
 		return (<div className="pageCommands"><CommandBar items={commandBarItems} farItems={farItems} /></div>);
 	}
@@ -127,18 +130,9 @@ module EditTextFileController {
 		}
 	}
 
-	function onSaveSuccess(response: any): void {
-		gotoInfo();
-		waitingDialogCallbacks.setFalse();
-	}
-
-	function onSaveError(): void {
-		waitingDialogCallbacks.setFalse();
-	}
-
 	export function getContentPanel(): JSX.Element {
 		let previewStyle: React.CSSProperties = {};
-		if (!Utils.tryGetBool(window, "showFileMetaDataPanel", true)) previewStyle.display = "none";
+		if (!Utils.tryGetBool(window, "showPreviewPanel", true)) previewStyle.display = "none";
 
 		switch (fileDetails?.type) {
 			case Workspaces.FileType.Markdown: {
@@ -148,11 +142,12 @@ module EditTextFileController {
 							<div className="watermark"><FontIcon iconName="Edit" /></div>
 							<div className="editorInput"><TextField id="editorInput" defaultValue={fileDetails?.contentText} multiline resizable={false} onChange={onEditorChange} /></div>
 						</div>
-						<div className="preview watermarkedPart">
+						<div className="preview watermarkedPart" style={previewStyle}>
 							<div className="watermark"><FontIcon iconName="EntryView" /></div>
-							<div id="previewContainer" className="articleContent" style={previewStyle}
+							<div id="previewContainer" className="articleContent"
 								dangerouslySetInnerHTML={{ __html: LayoutUtils.fixLocalLinksInHtml(fileDetails.contentHtml, pageInfo?.workspace, pageInfo?.contentItem) }} />
 						</div>
+						{getMarkdownHelpPanel()}
 					</div>
 				);
 			}
@@ -179,6 +174,95 @@ module EditTextFileController {
 		let show = !Utils.tryGetBool(window, "showPreviewPanel", true);
 		window["showPreviewPanel"] = show;
 		$(".preview").toggle(show);
+	}
+
+	function getMarkdownHelpPanel(): JSX.Element {
+		let elements: Array<JSX.Element> = [];
+
+		let preStyle: React.CSSProperties = { whiteSpace: "normal" };
+
+		elements.push(<>
+			{getHelpHeadingRow("Basic styles")}
+			<div className="articleContent">
+				<p><code>**Bold**</code> or <code>__Bold__</code> → <strong>Bold</strong></p>
+				<p><code>*Italic*</code> or <code>_Italic_</code> → <em>Italic</em></p>
+			</div></>);
+
+		elements.push(<>
+			{getHelpHeadingRow("Headings")}
+			<div className="articleContent">
+				<p>
+					<code># Heading 1 (page title)</code><br />
+					<code>## Heading 2</code><br />
+					<code>### Heading 3</code><br />
+					etc.
+				</p>
+				<p>or</p>
+				<pre style={preStyle}><code>Heading 1<br />===</code></pre>
+				<pre style={preStyle}><code>Heading 2<br />---</code></pre>
+			</div></>);
+
+		elements.push(<>
+			{getHelpHeadingRow("Paragraphs")}
+			<div className="articleContent">
+				<p>Add an empty line between texts to start a new paragraph.</p>
+				<p>Add two spaces at the end of the line<code>··</code><br /> to start a new line.</p>
+				<p>For a horizontal rule write <code>---</code>, <code>***</code>, or <code>___</code>.<br/>
+				<small>Be sure to have an empty line above <code>---</code> to avoid rendering the previous line as a heading.</small></p>
+			</div></>);
+
+		elements.push(<>
+			{getHelpHeadingRow("Lists")}
+			<div className="articleContent">
+				<p>Start a line with <code>-</code> or <code>*</code> for a bulleted list.</p>
+				<p>Start a line with <code>1.</code> or <code>1)</code> for a numbered list.</p>
+			</div></>);
+
+		elements.push(<>
+			{getHelpHeadingRow("Links & Images")}
+			<div className="articleContent">
+				<p><code>[Link text](URL)</code><br />
+				Example: <code>[Link](http://example.com/)</code> → <a href="http://example.com/" target="_blank">Link</a></p>
+				<p><code>![Alt text](Image URL)</code></p>
+			</div></>);
+
+		elements.push(<>
+			{getHelpHeadingRow("Quotes & Code")}
+			<div className="articleContent">
+				<p><code>&gt; Quote</code></p>
+				<blockquote><p>Quote</p></blockquote>
+				<p>For inline <code>code</code>, use single backticks before and after: <code>`code`</code>.</p>
+				<pre style={preStyle}>```<br />For a code block use three backticks before and after<br/>```</pre>
+			</div></>);
+
+
+		let panelStyle: React.CSSProperties = {};
+		if (!Utils.tryGetBool(window, "showHelpPanel", false)) panelStyle.display = "none";
+
+		for (let x = 0; x < elements.length; x++) {
+			let className = "helpSection";
+			if (x == 0) className += " first";
+			if (x == elements.length - 1) className += " last";
+			elements[x] = (<div className={className} key={"HelpSection" + x}>{elements[x]}</div>);
+		}
+
+		return (
+			<div className="help watermarkedPart" style={panelStyle}>
+				<div className="watermark"><FontIcon iconName="Unknown" /></div>
+				<div id="helpContainer">
+					{elements}
+				</div>
+			</div>);
+	}
+
+	function getHelpHeadingRow(text: string): JSX.Element {
+		return <div className="helpHeading">{text}</div>;
+	}
+
+	function toggleHelpPanel(): void {
+		let show = !Utils.tryGetBool(window, "showHelpPanel", false);
+		window["showHelpPanel"] = show;
+		$(".help").toggle(show);
 	}
 
 	function onEditorChange(ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newText: string): void {

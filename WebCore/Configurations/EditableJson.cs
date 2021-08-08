@@ -60,7 +60,7 @@ namespace Docomb.WebCore.Configurations
 
 		public T Read()
 		{
-			string runtimeDirectory = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+			string runtimeDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 			// Get the content out of the first viable file (first the main file, then the more recent backup versions)
 			foreach (string fileName in FileNameBackupQueue)
 			{

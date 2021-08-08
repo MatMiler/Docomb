@@ -57,7 +57,13 @@ namespace Docomb.WebAdmin.Controllers
 				}
 				else
 				{
-					await HttpContext.ChallengeAsync(scheme.Code, new AuthenticationProperties { RedirectUri = "/" + UrlPathPrefix });
+					await HttpContext.ChallengeAsync(scheme.Code, new AuthenticationProperties
+					{
+						RedirectUri = "/" + UrlPathPrefix,
+						AllowRefresh = true,
+						IsPersistent = true,
+						ExpiresUtc = new(DateTime.Now.AddYears(1))
+					});
 				}
 			}
 		}
@@ -88,7 +94,13 @@ namespace Docomb.WebAdmin.Controllers
 				}
 				schemeCode = scheme.Code;
 			}
-			await HttpContext.ChallengeAsync(schemeCode, new AuthenticationProperties { RedirectUri = "/" + UrlPathPrefix });
+			await HttpContext.ChallengeAsync(schemeCode, new AuthenticationProperties
+			{
+				RedirectUri = "/" + UrlPathPrefix,
+				AllowRefresh = true,
+				IsPersistent = true,
+				ExpiresUtc = new(DateTime.Now.AddYears(1))
+			});
 		}
 
 		[HttpGet("denied")]

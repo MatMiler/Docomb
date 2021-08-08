@@ -13,6 +13,7 @@ export default class App extends Component {
 				<Route exact path='/' component={Home} />
 				<Route exact path='/settings' component={Settings} />
 				<Route exact path='/settings/users' component={GlobalUsers} />
+				<Route exact path='/workspace' component={WorkspaceWrapper} />
 				<Route exact path='/workspace/:itemPath+' component={WorkspaceWrapper} />
 			</div>
 		);

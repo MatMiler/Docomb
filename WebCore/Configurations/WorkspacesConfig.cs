@@ -105,7 +105,7 @@ namespace Docomb.WebCore.Configurations
 
 			foreach (var (url, workspace) in list)
 			{
-				if (path.StartsWith(url))
+				if ((path.StartsWith(url)) || (url == "/"))
 				{
 					if (pathParts.Count < workspace.UrlParts.Count) continue; // Something went wrong with comparison
 					List<string> remainingParts = (pathParts.Count == workspace.UrlParts.Count) ? new() : pathParts.GetRange(workspace.UrlParts.Count, pathParts.Count - workspace.UrlParts.Count);

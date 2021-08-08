@@ -16,11 +16,11 @@ namespace Docomb.ContentStorage.MarkdownEngines
 
 		public override string Name => "Markdig";
 
-		public override string Description => "Markdig is a fast, powerful, CommonMark compliant, extensible Markdown processor for .NET.";
+		public override string Description => "CommonMark implementation";
 
 		public override string Version => Markdig.Markdown.Version;
 
-		public override string WebsiteUrl => "https://github.com/StackExchange/MarkdownSharp/";
+		public override string WebsiteUrl => "https://github.com/xoofx/markdig";
 
 
 

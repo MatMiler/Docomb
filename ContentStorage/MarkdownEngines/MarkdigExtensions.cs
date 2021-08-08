@@ -150,19 +150,22 @@ namespace Docomb.ContentStorage.MarkdownEngines
 			{
 				var code = new StringBuilder();
 				firstLine = null;
-				foreach (var line in obj.Lines.Lines)
+				if (obj?.Lines.Lines?.Length > 0)
 				{
-					var slice = line.Slice;
-					if (slice.Text == null) continue;
+					foreach (var line in obj.Lines.Lines)
+					{
+						var slice = line.Slice;
+						if (slice.Text == null) continue;
 
-					var lineText = slice.Text.Substring(slice.Start, slice.Length);
+						var lineText = slice.Text.Substring(slice.Start, slice.Length);
 
-					if (firstLine == null)
-						firstLine = lineText;
-					else
-						code.AppendLine();
+						if (firstLine == null)
+							firstLine = lineText;
+						else
+							code.AppendLine();
 
-					code.Append(lineText);
+						code.Append(lineText);
+					}
 				}
 				return code.ToString();
 			}

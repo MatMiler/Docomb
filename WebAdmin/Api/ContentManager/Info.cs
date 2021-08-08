@@ -48,6 +48,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 				Url = workspace.UrlPath;
 				ReactLocalUrl = Utils.CombineUrlPaths("", workspace.UrlPath);
 				Initials = (Name?.Length > 0) ? Name[0..1] : "?";
+				Icon = workspace.Icon;
 				Storage = new()
 				{
 					HasGit = workspace.Git?.IsValid ?? false
@@ -65,7 +66,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 		public static List<WorkspaceSummary> GetWorkspaceSummaryList(ClaimsPrincipal user)
 		{
-			if (!user.Identity.IsAuthenticated) return null;
+			if (!Access.HasAccess(user, AccessLevel.Editor)) return null;
 			List<WorkspaceSummary> list = new List<WorkspaceSummary>();
 
 			UserInfo userInfo = new(user);
@@ -75,7 +76,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			{
 				foreach (Workspace workspace in workspaces)
 				{
-					if (userInfo.GetAccessLevel(workspace) >= AccessLevel.Editor)
+					if ((!Access.NeedsAdminAccess()) || (userInfo.GetAccessLevel(workspace) >= AccessLevel.Editor))
 					{
 						list.Add(new(workspace));
 					}
@@ -113,10 +114,9 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 		public static WorkspacePageInfo GetWorkspacePageInfo(ClaimsPrincipal user, string url, string query)
 		{
-			if (!user.Identity.IsAuthenticated) return null;
+			if (!Access.HasAccess(user, AccessLevel.Editor)) return null;
 			(Workspace workspace, List<string> remainingPath) = WebCore.Configurations.WorkspacesConfig.FindFromPath(url);
 			if ((workspace == null) || (remainingPath == null)) return null;
-			if (new UserInfo(user).GetAccessLevel(workspace) < AccessLevel.Editor) return null;
 			ContentItem item = workspace.Content.FindItem(remainingPath, MatchType.Physical);
 			System.Collections.Specialized.NameValueCollection queryParams = HttpUtility.ParseQueryString((query ?? "").TrimStart('?'));
 			ContentItemAction action = ContentItemAction.View;
@@ -165,10 +165,9 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 		public static List<ContentItemSummary> GetTree(ClaimsPrincipal user, string workspaceUrl)
 		{
-			if (!user.Identity.IsAuthenticated) return null;
+			if (!Access.HasAccess(user, AccessLevel.Editor)) return null;
 			(Workspace workspace, _) = WebCore.Configurations.WorkspacesConfig.FindFromPath(workspaceUrl);
 			if (workspace == null) return null;
-			if (new UserInfo(user).GetAccessLevel(workspace) < AccessLevel.Editor) return null;
 			return GetTree(workspace, new());
 		}
 
@@ -196,10 +195,9 @@ namespace Docomb.WebAdmin.Api.ContentManager
 
 		public static DataWithStatus<List<string>> GetDirectoryPaths(ClaimsPrincipal user, string workspaceUrl)
 		{
-			if (!user.Identity.IsAuthenticated) return new(new ActionStatus(ActionStatus.StatusCode.AuthorizationNeeded), null);
+			if (!Access.HasAccess(user, AccessLevel.Editor)) return new(new ActionStatus(ActionStatus.StatusCode.AccessDenied), null);
 			(Workspace workspace, _) = WebCore.Configurations.WorkspacesConfig.FindFromPath(workspaceUrl);
 			if (workspace == null) return new(new ActionStatus(ActionStatus.StatusCode.NotFound), null);
-			if (new UserInfo(user).GetAccessLevel(workspace) < AccessLevel.Editor) return new(new ActionStatus(ActionStatus.StatusCode.AccessDenied), null);
 			try
 			{
 				List<string> list = GetChildDirectoryPaths(workspace, new());

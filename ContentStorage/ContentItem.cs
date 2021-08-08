@@ -19,7 +19,7 @@ namespace Docomb.ContentStorage
 
 		public abstract bool NeedsTrailingSlash { get; }
 
-		public virtual string Title { get => _title ??= UrlParts?.LastOrDefault(); set => _title = value; }
+		public virtual string Title { get => _title ??= UrlParts?.LastOrDefault() ?? Workspace.Name; set => _title = value; }
 		protected string _title = null;
 
 

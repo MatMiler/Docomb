@@ -55,7 +55,13 @@ namespace Docomb.WebReader
 				}
 				else
 				{
-					await HttpContext.ChallengeAsync(scheme.Code, new AuthenticationProperties { RedirectUri = "/" });
+					await HttpContext.ChallengeAsync(scheme.Code, new AuthenticationProperties
+					{
+						RedirectUri = "/",
+						AllowRefresh = true,
+						IsPersistent = true,
+						ExpiresUtc = new(DateTime.Now.AddYears(1))
+					});
 				}
 			}
 		}
@@ -86,7 +92,13 @@ namespace Docomb.WebReader
 				}
 				schemeCode = scheme.Code;
 			}
-			await HttpContext.ChallengeAsync(schemeCode, new AuthenticationProperties { RedirectUri = "/" });
+			await HttpContext.ChallengeAsync(schemeCode, new AuthenticationProperties
+			{
+				RedirectUri = "/",
+				AllowRefresh = true,
+				IsPersistent = true,
+				ExpiresUtc = new(DateTime.Now.AddYears(1))
+			});
 		}
 
 		[HttpGet("denied")]

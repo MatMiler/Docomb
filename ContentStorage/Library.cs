@@ -176,7 +176,7 @@ namespace Docomb.ContentStorage
 
 			#region Directories
 			{
-				List<DirectoryInfo> directories = parent.GetDirectories()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				List<DirectoryInfo> directories = parent.GetDirectories()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).OrderBy(x => x.Name).ToList();
 				if (directories?.Count > 0)
 				{
 					foreach (DirectoryInfo directory in directories)
@@ -225,7 +225,7 @@ namespace Docomb.ContentStorage
 
 			#region Files
 			{
-				List<FileInfo> files = parent.GetFiles()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				List<FileInfo> files = parent.GetFiles()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).OrderBy(x => x.Name).ToList();
 				if (files?.Count > 0)
 				{
 					foreach (FileInfo file in files)
@@ -267,7 +267,7 @@ namespace Docomb.ContentStorage
 			#region Directories
 			if (includeDirectories)
 			{
-				List<DirectoryInfo> directories = parent.GetDirectories()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				List<DirectoryInfo> directories = parent.GetDirectories()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).OrderBy(x => x.Name).ToList();
 				if (directories?.Count > 0)
 				{
 					foreach (DirectoryInfo directory in directories)
@@ -283,7 +283,7 @@ namespace Docomb.ContentStorage
 			#region Files
 			if (includeFiles)
 			{
-				List<FileInfo> files = parent.GetFiles()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).ToList();
+				List<FileInfo> files = parent.GetFiles()?.Where(x => (!x.Attributes.HasFlag(FileAttributes.Hidden)) && (!x.Attributes.HasFlag(FileAttributes.System))).OrderBy(x => x.Name).ToList();
 				if (files?.Count > 0)
 				{
 					foreach (FileInfo file in files)

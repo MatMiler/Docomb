@@ -117,6 +117,9 @@ namespace Docomb.WebCore.Authentication
 			return level;
 		}
 
+		public static bool NeedsAdminAccess() => (Configurations.MainConfig.Instance?.Authentication?.AuthorizeAdmin == true);
+
+		public static bool NeedsReaderAccess() => (Configurations.MainConfig.Instance?.Authentication?.AuthorizeReader == true);
 
 
 	}

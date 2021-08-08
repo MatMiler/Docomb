@@ -39,6 +39,7 @@ namespace Docomb.WebCore.Authentication
 						{
 							"MicrosoftAccount" => new MicrosoftAccount(child),
 							"Facebook" => new Facebook(child),
+							"Google" => new Google(child),
 							_ => null
 						};
 						if (scheme?.IsValid == true)
@@ -97,7 +98,11 @@ namespace Docomb.WebCore.Authentication
 			if (schemes?.Count > 0)
 			{
 				AuthenticationBuilder builder = services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme);
-				builder.AddCookie(item => item.LoginPath = new PathString(loginUrl));
+				builder.AddCookie(item => {
+					item.LoginPath = new PathString(loginUrl);
+					item.SlidingExpiration = true;
+					item.ExpireTimeSpan = new TimeSpan(356, 0, 0, 0);
+					});
 				foreach (var scheme in schemes)
 				{
 					scheme.AddToBuilder(builder);

@@ -24,8 +24,8 @@ namespace Docomb.WebAdmin.Api
 		[HttpGet("globalUsers/list")]
 		public DataWithStatus<Dictionary<string, AccessLevel>> ListGlobalUsers()
 		{
-			if (!User.Identity.IsAuthenticated) return new(new ActionStatus(ActionStatus.StatusCode.AuthorizationNeeded), null);
-			if (new UserInfo(User).GetAccessLevel() < AccessLevel.Admin) return new(new ActionStatus(ActionStatus.StatusCode.AccessDenied), null);
+			if ((!Access.NeedsAdminAccess()) || (!User.Identity.IsAuthenticated)) return new(new ActionStatus(ActionStatus.StatusCode.AuthorizationNeeded), null);
+			if (!Access.HasAccess(User, AccessLevel.Admin)) return new(new ActionStatus(ActionStatus.StatusCode.AccessDenied), null);
 
 			Dictionary<string, AccessLevel> list = UsersConfig.Instance?.GlobalUserAccess?.UserLevels;
 
@@ -37,8 +37,8 @@ namespace Docomb.WebAdmin.Api
 		[HttpPost("globalUsers/update")]
 		public DataWithStatus<Dictionary<string, AccessLevel>> UpdateGlobalUsers([FromBody] List<UserChangeItem> changes)
 		{
-			if (!User.Identity.IsAuthenticated) return new(new ActionStatus(ActionStatus.StatusCode.AuthorizationNeeded), null);
-			if (new UserInfo(User).GetAccessLevel() < AccessLevel.Admin) return new(new ActionStatus(ActionStatus.StatusCode.AccessDenied), null);
+			if ((!Access.NeedsAdminAccess()) || (!User.Identity.IsAuthenticated)) return new(new ActionStatus(ActionStatus.StatusCode.AuthorizationNeeded), null);
+			if (!Access.HasAccess(User, AccessLevel.Admin)) return new(new ActionStatus(ActionStatus.StatusCode.AccessDenied), null);
 
 			ActionStatus status = UsersConfig.Instance.UpdateUsersBulk(changes);
 

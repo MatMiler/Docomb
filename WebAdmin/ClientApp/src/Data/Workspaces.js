@@ -17,7 +17,7 @@ export var Workspaces;
     function loadWorkspaceList() {
         return __awaiter(this, void 0, void 0, function* () {
             let list = [];
-            let data = yield Apis.fetchJsonAsync("api/general/workspaces", true);
+            let data = yield Apis.fetchJsonAsync("api/general/workspaces", true, { expiry: 900000 });
             if (Utils.arrayHasValues(data)) {
                 for (let x = 0; x < data.length; x++) {
                     let item = new Workspace(data[x]);
@@ -51,7 +51,7 @@ export var Workspaces;
                 data = storedItem.value;
             }
             else {
-                data = yield Apis.fetchJsonAsync(url, true);
+                data = yield Apis.fetchJsonAsync(url, true, { expiry: 900000 });
                 LayoutUtils.WindowData.set("workspaceTreeTimestamp-" + encodeURI(workspaceUrl), Date.now());
             }
             if (Utils.arrayHasValues(data)) {

@@ -56,8 +56,8 @@ namespace Docomb.WebAdmin
 			});
 			services.ConfigureOptions(typeof(ConfigureOptions));
 
-
-			WebCore.Configurations.MainConfig.Instance?.Authentication?.AddAuthentications(services, $"/{WebCore.Configurations.UiConfig.UrlPathPrefix}/account/login");
+			if (WebCore.Configurations.MainConfig.Instance?.Authentication?.AuthorizeAdmin == true)
+				WebCore.Configurations.MainConfig.Instance?.Authentication?.AddAuthentications(services, $"/{WebCore.Configurations.UiConfig.UrlPathPrefix}/account/login");
 
 			WebCore.Configurations.UiConfig.SetHasAdmin(true);
 		}
