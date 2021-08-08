@@ -77,6 +77,9 @@ var EditTextFileController;
         if (hasPreview) {
             farItems.push({ key: "togglePreview", text: "Toggle preview", iconOnly: true, ariaLabel: "Toggle preview", iconProps: { iconName: "EntryView" }, onClick: togglePreviewPanel });
         }
+        if ((EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.type) == Workspaces.FileType.Markdown) {
+            farItems.push({ key: "toggleMarkdownHelp", text: "Toggle help", iconOnly: true, ariaLabel: "Toggle help", iconProps: { iconName: "Unknown" }, onClick: toggleHelpPanel });
+        }
         return (React.createElement("div", { className: "pageCommands" },
             React.createElement(CommandBar, { items: commandBarItems, farItems: farItems })));
     }
@@ -106,16 +109,9 @@ var EditTextFileController;
             }
         });
     }
-    function onSaveSuccess(response) {
-        gotoInfo();
-        waitingDialogCallbacks.setFalse();
-    }
-    function onSaveError() {
-        waitingDialogCallbacks.setFalse();
-    }
     function getContentPanel() {
         let previewStyle = {};
-        if (!Utils.tryGetBool(window, "showFileMetaDataPanel", true))
+        if (!Utils.tryGetBool(window, "showPreviewPanel", true))
             previewStyle.display = "none";
         switch (EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.type) {
             case Workspaces.FileType.Markdown: {
@@ -125,10 +121,11 @@ var EditTextFileController;
                             React.createElement(FontIcon, { iconName: "Edit" })),
                         React.createElement("div", { className: "editorInput" },
                             React.createElement(TextField, { id: "editorInput", defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, onChange: onEditorChange }))),
-                    React.createElement("div", { className: "preview watermarkedPart" },
+                    React.createElement("div", { className: "preview watermarkedPart", style: previewStyle },
                         React.createElement("div", { className: "watermark" },
                             React.createElement(FontIcon, { iconName: "EntryView" })),
-                        React.createElement("div", { id: "previewContainer", className: "articleContent", style: previewStyle, dangerouslySetInnerHTML: { __html: LayoutUtils.fixLocalLinksInHtml(EditTextFileController.fileDetails.contentHtml, EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.workspace, EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.contentItem) } }))));
+                        React.createElement("div", { id: "previewContainer", className: "articleContent", dangerouslySetInnerHTML: { __html: LayoutUtils.fixLocalLinksInHtml(EditTextFileController.fileDetails.contentHtml, EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.workspace, EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.contentItem) } })),
+                    getMarkdownHelpPanel()));
             }
             case Workspaces.FileType.Html:
             case Workspaces.FileType.PlainText: {
@@ -148,6 +145,138 @@ var EditTextFileController;
         let show = !Utils.tryGetBool(window, "showPreviewPanel", true);
         window["showPreviewPanel"] = show;
         $(".preview").toggle(show);
+    }
+    function getMarkdownHelpPanel() {
+        let elements = [];
+        let preStyle = { whiteSpace: "normal" };
+        elements.push(React.createElement(React.Fragment, null,
+            getHelpHeadingRow("Basic styles"),
+            React.createElement("div", { className: "articleContent" },
+                React.createElement("p", null,
+                    React.createElement("code", null, "**Bold**"),
+                    " or ",
+                    React.createElement("code", null, "__Bold__"),
+                    " \u2192 ",
+                    React.createElement("strong", null, "Bold")),
+                React.createElement("p", null,
+                    React.createElement("code", null, "*Italic*"),
+                    " or ",
+                    React.createElement("code", null, "_Italic_"),
+                    " \u2192 ",
+                    React.createElement("em", null, "Italic")))));
+        elements.push(React.createElement(React.Fragment, null,
+            getHelpHeadingRow("Headings"),
+            React.createElement("div", { className: "articleContent" },
+                React.createElement("p", null,
+                    React.createElement("code", null, "# Heading 1 (page title)"),
+                    React.createElement("br", null),
+                    React.createElement("code", null, "## Heading 2"),
+                    React.createElement("br", null),
+                    React.createElement("code", null, "### Heading 3"),
+                    React.createElement("br", null),
+                    "etc."),
+                React.createElement("p", null, "or"),
+                React.createElement("pre", { style: preStyle },
+                    React.createElement("code", null,
+                        "Heading 1",
+                        React.createElement("br", null),
+                        "===")),
+                React.createElement("pre", { style: preStyle },
+                    React.createElement("code", null,
+                        "Heading 2",
+                        React.createElement("br", null),
+                        "---")))));
+        elements.push(React.createElement(React.Fragment, null,
+            getHelpHeadingRow("Paragraphs"),
+            React.createElement("div", { className: "articleContent" },
+                React.createElement("p", null, "Add an empty line between texts to start a new paragraph."),
+                React.createElement("p", null,
+                    "Add two spaces at the end of the line",
+                    React.createElement("code", null, "\u00B7\u00B7"),
+                    React.createElement("br", null),
+                    " to start a new line."),
+                React.createElement("p", null,
+                    "For a horizontal rule write ",
+                    React.createElement("code", null, "---"),
+                    ", ",
+                    React.createElement("code", null, "***"),
+                    ", or ",
+                    React.createElement("code", null, "___"),
+                    ".",
+                    React.createElement("br", null),
+                    React.createElement("small", null,
+                        "Be sure to have an empty line above ",
+                        React.createElement("code", null, "---"),
+                        " to avoid rendering the previous line as a heading.")))));
+        elements.push(React.createElement(React.Fragment, null,
+            getHelpHeadingRow("Lists"),
+            React.createElement("div", { className: "articleContent" },
+                React.createElement("p", null,
+                    "Start a line with ",
+                    React.createElement("code", null, "-"),
+                    " or ",
+                    React.createElement("code", null, "*"),
+                    " for a bulleted list."),
+                React.createElement("p", null,
+                    "Start a line with ",
+                    React.createElement("code", null, "1."),
+                    " or ",
+                    React.createElement("code", null, "1)"),
+                    " for a numbered list."))));
+        elements.push(React.createElement(React.Fragment, null,
+            getHelpHeadingRow("Links & Images"),
+            React.createElement("div", { className: "articleContent" },
+                React.createElement("p", null,
+                    React.createElement("code", null, "[Link text](URL)"),
+                    React.createElement("br", null),
+                    "Example: ",
+                    React.createElement("code", null, "[Link](http://example.com/)"),
+                    " \u2192 ",
+                    React.createElement("a", { href: "http://example.com/", target: "_blank" }, "Link")),
+                React.createElement("p", null,
+                    React.createElement("code", null, "![Alt text](Image URL)")))));
+        elements.push(React.createElement(React.Fragment, null,
+            getHelpHeadingRow("Quotes & Code"),
+            React.createElement("div", { className: "articleContent" },
+                React.createElement("p", null,
+                    React.createElement("code", null, "> Quote")),
+                React.createElement("blockquote", null,
+                    React.createElement("p", null, "Quote")),
+                React.createElement("p", null,
+                    "For inline ",
+                    React.createElement("code", null, "code"),
+                    ", use single backticks before and after: ",
+                    React.createElement("code", null, "`code`"),
+                    "."),
+                React.createElement("pre", { style: preStyle },
+                    "```",
+                    React.createElement("br", null),
+                    "For a code block use three backticks before and after",
+                    React.createElement("br", null),
+                    "```"))));
+        let panelStyle = {};
+        if (!Utils.tryGetBool(window, "showHelpPanel", false))
+            panelStyle.display = "none";
+        for (let x = 0; x < elements.length; x++) {
+            let className = "helpSection";
+            if (x == 0)
+                className += " first";
+            if (x == elements.length - 1)
+                className += " last";
+            elements[x] = (React.createElement("div", { className: className, key: "HelpSection" + x }, elements[x]));
+        }
+        return (React.createElement("div", { className: "help watermarkedPart", style: panelStyle },
+            React.createElement("div", { className: "watermark" },
+                React.createElement(FontIcon, { iconName: "Unknown" })),
+            React.createElement("div", { id: "helpContainer" }, elements)));
+    }
+    function getHelpHeadingRow(text) {
+        return React.createElement("div", { className: "helpHeading" }, text);
+    }
+    function toggleHelpPanel() {
+        let show = !Utils.tryGetBool(window, "showHelpPanel", false);
+        window["showHelpPanel"] = show;
+        $(".help").toggle(show);
     }
     function onEditorChange(ev, newText) {
         let prevContent = content;

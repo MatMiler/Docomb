@@ -201,15 +201,17 @@ main
 	hr { margin: 30px 0; border-top: 2px solid; border-left: none; border-right: none; border-bottom: none; @include themeMap("border-top-color", $textColorLight); }
 
 
-	table
-	{
-		margin-top: 15px; margin-bottom: 15px; text-align: left; border-collapse: collapse; border: 1px solid;
-		tr:hover { @include themeMap("background", $menuBackgroundColor) }
-		th, td { padding: 5px 10px; border: 1px solid; vertical-align: top; }
-		th { border-bottom-width: 2px; }
+	table {
+		margin-top: 15px; margin-bottom: 15px; text-align: left; border-collapse: separate; border-spacing: 0;
+		tr:hover td { background-clip: padding-box; @include themeMap("background-color", $menuBackgroundColor) }
+		th, td {
+			padding: 5px 10px; vertical-align: top; border-width: 0; border-style: solid; border-right-width: 1px; border-bottom-width: 1px;
+			&:first-child { border-left-width: 1px; }
+			@include themeMap("border-color", $menuBorderColor);
+		}
+		thead:first-child th, tbody:first-child td, & > tr:first-child td { border-top-width: 1px; }
+		th { @include themeMap("background-color", $menuBackgroundColor); }
 	}
-	table, table td, table th { @include themeMap("border-color", $menuBorderColor); }
-	table th { @include themeMaps(("border-bottom-color": $textColorLight, "background": $menuBackgroundColor)); }
 
 
 }

@@ -443,51 +443,48 @@ main table {
   margin-top: 15px;
   margin-bottom: 15px;
   text-align: left;
-  border-collapse: collapse;
-  border: 1px solid; }
-  html main table tr:hover {
-    background: #eee; }
-  .dark main table tr:hover {
-    background: #333; }
-  @media (prefers-color-scheme: dark) {
-    html main table tr:hover {
-      background: #333; }
-    .light main table tr:hover {
-      background: #eee; } }
+  border-collapse: separate;
+  border-spacing: 0; }
+  main table tr:hover td {
+    background-clip: padding-box; }
+    html main table tr:hover td {
+      background-color: #eee; }
+    .dark main table tr:hover td {
+      background-color: #333; }
+    @media (prefers-color-scheme: dark) {
+      html main table tr:hover td {
+        background-color: #333; }
+      .light main table tr:hover td {
+        background-color: #eee; } }
   main table th, main table td {
     padding: 5px 10px;
-    border: 1px solid;
-    vertical-align: top; }
-  main table th {
-    border-bottom-width: 2px; }
-
-html main table, html main table td, html main table th {
-  border-color: #c9c9c9; }
-
-.dark main table, .dark main table td, .dark main table th {
-  border-color: #494949; }
-
-@media (prefers-color-scheme: dark) {
-  html main table, html main table td, html main table th {
-    border-color: #494949; }
-  .light main table, .light main table td, .light main table th {
-    border-color: #c9c9c9; } }
-
-html main table th {
-  border-bottom-color: #666;
-  background: #eee; }
-
-.dark main table th {
-  border-bottom-color: #999;
-  background: #333; }
-
-@media (prefers-color-scheme: dark) {
+    vertical-align: top;
+    border-width: 0;
+    border-style: solid;
+    border-right-width: 1px;
+    border-bottom-width: 1px; }
+    main table th:first-child, main table td:first-child {
+      border-left-width: 1px; }
+    html main table th, html main table td {
+      border-color: #c9c9c9; }
+    .dark main table th, .dark main table td {
+      border-color: #494949; }
+    @media (prefers-color-scheme: dark) {
+      html main table th, html main table td {
+        border-color: #494949; }
+      .light main table th, .light main table td {
+        border-color: #c9c9c9; } }
+  main table thead:first-child th, main table tbody:first-child td, main table > tr:first-child td {
+    border-top-width: 1px; }
   html main table th {
-    border-bottom-color: #999;
-    background: #333; }
-  .light main table th {
-    border-bottom-color: #666;
-    background: #eee; } }
+    background-color: #eee; }
+  .dark main table th {
+    background-color: #333; }
+  @media (prefers-color-scheme: dark) {
+    html main table th {
+      background-color: #333; }
+    .light main table th {
+      background-color: #eee; } }
 
 .editor-colors .typeVariable, .editor-colors .italic {
   font-style: italic; }
