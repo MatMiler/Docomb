@@ -1,12 +1,13 @@
 ﻿import React, { Component, FC, ReactElement, useState } from "react";
 import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
-import { CommandBar, DetailsList, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, IDetailsHeaderProps, IRenderFunction, mergeStyles, PrimaryButton, ScrollablePane, Spinner, SpinnerSize, Stack, Sticky, Selection, ISelection, TextField, DefaultButton, ChoiceGroup, Dropdown, IDropdownOption } from "@fluentui/react";
+import { CommandBar, DetailsList, Dialog, DialogFooter, DialogType, ICommandBarItemProps, IDetailsHeaderProps, IRenderFunction, mergeStyles, PrimaryButton, ScrollablePane, Spinner, SpinnerSize, Stack, Sticky, Selection, ISelection, TextField, DefaultButton, ChoiceGroup, Dropdown, IDropdownOption } from "@fluentui/react";
 import SettingsBreadcrumbs from "./SettingsBreadcrumbs";
 import { Users } from "../../Data/Users";
 import { Apis } from "../../Data/Apis";
 import { Utils } from "../../Data/Utils";
 import { Layout } from "../Layout";
 import $ from 'jquery';
+import { WarningIcon } from '@fluentui/react-icons-mdl2';
 
 
 
@@ -49,7 +50,7 @@ const GlobalUsersUi: FC<{}> = (): ReactElement => {
 			</Dialog>
 			<Dialog hidden={!alertIsVisible} dialogContentProps={{ type: DialogType.largeHeader, title: alertTitle }} modalProps={{ isBlocking: false }} onDismiss={hideAlert} >
 				<Stack horizontal verticalAlign="center">
-					<FontIcon iconName="Warning" className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
+					<WarningIcon className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
 					<div>{alertContent}</div>
 				</Stack>
 				<DialogFooter><PrimaryButton onClick={hideAlert} text="OK" /></DialogFooter>

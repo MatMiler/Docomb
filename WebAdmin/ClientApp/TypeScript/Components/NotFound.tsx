@@ -1,5 +1,4 @@
-﻿import { FontIcon } from '@fluentui/react';
-import React, { Component } from 'react';
+﻿import React, { Component } from 'react';
 import { EventBus } from '../EventBus';
 import { LayoutUtils } from '../LayoutUtils';
 

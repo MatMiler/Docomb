@@ -9,12 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import React, { Component, useState } from "react";
 import { useBoolean } from '@fluentui/react-hooks';
-import { CommandBar, DetailsList, Dialog, DialogFooter, DialogType, FontIcon, mergeStyles, PrimaryButton, ScrollablePane, Spinner, SpinnerSize, Stack, Sticky, Selection, TextField, DefaultButton, Dropdown } from "@fluentui/react";
+import { CommandBar, DetailsList, Dialog, DialogFooter, DialogType, mergeStyles, PrimaryButton, ScrollablePane, Spinner, SpinnerSize, Stack, Sticky, Selection, TextField, DefaultButton, Dropdown } from "@fluentui/react";
 import SettingsBreadcrumbs from "./SettingsBreadcrumbs";
 import { Users } from "../../Data/Users";
 import { Utils } from "../../Data/Utils";
 import { Layout } from "../Layout";
 import $ from 'jquery';
+import { WarningIcon } from '@fluentui/react-icons-mdl2';
 const GlobalUsersUi = () => {
     var _a, _b;
     const [dataHash, setDataHash] = useState(0);
@@ -43,7 +44,7 @@ const GlobalUsersUi = () => {
                 React.createElement(Spinner, { label: "Please wait...", labelPosition: "right", size: SpinnerSize.large }))),
         React.createElement(Dialog, { hidden: !alertIsVisible, dialogContentProps: { type: DialogType.largeHeader, title: alertTitle }, modalProps: { isBlocking: false }, onDismiss: hideAlert },
             React.createElement(Stack, { horizontal: true, verticalAlign: "center" },
-                React.createElement(FontIcon, { iconName: "Warning", className: mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" }) }),
+                React.createElement(WarningIcon, { className: mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" }) }),
                 React.createElement("div", null, alertContent)),
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: hideAlert, text: "OK" }))),

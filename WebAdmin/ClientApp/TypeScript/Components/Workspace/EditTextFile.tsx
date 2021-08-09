@@ -1,4 +1,4 @@
-﻿import { CommandBar, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, mergeStyles, PrimaryButton, ScrollablePane, Spinner, SpinnerSize, Stack, Sticky, StickyPositionType, TextField } from "@fluentui/react";
+﻿import { CommandBar, Dialog, DialogFooter, DialogType, ICommandBarItemProps, mergeStyles, PrimaryButton, ScrollablePane, Spinner, SpinnerSize, Stack, Sticky, StickyPositionType, TextField } from "@fluentui/react";
 import React, { FC, ReactElement, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
@@ -8,6 +8,7 @@ import { LayoutUtils } from "../../LayoutUtils";
 import PageBreadcrumbs from "./PageBreadcrumbs";
 import $ from 'jquery';
 import { Apis } from "../../Data/Apis";
+import { WarningIcon, EditIcon, EntryViewIcon, UnknownIcon } from '@fluentui/react-icons-mdl2';
 
 
 const EditTextFile: FC<{}> = (): ReactElement => {
@@ -37,7 +38,7 @@ const EditTextFile: FC<{}> = (): ReactElement => {
 			</Dialog>
 			<Dialog hidden={!alertIsVisible} dialogContentProps={{ type: DialogType.largeHeader, title: alertTitle }} modalProps={{ isBlocking: false }} onDismiss={hideAlert} >
 				<Stack horizontal verticalAlign="center">
-					<FontIcon iconName="Warning" className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
+					<WarningIcon className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
 					<div>{alertContent}</div>
 				</Stack>
 				<DialogFooter><PrimaryButton onClick={hideAlert} text="OK" /></DialogFooter>
@@ -139,11 +140,11 @@ module EditTextFileController {
 				return (
 					<div className="editTextFile">
 						<div className="editor watermarkedPart">
-							<div className="watermark"><FontIcon iconName="Edit" /></div>
+							<div className="watermark"><EditIcon /></div>
 							<div className="editorInput"><TextField id="editorInput" defaultValue={fileDetails?.contentText} multiline resizable={false} onChange={onEditorChange} /></div>
 						</div>
 						<div className="preview watermarkedPart" style={previewStyle}>
-							<div className="watermark"><FontIcon iconName="EntryView" /></div>
+							<div className="watermark"><EntryViewIcon /></div>
 							<div id="previewContainer" className="articleContent"
 								dangerouslySetInnerHTML={{ __html: LayoutUtils.fixLocalLinksInHtml(fileDetails.contentHtml, pageInfo?.workspace, pageInfo?.contentItem) }} />
 						</div>
@@ -155,7 +156,7 @@ module EditTextFileController {
 				return (
 					<div className="editTextFile">
 						<div className="editor watermarkedPart">
-							<div className="watermark"><FontIcon iconName="Edit" /></div>
+							<div className="watermark"><EditIcon /></div>
 							<div className="editorInput"><TextField id="editorInput" defaultValue={fileDetails?.contentText} multiline resizable={false} onChange={onEditorChange} /></div>
 						</div>
 					</div>
@@ -248,7 +249,7 @@ module EditTextFileController {
 
 		return (
 			<div className="help watermarkedPart" style={panelStyle}>
-				<div className="watermark"><FontIcon iconName="Unknown" /></div>
+				<div className="watermark"><UnknownIcon /></div>
 				<div id="helpContainer">
 					{elements}
 				</div>

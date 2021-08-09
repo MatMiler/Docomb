@@ -22,6 +22,7 @@
 	<ItemGroup>
 		<Content Remove="compilerconfig.json" />
 		<Content Remove="wwwroot\_resources\images\facebook-color.svg" />
+		<Content Remove="wwwroot\_resources\images\google-color.svg" />
 		<Content Remove="wwwroot\_resources\images\microsoft-color.svg" />
 		<Content Remove="wwwroot\_resources\styles\auth.scss" />
 		<Content Remove="wwwroot\_resources\styles\docomb\shared\theme.scss" />

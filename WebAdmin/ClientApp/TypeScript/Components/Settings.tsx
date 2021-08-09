@@ -1,8 +1,8 @@
-﻿import { FontIcon } from '@fluentui/react';
-import React, { Component } from 'react';
+﻿import React, { Component } from 'react';
 import { EventBus } from '../EventBus';
 import { LayoutUtils } from '../LayoutUtils';
 import { Layout } from './Layout';
+import { SettingsIcon } from '@fluentui/react-icons-mdl2';
 
 export class Settings extends Component {
 	componentDidMount() {
@@ -14,7 +14,7 @@ export class Settings extends Component {
 		return (
 			<Layout mainNavType="settings">
 				<div className="adminHome emptyPage">
-					<div className="watermark"><FontIcon iconName="Settings" /></div>
+					<div className="watermark"><SettingsIcon /></div>
 				</div>
 			</Layout>
 		);

@@ -7,12 +7,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { CommandBar, Dialog, DialogFooter, DialogType, FontIcon, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack } from "@fluentui/react";
+import { CommandBar, Dialog, DialogFooter, DialogType, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack } from "@fluentui/react";
 import React, { useState } from "react";
 import { useBoolean } from '@fluentui/react-hooks';
 import { Workspaces } from "../../Data/Workspaces";
 import { LayoutUtils } from "../../LayoutUtils";
 import OptionsBreadcrumbs from "./OptionsBreadcrumbs";
+import { GitGraphIcon, WarningIcon } from '@fluentui/react-icons-mdl2';
 const GitManager = () => {
     // Waiting dialog
     const [waitingIsVisible, { toggle: toggleWaiting, setTrue: showWaiting, setFalse: hideWaiting }] = useBoolean(false);
@@ -33,13 +34,13 @@ const GitManager = () => {
             React.createElement("div", { className: "pageContent" },
                 React.createElement("div", { className: "emptyPage" },
                     React.createElement("div", { className: "watermark" },
-                        React.createElement(FontIcon, { iconName: "GitGraph" }))))),
+                        React.createElement(GitGraphIcon, null))))),
         React.createElement(Dialog, { hidden: !waitingIsVisible, dialogContentProps: { type: DialogType.normal, title: null, showCloseButton: false }, modalProps: { isBlocking: true } },
             React.createElement(DialogFooter, null,
                 React.createElement(Spinner, { label: "Please wait...", labelPosition: "right", size: SpinnerSize.large }))),
         React.createElement(Dialog, { hidden: !alertIsVisible, dialogContentProps: { type: DialogType.largeHeader, title: alertTitle }, modalProps: { isBlocking: false }, onDismiss: hideAlert },
             React.createElement(Stack, { horizontal: true, verticalAlign: "center" },
-                React.createElement(FontIcon, { iconName: "Warning", className: mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" }) }),
+                React.createElement(WarningIcon, { className: mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" }) }),
                 React.createElement("div", null, alertContent)),
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: hideAlert, text: "OK" })))));

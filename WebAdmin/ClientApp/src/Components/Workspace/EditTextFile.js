@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { CommandBar, Dialog, DialogFooter, DialogType, FontIcon, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from "@fluentui/react";
+import { CommandBar, Dialog, DialogFooter, DialogType, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from "@fluentui/react";
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useBoolean } from '@fluentui/react-hooks';
@@ -17,6 +17,7 @@ import { LayoutUtils } from "../../LayoutUtils";
 import PageBreadcrumbs from "./PageBreadcrumbs";
 import $ from 'jquery';
 import { Apis } from "../../Data/Apis";
+import { WarningIcon, EditIcon, EntryViewIcon, UnknownIcon } from '@fluentui/react-icons-mdl2';
 const EditTextFile = () => {
     const history = useHistory();
     function navigate(url) { history.push(url); }
@@ -36,7 +37,7 @@ const EditTextFile = () => {
                 React.createElement(Spinner, { label: "Please wait...", labelPosition: "right", size: SpinnerSize.large }))),
         React.createElement(Dialog, { hidden: !alertIsVisible, dialogContentProps: { type: DialogType.largeHeader, title: alertTitle }, modalProps: { isBlocking: false }, onDismiss: hideAlert },
             React.createElement(Stack, { horizontal: true, verticalAlign: "center" },
-                React.createElement(FontIcon, { iconName: "Warning", className: mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" }) }),
+                React.createElement(WarningIcon, { className: mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" }) }),
                 React.createElement("div", null, alertContent)),
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: hideAlert, text: "OK" })))));
@@ -118,12 +119,12 @@ var EditTextFileController;
                 return (React.createElement("div", { className: "editTextFile" },
                     React.createElement("div", { className: "editor watermarkedPart" },
                         React.createElement("div", { className: "watermark" },
-                            React.createElement(FontIcon, { iconName: "Edit" })),
+                            React.createElement(EditIcon, null)),
                         React.createElement("div", { className: "editorInput" },
                             React.createElement(TextField, { id: "editorInput", defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, onChange: onEditorChange }))),
                     React.createElement("div", { className: "preview watermarkedPart", style: previewStyle },
                         React.createElement("div", { className: "watermark" },
-                            React.createElement(FontIcon, { iconName: "EntryView" })),
+                            React.createElement(EntryViewIcon, null)),
                         React.createElement("div", { id: "previewContainer", className: "articleContent", dangerouslySetInnerHTML: { __html: LayoutUtils.fixLocalLinksInHtml(EditTextFileController.fileDetails.contentHtml, EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.workspace, EditTextFileController.pageInfo === null || EditTextFileController.pageInfo === void 0 ? void 0 : EditTextFileController.pageInfo.contentItem) } })),
                     getMarkdownHelpPanel()));
             }
@@ -132,7 +133,7 @@ var EditTextFileController;
                 return (React.createElement("div", { className: "editTextFile" },
                     React.createElement("div", { className: "editor watermarkedPart" },
                         React.createElement("div", { className: "watermark" },
-                            React.createElement(FontIcon, { iconName: "Edit" })),
+                            React.createElement(EditIcon, null)),
                         React.createElement("div", { className: "editorInput" },
                             React.createElement(TextField, { id: "editorInput", defaultValue: EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.contentText, multiline: true, resizable: false, onChange: onEditorChange })))));
             }
@@ -267,7 +268,7 @@ var EditTextFileController;
         }
         return (React.createElement("div", { className: "help watermarkedPart", style: panelStyle },
             React.createElement("div", { className: "watermark" },
-                React.createElement(FontIcon, { iconName: "Unknown" })),
+                React.createElement(UnknownIcon, null)),
             React.createElement("div", { id: "helpContainer" }, elements)));
     }
     function getHelpHeadingRow(text) {

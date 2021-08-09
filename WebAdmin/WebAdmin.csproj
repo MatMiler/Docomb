@@ -42,7 +42,8 @@
 	  <Content Remove="ClientApp\package.json" />
 	  <Content Remove="compilerconfig.json" />
 	  <Content Remove="tsconfig.json" />
-	  <Content Remove="wwwroot\_resources\images\facebook-color.svg" />
+		<Content Remove="wwwroot\_resources\images\facebook-color.svg" />
+		<Content Remove="wwwroot\_resources\images\google-color.svg" />
 	  <Content Remove="wwwroot\_resources\images\microsoft-color.svg" />
 	  <Content Remove="wwwroot\_resources\styles\article.scss" />
 	  <Content Remove="wwwroot\_resources\styles\docomb\auth.scss" />

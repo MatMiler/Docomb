@@ -1,6 +1,7 @@
-﻿import { ContextualMenu, DirectionalHint, FontIcon, IContextualMenuItem } from "@fluentui/react";
+﻿import { ContextualMenu, DirectionalHint, IContextualMenuItem } from "@fluentui/react";
 import React, { FC, ReactElement, useState } from "react";
 import { Users } from "../Data/Users";
+import { ContactIcon } from '@fluentui/react-icons-mdl2';
 
 
 const SideBarUser: FC<{}> = (): ReactElement => {
@@ -16,7 +17,7 @@ const SideBarUser: FC<{}> = (): ReactElement => {
 	return SideBarUserController.hasUser() ? (
 		<div className="sideBarItem" title={SideBarUserController.name + "\n" + SideBarUserController.username}>
 			<a ref={linkRef} onClick={showMenu}>
-				<span className="icon" aria-hidden="true"><FontIcon iconName="Contact" /></span>
+				<span className="icon" aria-hidden="true"><ContactIcon /></span>
 				<span className="name">{SideBarUserController.name}</span>
 			</a>
 			<ContextualMenu items={SideBarUserController.getMenuItems()} hidden={!menuIsVisible} target={linkRef} onItemClick={hideMenu} onDismiss={hideMenu} isBeakVisible={true} directionalHint={DirectionalHint.topCenter} />

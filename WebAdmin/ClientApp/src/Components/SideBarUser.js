@@ -7,9 +7,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { ContextualMenu, DirectionalHint, FontIcon } from "@fluentui/react";
+import { ContextualMenu, DirectionalHint } from "@fluentui/react";
 import React, { useState } from "react";
 import { Users } from "../Data/Users";
+import { ContactIcon } from '@fluentui/react-icons-mdl2';
 const SideBarUser = () => {
     const [username, setUsername] = useState("User");
     const [menuIsVisible, setMenuIsVisible] = React.useState(false);
@@ -20,7 +21,7 @@ const SideBarUser = () => {
     return SideBarUserController.hasUser() ? (React.createElement("div", { className: "sideBarItem", title: SideBarUserController.name + "\n" + SideBarUserController.username },
         React.createElement("a", { ref: linkRef, onClick: showMenu },
             React.createElement("span", { className: "icon", "aria-hidden": "true" },
-                React.createElement(FontIcon, { iconName: "Contact" })),
+                React.createElement(ContactIcon, null)),
             React.createElement("span", { className: "name" }, SideBarUserController.name)),
         React.createElement(ContextualMenu, { items: SideBarUserController.getMenuItems(), hidden: !menuIsVisible, target: linkRef, onItemClick: hideMenu, onDismiss: hideMenu, isBeakVisible: true, directionalHint: DirectionalHint.topCenter }))) : null;
 };

@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, FontIcon, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
+import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
 import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
 import { useBoolean } from '@fluentui/react-hooks';
@@ -17,6 +17,7 @@ import { LayoutUtils } from '../../LayoutUtils';
 import PageBreadcrumbs from './PageBreadcrumbs';
 import $ from 'jquery';
 import { EventBus } from '../../EventBus';
+import { WarningIcon, InfoIcon } from '@fluentui/react-icons-mdl2';
 const ContentFileInfo = () => {
     const history = useHistory();
     function navigate(url) { history.push(url); }
@@ -40,7 +41,7 @@ const ContentFileInfo = () => {
                 React.createElement(Spinner, { label: "Please wait...", labelPosition: "right", size: SpinnerSize.large }))),
         React.createElement(Dialog, { hidden: !alertIsVisible, dialogContentProps: { type: DialogType.largeHeader, title: alertTitle }, modalProps: { isBlocking: false }, onDismiss: hideAlert },
             React.createElement(Stack, { horizontal: true, verticalAlign: "center" },
-                React.createElement(FontIcon, { iconName: "Warning", className: mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" }) }),
+                React.createElement(WarningIcon, { className: mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" }) }),
                 React.createElement("div", null, alertContent)),
             React.createElement(DialogFooter, null,
                 React.createElement(PrimaryButton, { onClick: hideAlert, text: "OK" }))),
@@ -162,7 +163,7 @@ var ContentFileInfoController;
         if (items.length > 0)
             return (React.createElement("div", { className: "metaInfo", style: panelStyle },
                 React.createElement("h2", null,
-                    React.createElement(FontIcon, { iconName: "Info" }),
+                    React.createElement(InfoIcon, null),
                     " Information"),
                 items));
         return null;

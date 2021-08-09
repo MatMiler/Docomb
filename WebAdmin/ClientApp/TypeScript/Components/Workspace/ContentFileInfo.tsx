@@ -1,4 +1,4 @@
-﻿import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, FontIcon, ICommandBarItemProps, IDialogContentProps, IDialogProps, IDropdown, IDropdownOption, IModalProps, IRefObject, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
+﻿import { CommandBar, DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, ICommandBarItemProps, IDialogContentProps, IDialogProps, IDropdown, IDropdownOption, IModalProps, IRefObject, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
 import React, { FC, ReactElement, useState } from 'react';
 import { useHistory } from "react-router-dom";
 import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
@@ -8,6 +8,7 @@ import { LayoutUtils } from '../../LayoutUtils';
 import PageBreadcrumbs from './PageBreadcrumbs';
 import $ from 'jquery';
 import { EventBus } from '../../EventBus';
+import { WarningIcon, InfoIcon } from '@fluentui/react-icons-mdl2';
 
 
 const ContentFileInfo: FC<{}> = (): ReactElement => {
@@ -44,7 +45,7 @@ const ContentFileInfo: FC<{}> = (): ReactElement => {
 			</Dialog>
 			<Dialog hidden={!alertIsVisible} dialogContentProps={{ type: DialogType.largeHeader, title: alertTitle }} modalProps={{ isBlocking: false }} onDismiss={hideAlert} >
 				<Stack horizontal verticalAlign="center">
-					<FontIcon iconName="Warning" className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
+					<WarningIcon className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
 					<div>{alertContent}</div>
 				</Stack>
 				<DialogFooter><PrimaryButton onClick={hideAlert} text="OK" /></DialogFooter>
@@ -220,7 +221,7 @@ module ContentFileInfoController {
 		if (items.length > 0)
 			return (
 				<div className="metaInfo" style={panelStyle}>
-					<h2><FontIcon iconName="Info" /> Information</h2>
+					<h2><InfoIcon /> Information</h2>
 					{items}
 				</div>
 				);

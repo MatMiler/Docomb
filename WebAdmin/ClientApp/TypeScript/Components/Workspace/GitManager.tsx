@@ -1,4 +1,4 @@
-﻿import { CommandBar, Dialog, DialogFooter, DialogType, FontIcon, ICommandBarItemProps, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from "@fluentui/react";
+﻿import { CommandBar, Dialog, DialogFooter, DialogType, ICommandBarItemProps, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from "@fluentui/react";
 import React, { FC, ReactElement, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
@@ -9,6 +9,7 @@ import PageBreadcrumbs from "./PageBreadcrumbs";
 import $ from 'jquery';
 import { Apis } from "../../Data/Apis";
 import OptionsBreadcrumbs from "./OptionsBreadcrumbs";
+import { GitGraphIcon, WarningIcon } from '@fluentui/react-icons-mdl2';
 
 
 const GitManager: FC<{}> = (): ReactElement => {
@@ -33,7 +34,7 @@ const GitManager: FC<{}> = (): ReactElement => {
 				{GitController.getToolbar()}
 				<div className="pageContent">
 					<div className="emptyPage">
-						<div className="watermark"><FontIcon iconName={"GitGraph"} /></div>
+						<div className="watermark"><GitGraphIcon /></div>
 					</div>
 				</div>
 			</div>
@@ -46,7 +47,7 @@ const GitManager: FC<{}> = (): ReactElement => {
 			{/* Alert dialog */}
 			<Dialog hidden={!alertIsVisible} dialogContentProps={{ type: DialogType.largeHeader, title: alertTitle }} modalProps={{ isBlocking: false }} onDismiss={hideAlert} >
 				<Stack horizontal verticalAlign="center">
-					<FontIcon iconName="Warning" className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
+					<WarningIcon className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
 					<div>{alertContent}</div>
 				</Stack>
 				<DialogFooter><PrimaryButton onClick={hideAlert} text="OK" /></DialogFooter>

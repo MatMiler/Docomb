@@ -1,4 +1,4 @@
-﻿import { CommandBar, ContextualMenuItemType, DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, FontIcon, ICommandBarItemProps, IDialogContentProps, IDropdownOption, IModalProps, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
+﻿import { CommandBar, ContextualMenuItemType, DefaultButton, Dialog, DialogFooter, DialogType, Dropdown, ICommandBarItemProps, IDialogContentProps, IDropdownOption, IModalProps, mergeStyles, PrimaryButton, Spinner, SpinnerSize, Stack, TextField } from '@fluentui/react';
 import React, { FC, ReactElement, useState } from 'react';
 import { useHistory } from "react-router-dom";
 import { useBoolean, IUseBooleanCallbacks } from '@fluentui/react-hooks';
@@ -9,6 +9,7 @@ import PageBreadcrumbs from './PageBreadcrumbs';
 import $ from 'jquery';
 import { EventBus } from '../../EventBus';
 import { Apis } from '../../Data/Apis';
+import { OpenFolderHorizontalIcon, WarningIcon } from '@fluentui/react-icons-mdl2';
 
 
 const ContentDirectory: FC<{}> = (): ReactElement => {
@@ -71,7 +72,7 @@ const ContentDirectory: FC<{}> = (): ReactElement => {
 				{ContentDirectoryController.getToolbar()}
 				<div className="pageContent">
 					<div className="emptyPage">
-						<div className="watermark"><FontIcon iconName={ContentDirectoryController.isRoot ? "ProjectCollection" : "OpenFolderHorizontal"} /></div>
+						<div className="watermark"><OpenFolderHorizontalIcon /></div>
 					</div>
 				</div>
 			</div>
@@ -84,7 +85,7 @@ const ContentDirectory: FC<{}> = (): ReactElement => {
 			{/* Alert dialog */}
 			<Dialog hidden={!alertIsVisible} dialogContentProps={{ type: DialogType.largeHeader, title: alertTitle }} modalProps={{ isBlocking: false }} onDismiss={hideAlert} >
 				<Stack horizontal verticalAlign="center">
-					<FontIcon iconName="Warning" className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
+					<WarningIcon className={mergeStyles({ fontSize: 30, width: 30, height: 36, lineHeight: 36, margin: "0 16px 0 0" })} />
 					<div>{alertContent}</div>
 				</Stack>
 				<DialogFooter><PrimaryButton onClick={hideAlert} text="OK" /></DialogFooter>
