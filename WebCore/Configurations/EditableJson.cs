@@ -87,7 +87,7 @@ namespace Docomb.WebCore.Configurations
 			 * 3. Create a new main config file and save content into it
 			 */
 
-			string runtimeDirectory = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+			string runtimeDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 			string renameTo = null;
 			bool isLastBackupFile = true;
 
