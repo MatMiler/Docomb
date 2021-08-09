@@ -16,7 +16,7 @@ Docomb is a simple content management system for Markdown files. It's packaged a
 
 ### Basic implementation
 1. Create a new empty ASP.NET 5.0 project.
-2. Add [Docomb.WebReader](https://www.nuget.org/packages/Docomb.WebReader/) and [Docomb.WebAdmin](https://www.nuget.org/packages/Docomb.WebAdmin/) NuGet packages to the project. (Both packages can be used alone.)
+2. Add [Docomb.WebReader](https://www.nuget.org/packages/Docomb.WebReader/) and [Docomb.WebAdmin](https://www.nuget.org/packages/Docomb.WebAdmin/) NuGet packages to the project. (The packages can be used either together or alone.)
 3. In `Startup.cs` file add the following:
 	- Among the using statements:
 		```
