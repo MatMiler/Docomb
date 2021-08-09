@@ -32,6 +32,12 @@ Docomb is a simple content management system for Markdown files. It's packaged a
 		```
 		app.UseDocombAdmin();
 		app.UseDocombReader();
+		app.UseStaticFiles();
+		app.UseEndpoints(endpoints =>
+		{
+			endpoints.MapControllers();
+			endpoints.MapRazorPages();
+		});
 		```
 4. Prepare configuration files and save them to the directory from where the project will run.
 
