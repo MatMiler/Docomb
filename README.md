@@ -1,10 +1,11 @@
 # Docomb [![Admin NuGet](https://img.shields.io/nuget/v/Docomb.WebAdmin.svg?label=admin+nuget)](https://www.nuget.org/packages/Docomb.WebAdmin/) [![Admin NuGet](https://img.shields.io/nuget/v/Docomb.WebReader.svg?label=reader+nuget)](https://www.nuget.org/packages/Docomb.WebReader/)
 
-Docomb is a simple content management system for Markdown files. It's packaged as a library, rather than a finished solution, so it's easier to adapt to specific requirements.
+Docomb is a simple content management system for Markdown files, intended primarily for managing documentations. It is packaged as a library, rather than a finished solution, so it is easier to adapt to specific requirements.
 
 
 ## Characteristics
 - Separate reader & admin interfaces
+- File management with editor for Markdown and TXT files
 - Multiple document workspaces
 - External authentication with Facebook, Google, and Microsoft account
 - Saves changes to Git
@@ -140,7 +141,7 @@ Example:
 | `[].git.commiterEmail`  | string | Email of the entity that commits to Git. |
 
 ### Configuration: `users.json`
-This file will be managed by admin interface, and doesn't need to be kept up-to-date manually.
+This file will be managed by admin interface, and does not need to be kept up-to-date manually.
 
 Example:
 ```
