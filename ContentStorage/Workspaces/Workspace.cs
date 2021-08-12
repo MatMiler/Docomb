@@ -15,7 +15,6 @@ namespace Docomb.ContentStorage.Workspaces
 			Name = name;
 			UrlPath = urlPath;
 			ContentStoragePath = storagePath;
-			Initialize();
 		}
 
 
@@ -72,7 +71,12 @@ namespace Docomb.ContentStorage.Workspaces
 
 		public void Initialize()
 		{
-			if (Git != null) Git.Workspace = this;
+			if (Git != null)
+			{
+				Git.Workspace = this;
+				if (Git.ShouldClone)
+					Git.CloneIfEmpty();
+			}
 		}
 
 

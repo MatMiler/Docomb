@@ -51,7 +51,6 @@ namespace Docomb.WebCore.Dtos
 				Icon = Icon,
 				Git = Git?.ToGitManager()
 			};
-			workspace.Initialize();
 			return workspace;
 		}
 

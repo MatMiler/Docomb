@@ -25,6 +25,8 @@ namespace Docomb.ContentStorage.Workspaces
 
 		public string CommiterEmail { get; set; }
 
+		public bool ShouldClone { get; set; } = false;
+
 
 		public Workspace Workspace { get; internal set; }
 
@@ -67,6 +69,44 @@ namespace Docomb.ContentStorage.Workspaces
 
 		private readonly object _localLock = new();
 		private readonly object _originLock = new();
+
+
+
+		public void CloneIfEmpty()
+		{
+			string path = Workspace.ContentStoragePath;
+			#region Check path & create directory
+			{
+				if (!Directory.Exists(path))
+				{
+					try
+					{
+						Directory.CreateDirectory(path);
+					}
+					catch (Exception e)
+					{
+						return;
+					}
+				}
+			}
+			#endregion
+
+
+			#region Clone
+			if (!Repository.IsValid(path))
+			{
+				try
+				{
+					CloneOptions options = new() { CredentialsProvider = CredentialsProvider, BranchName = Branch };
+					Repository.Clone(RepositoryPath, path, options);
+				}
+				catch (Exception e)
+				{
+				}
+			}
+			#endregion
+		}
+
 
 
 		public void AddFile(string path, ActionContext context, bool push = true)
@@ -213,9 +253,8 @@ namespace Docomb.ContentStorage.Workspaces
 					var options = new PullOptions();
 					Signature merger = new(CommiterName, CommiterEmail, DateTime.Now);
 
-					var credentials = new UsernamePasswordCredentials { Username = Username, Password = Password };
 					options.FetchOptions ??= new();
-					options.FetchOptions.CredentialsProvider = (url, user, cred) => credentials;
+					options.FetchOptions.CredentialsProvider = CredentialsProvider;
 					Commands.Pull(Repository, merger, options);
 				}
 				catch { }
@@ -228,30 +267,38 @@ namespace Docomb.ContentStorage.Workspaces
 			{
 				var branch = Repository.Branches[Branch];
 				var options = new PushOptions();
-				var credentials = new UsernamePasswordCredentials { Username = Username, Password = Password };
-				options.CredentialsProvider = (url, user, cred) => credentials;
-				ConflictCollection conflicts = Repository.Index.Conflicts;
-				if (conflicts?.Count() > 0)
+				options.CredentialsProvider = CredentialsProvider;
+
+				#region Check for & resolve conflicts
 				{
-					foreach (var conflict in Repository.Index.Conflicts)
+					ConflictCollection conflicts = Repository.Index.Conflicts;
+					if (conflicts?.Count() > 0)
 					{
-						IndexEntry ours = conflict.Ours;
-						Blob ourBlob = (ours != null) ? (Blob)Repository.Lookup(ours.Id) : null;
-						var ourStream = (ours != null) ? ourBlob.GetContentStream(new FilteringOptions(ours.Path)) : null;
-						var fullPath = Path.Combine(Workspace.ContentStoragePath, ours.Path);
-						using (var oursOutputStream = File.Create(fullPath))
+						foreach (var conflict in Repository.Index.Conflicts)
 						{
-							ourStream.CopyTo(oursOutputStream);
+							IndexEntry ours = conflict.Ours;
+							Blob ourBlob = (ours != null) ? (Blob)Repository.Lookup(ours.Id) : null;
+							var ourStream = (ours != null) ? ourBlob.GetContentStream(new FilteringOptions(ours.Path)) : null;
+							var fullPath = Path.Combine(Workspace.ContentStoragePath, ours.Path);
+							using (var oursOutputStream = File.Create(fullPath))
+							{
+								ourStream.CopyTo(oursOutputStream);
+							}
+							Commands.Stage(Repository, conflict.Ours.Path);
 						}
-						Commands.Stage(Repository, conflict.Ours.Path);
+						Repository.Commit("Merge conflicts (using local changes)", Committer, Committer);
 					}
-					Repository.Commit("Merge conflicts (using local changes)", Committer, Committer);
 				}
+				#endregion
+
 				Repository.Network.Push(branch, options);
 			}
 		}
 
 		private Signature Committer => new(CommiterName, CommiterEmail, DateTime.Now);
+
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+		private UsernamePasswordCredentials CredentialsProvider(string url, string usernameFromUrl, SupportedCredentialTypes types) => new() { Username = Username, Password = Password };
 
 		public void Sync(ActionContext context)
 		{
