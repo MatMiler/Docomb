@@ -257,8 +257,12 @@ namespace Docomb.ContentStorage.Workspaces
 
 					options.FetchOptions ??= new();
 					options.FetchOptions.CredentialsProvider = CredentialsProvider;
-					Commands.Pull(Repository, merger, options);
-					ResolveConflicts();
+					MergeResult pullResults = Commands.Pull(Repository, merger, options);
+					bool anyConflicts = ResolveConflicts();
+					if ((pullResults?.Status != MergeStatus.UpToDate) || (anyConflicts))
+					{
+						Workspace.Content.ClearCache();
+					}
 				}
 				catch { }
 			}
@@ -276,9 +280,10 @@ namespace Docomb.ContentStorage.Workspaces
 			}
 		}
 
-		public void ResolveConflicts()
+		public bool ResolveConflicts()
 		{
 			ConflictCollection conflicts = Repository.Index.Conflicts;
+			var result = false;
 			if (conflicts?.Count() > 0)
 			{
 				foreach (var conflict in Repository.Index.Conflicts)
@@ -292,9 +297,11 @@ namespace Docomb.ContentStorage.Workspaces
 						ourStream.CopyTo(oursOutputStream);
 					}
 					Commands.Stage(Repository, conflict.Ours.Path);
+					result = true;
 				}
 				Repository.Commit("Merge conflicts (using local changes)", Committer, Committer);
 			}
+			return result;
 		}
 
 		private Signature Committer => new(CommiterName, CommiterEmail, DateTime.Now);
