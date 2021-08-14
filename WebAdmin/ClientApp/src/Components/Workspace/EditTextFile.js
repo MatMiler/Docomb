@@ -76,7 +76,16 @@ var EditTextFileController;
             //case Workspaces.FileType.PlainText: { hasPreview = false; break; }
         }
         if (hasPreview) {
-            farItems.push({ key: "togglePreview", text: "Toggle preview", iconOnly: true, ariaLabel: "Toggle preview", iconProps: { iconName: "EntryView" }, onClick: togglePreviewPanel });
+            farItems.push({
+                key: "preview", text: "Preview", iconOnly: true, ariaLabel: "Toggle preview", iconProps: { iconName: "EntryView" }, onClick: togglePreviewPanel, split: true,
+                subMenuProps: {
+                    items: [
+                        { key: "togglePreview", text: "Toggle preview", onClick: togglePreviewPanel, iconProps: { iconName: 'View' } },
+                        { key: "refreshPreview", text: "Refresh preview", onClick: refreshPreviewPanel, iconProps: { iconName: 'Refresh' } }
+                    ],
+                    ariaLabel: "More preview options"
+                }
+            });
         }
         if ((EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.type) == Workspaces.FileType.Markdown) {
             farItems.push({ key: "toggleMarkdownHelp", text: "Toggle help", iconOnly: true, ariaLabel: "Toggle help", iconProps: { iconName: "Unknown" }, onClick: toggleHelpPanel });
@@ -146,6 +155,14 @@ var EditTextFileController;
         let show = !Utils.tryGetBool(window, "showPreviewPanel", true);
         window["showPreviewPanel"] = show;
         $(".preview").toggle(show);
+    }
+    function refreshPreviewPanel() {
+        switch (EditTextFileController.fileDetails === null || EditTextFileController.fileDetails === void 0 ? void 0 : EditTextFileController.fileDetails.type) {
+            case Workspaces.FileType.Markdown: {
+                MarkdownPreview.refresh(content, content, true);
+                break;
+            }
+        }
     }
     function getMarkdownHelpPanel() {
         let elements = [];
@@ -302,7 +319,7 @@ var EditTextFileController;
     let MarkdownPreview;
     (function (MarkdownPreview) {
         function refresh(content, prevContent, immediate = false) {
-            if (content == prevContent)
+            if ((immediate != true) && (content == prevContent))
                 return; // No changes
             if (((Date.now() - lastRequest) < requestTimeout) && ((updateTimeoutId > 0) || (isExecuting)))
                 return; // Already queued
