@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Docomb.WebReader;
 using Docomb.WebAdmin;
+using Docomb.WebCore;
 //using Microsoft.Net.Http.Headers;
 
 namespace TestSite
@@ -33,8 +34,7 @@ namespace TestSite
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseDocombAdmin();
-			app.UseDocombReader();
+			app.UseDocomb();
 
 			app.UseStaticFiles();
 

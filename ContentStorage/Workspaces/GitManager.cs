@@ -27,6 +27,8 @@ namespace Docomb.ContentStorage.Workspaces
 
 		public bool ShouldClone { get; set; } = false;
 
+		public int? AutoSyncInterval { get; set; } = null;
+
 
 		public Workspace Workspace { get; internal set; }
 
@@ -256,6 +258,7 @@ namespace Docomb.ContentStorage.Workspaces
 					options.FetchOptions ??= new();
 					options.FetchOptions.CredentialsProvider = CredentialsProvider;
 					Commands.Pull(Repository, merger, options);
+					ResolveConflicts();
 				}
 				catch { }
 			}
@@ -268,30 +271,29 @@ namespace Docomb.ContentStorage.Workspaces
 				var branch = Repository.Branches[Branch];
 				var options = new PushOptions();
 				options.CredentialsProvider = CredentialsProvider;
-
-				#region Check for & resolve conflicts
-				{
-					ConflictCollection conflicts = Repository.Index.Conflicts;
-					if (conflicts?.Count() > 0)
-					{
-						foreach (var conflict in Repository.Index.Conflicts)
-						{
-							IndexEntry ours = conflict.Ours;
-							Blob ourBlob = (ours != null) ? (Blob)Repository.Lookup(ours.Id) : null;
-							var ourStream = (ours != null) ? ourBlob.GetContentStream(new FilteringOptions(ours.Path)) : null;
-							var fullPath = Path.Combine(Workspace.ContentStoragePath, ours.Path);
-							using (var oursOutputStream = File.Create(fullPath))
-							{
-								ourStream.CopyTo(oursOutputStream);
-							}
-							Commands.Stage(Repository, conflict.Ours.Path);
-						}
-						Repository.Commit("Merge conflicts (using local changes)", Committer, Committer);
-					}
-				}
-				#endregion
-
+				ResolveConflicts();
 				Repository.Network.Push(branch, options);
+			}
+		}
+
+		public void ResolveConflicts()
+		{
+			ConflictCollection conflicts = Repository.Index.Conflicts;
+			if (conflicts?.Count() > 0)
+			{
+				foreach (var conflict in Repository.Index.Conflicts)
+				{
+					IndexEntry ours = conflict.Ours;
+					Blob ourBlob = (ours != null) ? (Blob)Repository.Lookup(ours.Id) : null;
+					var ourStream = (ours != null) ? ourBlob.GetContentStream(new FilteringOptions(ours.Path)) : null;
+					var fullPath = Path.Combine(Workspace.ContentStoragePath, ours.Path);
+					using (var oursOutputStream = File.Create(fullPath))
+					{
+						ourStream.CopyTo(oursOutputStream);
+					}
+					Commands.Stage(Repository, conflict.Ours.Path);
+				}
+				Repository.Commit("Merge conflicts (using local changes)", Committer, Committer);
 			}
 		}
 

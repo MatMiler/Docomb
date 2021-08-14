@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Docomb.WebCore;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.DependencyInjection;
@@ -52,11 +53,13 @@ namespace Docomb.WebReader
 				WebCore.Configurations.MainConfig.Instance?.Authentication?.AddAuthentications(services, $"/account/login");
 
 			WebCore.Configurations.UiConfig.SetHasReader(true);
+
+			services.AddDocombCore();
 		}
 
 		public static void UseDocombReader(this IApplicationBuilder app)
 		{
-			WebCore.Configurations.MainConfig.Instance?.Authentication?.UseAuthentication(app);
+			app.UseDocomb();
 		}
 	}
 
