@@ -54,6 +54,7 @@ export class MainNav extends Component<{}, MainNavState> {
 		let lastLoadedTimestamp = LayoutUtils.WindowData.get("workspaceTreeTimestamp-" + encodeURI(workspaceUrl));
 		let selectedKey: string = Utils.tryGetString(LayoutUtils.WindowData.get(LayoutUtils.WindowData.ItemKey.WorkspacePageInfo), ["contentItem", "url"]);
 		if ((workspaceUrl != this.state.currentWorkspaceUrl) || (lastLoadedTimestamp != this.state.lastLoadedTimestamp)) {
+			MainNavController.hasLoaded = false;
 			MainNavController.treeData = null;
 			this.setState({ loading: true, selectedKey: selectedKey });
 			MainNavController.loadData();
