@@ -89,11 +89,47 @@ export class MainNav extends Component {
         let currentUrlTrailed = Utils.padWithSlash(currentUrl, false, true);
         let itemUrlTrailed = Utils.padWithSlash(item.url, false, true);
         let isExpanded = ((item.url == currentUrl) || (currentUrlTrailed.startsWith(itemUrlTrailed)));
+        let icon = (item.type == Workspaces.ContentItemType.Directory) ? "FolderFill" : "Page";
+        if (item.type == Workspaces.ContentItemType.File) {
+            let extension = Utils.lastStringPart(item.name, ".");
+            if ((extension === null || extension === void 0 ? void 0 : extension.length) > 0) {
+                switch (extension.toLowerCase()) {
+                    case "md":
+                    case "markdown":
+                    case "mdown":
+                    case "mkdn":
+                    case "mkd":
+                    case "mdwn":
+                    case "text": {
+                        icon = "MarkDownLanguage";
+                        break;
+                    }
+                    case "txt": {
+                        icon = "TextDocument";
+                        break;
+                    }
+                    case "js":
+                    case "json": {
+                        icon = "JavaScriptLanguage";
+                        break;
+                    }
+                    case "jpeg":
+                    case "png":
+                    case "bmp":
+                    case "jpg":
+                    case "tiff":
+                    case "gif": {
+                        icon = "Photo2";
+                        break;
+                    }
+                }
+            }
+        }
         return {
             name: item.name,
             url: "workspace" + item.reactLocalUrl,
             key: (item.url.endsWith("/")) ? item.url.slice(0, -1) : item.url,
-            icon: (item.type == Workspaces.ContentItemType.Directory) ? "FolderHorizontal" : "Page",
+            icon: icon,
             isExpanded: isExpanded
         };
     }
@@ -119,9 +155,17 @@ var MainNavController;
         let selectedKey = instance.state.selectedKey;
         if (selectedKey.endsWith("/"))
             selectedKey = selectedKey.slice(0, -1);
+        let links = MainNav.itemChildrenToLinks(MainNavController.treeData, selectedKey);
+        if (links != null)
+            links.reverse();
+        else
+            links = [];
+        links.push({ name: "/", url: "workspace" + MainNavController.workspace.reactLocalUrl, key: "/", icon: "HomeSolid", isExpanded: false });
+        if (links.length > 1)
+            links.reverse();
         let navLinkGroups = [
             {
-                links: MainNav.itemChildrenToLinks(MainNavController.treeData, selectedKey)
+                links: links
             }
         ];
         return (React.createElement(Nav, { groups: navLinkGroups, selectedKey: selectedKey, onLinkClick: onLinkClick }));
