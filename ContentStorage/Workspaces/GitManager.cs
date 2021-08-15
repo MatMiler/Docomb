@@ -235,6 +235,18 @@ namespace Docomb.ContentStorage.Workspaces
 			if (!IsValid) return;
 			try
 			{
+				bool anyChanges = false;
+				foreach (var item in Repository.RetrieveStatus())
+				{
+					switch (item.State)
+					{
+						case FileStatus.Ignored: case FileStatus.Unaltered: case FileStatus.Unreadable: break;
+						default: { anyChanges = true; break; }
+					}
+					if (anyChanges) break;
+				}
+				if (!anyChanges) return;
+
 				Signature author = new(context?.UserName ?? CommiterName, context?.UserEmail ?? CommiterEmail, DateTime.Now);
 				Signature commiter = new(CommiterName, CommiterEmail, DateTime.Now);
 				Repository.Commit(message, author, commiter);
