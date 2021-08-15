@@ -33,12 +33,12 @@ namespace Docomb.WebCore.WebReporters
 
 		private void LoadConsoleConfig(IConfigurationSection configSource)
 		{
-			bool isEnabled = Utils.ParseBool(configSource?.GetSection("enabled"), true);
+			bool isEnabled = Utils.ParseBool(configSource?.GetValue<bool?>("enabled"), true);
 			if (isEnabled)
 			{
 				_consoleReporter ??= new();
-				_consoleReporter.IncludeDate = Utils.ParseBool(configSource?.GetSection("showDate"), true);
-				string dateFormat = Utils.ParseString(configSource?.GetSection("dateFormat"));
+				_consoleReporter.IncludeDate = Utils.ParseBool(configSource?.GetValue<bool?>("showDate"), true);
+				string dateFormat = Utils.ParseString(configSource?.GetValue<string>("dateFormat"));
 				if (!string.IsNullOrWhiteSpace(dateFormat)) _consoleReporter.DateFormat = dateFormat;
 				Reports.AddReporter(_consoleReporterCode, _consoleReporter);
 			}

@@ -45,9 +45,9 @@ namespace Docomb.WebCore.Configurations
 				Authentication = new(jsonConfig?.GetSection("authentication"));
 				Credentials = new(jsonConfig?.GetSection("credentials"));
 				if (Reporters == null)
-					Reporters = new(jsonConfig?.GetSection("credentials"));
+					Reporters = new(jsonConfig?.GetSection("reporters"));
 				else
-					Reporters.LoadConfiguration(jsonConfig?.GetSection("credentials"));
+					Reporters.LoadConfiguration(jsonConfig?.GetSection("reporters"));
 			}
 		}
 		/// <summary>Reload data from configuration sources</summary>
