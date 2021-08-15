@@ -108,7 +108,7 @@ namespace Docomb.ContentStorage
 				_textContentWasLoaded = true;
 				return _textContent;
 			}
-			catch { }
+			catch (Exception e) { Reports.Report(e); }
 			_textContent = "";
 			return _textContent;
 		}
@@ -126,7 +126,11 @@ namespace Docomb.ContentStorage
 				Workspace.Git?.UpdateFile(FilePath, context);
 				return true;
 			}
-			catch { return false; }
+			catch (Exception e)
+			{
+				Reports.Report(e);
+				return false;
+			}
 		}
 
 
@@ -144,6 +148,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new ActionStatus(ActionStatus.StatusCode.Error, exception: e);
 			}
 		}
@@ -166,6 +171,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(ActionStatus.StatusCode.Error, exception: e);
 			}
 		}
@@ -188,6 +194,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(ActionStatus.StatusCode.Error, exception: e);
 			}
 		}
@@ -203,6 +210,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(ActionStatus.StatusCode.Error, exception: e);
 			}
 		}

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Docomb.CommonCore;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -51,7 +52,7 @@ namespace Docomb.ContentStorage.FormatInfo
 				data = FrontMatterDeserializer.Deserialize<MetaData>(parser);
 				parser.Consume<DocumentEnd>();
 			}
-			catch { }
+			catch (Exception e) { Reports.Report(e); }
 			return data;
 		}
 

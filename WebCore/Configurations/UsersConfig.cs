@@ -71,6 +71,7 @@ namespace Docomb.WebCore.Configurations
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new ActionStatus(ActionStatus.StatusCode.Error, exception: e);
 			}
 		}

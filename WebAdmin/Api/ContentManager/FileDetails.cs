@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using static Docomb.WebAdmin.Api.ContentManager.Info;
 using Docomb.ContentStorage.Workspaces;
+using Docomb.CommonCore;
 
 namespace Docomb.WebAdmin.Api.ContentManager
 {
@@ -98,7 +99,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 				FileSizeDesc = DescriptiveByteSize(fileInfo.Length);
 				LastModifiedDate = fileInfo.LastWriteTimeUtc;
 			}
-			catch { }
+			catch (Exception e) { Reports.Report(e); }
 			#endregion
 
 			#region Content

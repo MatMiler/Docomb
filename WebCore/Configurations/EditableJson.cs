@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Docomb.CommonCore;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace Docomb.WebCore.Configurations
 					if (data != null)
 						return data;
 				}
-				catch { }
+				catch (Exception e) { Reports.Report(e); }
 			}
 			return null;
 		}

@@ -389,6 +389,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(new ActionStatus(ActionStatus.StatusCode.Error, exception: e), null);
 			}
 		}
@@ -415,6 +416,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(new ActionStatus(ActionStatus.StatusCode.Error, exception: e), null);
 			}
 		}

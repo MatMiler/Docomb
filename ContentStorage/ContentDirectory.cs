@@ -37,6 +37,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(ActionStatus.StatusCode.Error, exception: e);
 			}
 		}
@@ -59,6 +60,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(ActionStatus.StatusCode.Error, exception: e);
 			}
 		}
@@ -74,6 +76,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(ActionStatus.StatusCode.Error, exception: e);
 			}
 		}

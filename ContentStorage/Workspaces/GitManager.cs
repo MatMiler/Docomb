@@ -1,4 +1,5 @@
-﻿using LibGit2Sharp;
+﻿using Docomb.CommonCore;
+using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -87,6 +88,7 @@ namespace Docomb.ContentStorage.Workspaces
 					}
 					catch (Exception e)
 					{
+						Reports.Report(e);
 						return;
 					}
 				}
@@ -104,6 +106,7 @@ namespace Docomb.ContentStorage.Workspaces
 				}
 				catch (Exception e)
 				{
+					Reports.Report(e);
 				}
 			}
 			#endregion
@@ -118,7 +121,7 @@ namespace Docomb.ContentStorage.Workspaces
 			{
 				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
 				Commands.Stage(Repository, relativePath);
-				Commit($"Added '{relativePath}'", context, push);
+				Commit($"Add '{relativePath}'", context, push);
 			}
 		}
 
@@ -135,7 +138,7 @@ namespace Docomb.ContentStorage.Workspaces
 			{
 				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
 				Commands.Stage(Repository, relativePath);
-				Commit($"Updated '{relativePath}'", context, push);
+				Commit($"Update '{relativePath}'", context, push);
 			}
 		}
 
@@ -146,7 +149,7 @@ namespace Docomb.ContentStorage.Workspaces
 			{
 				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
 				Commands.Stage(Repository, relativePath);
-				Commit($"Removed '{relativePath}'", context, push);
+				Commit($"Remove '{relativePath}'", context, push);
 			}
 		}
 
@@ -168,7 +171,7 @@ namespace Docomb.ContentStorage.Workspaces
 				{
 					Commands.Stage(Repository, status.Select(x => x.FilePath));
 				}
-				Commit($"Removed '{relativePath}'", context, push);
+				Commit($"Remove '{relativePath}'", context, push);
 			}
 		}
 
@@ -182,11 +185,12 @@ namespace Docomb.ContentStorage.Workspaces
 					string relativeOldPath = Path.GetRelativePath(Workspace.ContentStoragePath, oldPath);
 					string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
 					Commands.Move(Repository, relativeOldPath, relativeNewPath);
-					Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context, push);
+					Commit($"Move '{relativeOldPath}' -> '{relativeNewPath}'", context, push);
 					return true;
 				}
-				catch
+				catch (Exception e)
 				{
+					Reports.Report(e);
 					return false;
 				}
 			}
@@ -211,7 +215,7 @@ namespace Docomb.ContentStorage.Workspaces
 				{
 					Commands.Stage(Repository, status.Select(x => x.FilePath));
 				}
-				Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context, push);
+				Commit($"Move '{relativeOldPath}' -> '{relativeNewPath}'", context, push);
 			}
 		}
 
@@ -240,7 +244,7 @@ namespace Docomb.ContentStorage.Workspaces
 					Task.Run(() => { Pull(); Push(); });
 				}
 			}
-			catch { }
+			catch (Exception e) { Reports.Report(e); }
 		}
 
 
@@ -264,7 +268,7 @@ namespace Docomb.ContentStorage.Workspaces
 						Workspace.Content.ClearCache();
 					}
 				}
-				catch { }
+				catch (Exception e) { Reports.Report(e); }
 			}
 		}
 

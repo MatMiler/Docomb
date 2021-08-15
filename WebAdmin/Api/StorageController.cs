@@ -27,6 +27,7 @@ namespace Docomb.WebAdmin.Api
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new ActionStatus(ActionStatus.StatusCode.Error, exception: e);
 			}
 

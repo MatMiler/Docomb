@@ -1,4 +1,5 @@
-﻿using Docomb.ContentStorage.Workspaces;
+﻿using Docomb.CommonCore;
+using Docomb.ContentStorage.Workspaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
@@ -47,6 +48,7 @@ namespace Docomb.WebCore
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 			}
 		}
 
