@@ -20,7 +20,9 @@ namespace Docomb.ContentStorage
 		File,
 		Markdown,
 		Html,
-		PlainText
+		PlainText,
+		BitmapImage,
+		VectorImage
 	}
 
 

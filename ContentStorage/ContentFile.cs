@@ -84,7 +84,21 @@ namespace Docomb.ContentStorage
 				FileType = FileType.PlainText;
 				return;
 			}
-
+			else if (FormatInfo.ScriptInfo.Extensions.Contains(extension))
+			{
+				FileType = FileType.PlainText;
+				return;
+			}
+			else if (FormatInfo.BitmapImageInfo.Extensions.Contains(extension))
+			{
+				FileType = FileType.BitmapImage;
+				return;
+			}
+			else if (FormatInfo.VectorImageInfo.Extensions.Contains(extension))
+			{
+				FileType = FileType.VectorImage;
+				return;
+			}
 		}
 
 

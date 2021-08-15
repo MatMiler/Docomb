@@ -115,7 +115,7 @@ export class MainNav extends Component<{}, MainNavState> {
 					case "md": case "markdown": case "mdown": case "mkdn": case "mkd": case "mdwn": case "text": { icon = "MarkDownLanguage"; break; }
 					case "txt": { icon = "TextDocument"; break; }
 					case "js": case "json": { icon = "JavaScriptLanguage"; break; }
-					case "jpeg": case "png": case "bmp": case "jpg": case "tiff": case "gif": { icon = "Photo2"; break; }
+					case "jpg": case "jpeg": case "png": case "gif": case "bmp": case "tiff": case "tif": case "ico": case "svg": { icon = "Photo2"; break; }
 				}
 			}
 		}

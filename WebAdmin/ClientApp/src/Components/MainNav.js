@@ -114,12 +114,15 @@ export class MainNav extends Component {
                         icon = "JavaScriptLanguage";
                         break;
                     }
+                    case "jpg":
                     case "jpeg":
                     case "png":
+                    case "gif":
                     case "bmp":
-                    case "jpg":
                     case "tiff":
-                    case "gif": {
+                    case "tif":
+                    case "ico":
+                    case "svg": {
                         icon = "Photo2";
                         break;
                     }
