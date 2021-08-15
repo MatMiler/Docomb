@@ -45,17 +45,5 @@ namespace Docomb.WebCore.WebReporters
 		}
 
 
-		public bool LogRequests { get; set; } = false;
-
-		public static void LogRequest(Microsoft.AspNetCore.Http.HttpRequest request, string message)
-		{
-			string s = $"{(request?.Scheme ?? "").ToUpper()} {request.Method} request from '{request?.HttpContext?.Connection?.RemoteIpAddress}' on '{request?.Path}'";
-
-			if (!string.IsNullOrWhiteSpace(message)) s += "; " + message;
-
-			System.Console.WriteLine(s);
-		}
-
-
 	}
 }
