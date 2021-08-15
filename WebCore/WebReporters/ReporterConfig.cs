@@ -20,6 +20,7 @@ namespace Docomb.WebCore.WebReporters
 		public void LoadConfiguration(IConfigurationSection configSource)
 		{
 			LoadConsoleConfig(configSource?.GetSection("console"));
+			LoadEmailConfig(configSource?.GetSection("email"));
 		}
 
 
@@ -50,6 +51,35 @@ namespace Docomb.WebCore.WebReporters
 
 		#endregion
 
+
+
+
+		#region Email
+
+		private const string _emailReporterCode = "email";
+		private WebReporters.Email _emailReporter = null;
+
+		private void LoadEmailConfig(IConfigurationSection configSource)
+		{
+			bool isEnabled = Utils.ParseBool(configSource?.GetValue<bool?>("enabled"), false);
+			if (isEnabled)
+			{
+				string recipients = Utils.ParseString(configSource?.GetValue<string>("recipients"));
+				string host = Utils.ParseString(configSource?.GetValue<string>("host"));
+				int port = Utils.ParseInt(configSource?.GetValue<string>("port"));
+				string username = Utils.ParseString(configSource?.GetValue<string>("username"));
+				string password = Utils.ParseString(configSource?.GetValue<string>("password"));
+				_emailReporter ??= new(recipients, host, port, username, password);
+				Reports.AddReporter(_emailReporterCode, _emailReporter);
+			}
+			else
+			{
+				Reports.RemoveReporter(_emailReporterCode);
+			}
+		}
+
+
+		#endregion
 
 
 	}
