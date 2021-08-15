@@ -84,14 +84,29 @@ Example:
 			"username": "••••••••",
 			"password": "••••••••"
 		}
-	]
+	],
+	"reporters": {
+		"console": {
+			"enabled": true,
+			"showDate": true,
+			"dateFormat": "yyyy-MM-ddTHH:mm:ssZ"
+		},
+		"email": {
+			"enabled": false,
+			"recipients": "••••@••••.••",
+			"host": "smtp.example.com",
+			"port": 587,
+			"username": "••••••••",
+			"password": "••••••••"
+		}
+	}
 }
 ```
 
 | Value                            | Type         | Description |
 | -------------------------------- | ------------ | --- |
 | `name`                           | string       | Displayed name of the web site. |
-| `authentication`                 | object      | Configiration for external authentication. |
+| `authentication`                 | object       | Configuration for external authentication. |
 | `authentication.authorizeAdmin`  | boolean      | Whether admin interface requires authorization. |
 | `authentication.authorizeReader` | boolean      | Whether reader interface requires authorization. |
 | `authentication.schemes`         | object array | Authentication schemes. |
@@ -107,6 +122,19 @@ Example:
 | `credentials[].key`              | string       | Credential key, referenced in Git configuration in workspaces. |
 | `credentials[].username`         | string       | Username. |
 | `credentials[].password`         | string       | Password. |
+| `reporters`                      | object       | Configurations for error & info reporters. |
+| `reporters.console`              | object       | Configurations for console reporter. |
+| `reporters.console.enabled`      | boolean      | Whether the console reporter is enabled - the errors and info will be reported in the console. Default value is `true`. |
+| `reporters.console.showDate`     | boolean      | Whether the console output include date and time. Default value is `true`. |
+| `reporters.console.dateFormat`   | string       | Date format of the console output. Default value is `yyyy-MM-ddTHH:mm:ssZ`. |
+| `reporters.console`              | object       | Configurations for email reporter. |
+| `reporters.console.enabled`      | boolean      | Whether the email reporter is enabled - the errors will sent by email. |
+| `reporters.console.recipients`   | string       | Recipients of the email reports. |
+| `reporters.console.host`         | string       | SMTP host. |
+| `reporters.console.port`         | integer      | SMTP port. |
+| `reporters.console.username`     | string       | SMTP username. |
+| `reporters.console.password`     | string       | SMTP password. |
+
 
 ### Configuration: `workspaces.json`
 Example:
