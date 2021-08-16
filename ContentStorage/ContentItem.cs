@@ -41,6 +41,8 @@ namespace Docomb.ContentStorage
 		public ContentDirectory AsDirectory => (this is ContentDirectory directory) ? directory : null;
 
 
+		public string FullUrlPath => _fullUrlPath ??= string.Join("/", (Workspace.UrlParts ?? new()).Concat(SplitPath(System.IO.Path.GetRelativePath(Workspace.ContentStoragePath, FilePath))));
+		private string _fullUrlPath = null;
 
 	}
 }
