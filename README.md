@@ -150,7 +150,9 @@ Example:
 			"credentialsKey": "GitCredentials1",
 			"branch": "main",
 			"commiterName": "Docomb",
-			"commiterEmail": "@Docomb"
+			"commiterEmail": "@Docomb",
+			"clone": true,
+			"syncInterval": 15
 		}
 	}
 ]
@@ -167,6 +169,8 @@ Example:
 | `[].git.branch`         | string | Branch to pull/push. |
 | `[].git.commiterName`   | string | Name of the entity that commits to Git. |
 | `[].git.commiterEmail`  | string | Email of the entity that commits to Git. |
+| `[].git.clone`  | boolean | Whether the workspace should be cloned from Git if not yet locally available. |
+| `[].git.syncInterval`  | integer | If specified, it represents the interval in minutes of how often the Git repository should be synchronized with the remote. Minimal value is `5`. `0`, negative value or no value will disable synchronization.  |
 
 ### Configuration: `users.json`
 This file will be managed by admin interface, and does not need to be kept up-to-date manually.
