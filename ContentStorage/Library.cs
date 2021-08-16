@@ -41,6 +41,9 @@ namespace Docomb.ContentStorage
 			FormatInfo.MarkdownInfo.Extensions
 			.Concat(FormatInfo.HtmlInfo.Extensions)
 			.Concat(FormatInfo.PlainTextInfo.Extensions)
+			.Concat(FormatInfo.ScriptInfo.Extensions)
+			.Concat(FormatInfo.BitmapImageInfo.Extensions)
+			.Concat(FormatInfo.VectorImageInfo.Extensions)
 			.ToHashSet();
 		public static readonly HashSet<string> DefaultFileNameCores = new() { "index", "default", "home", "readme" };
 		public static readonly HashSet<string> DefaultFileNames = MergeListContents(DefaultFileNameCores, OmittableExtensions, (a, b) => $"{a}.{b}").ToHashSet();
@@ -116,10 +119,38 @@ namespace Docomb.ContentStorage
 
 		#region Item summaries
 
-		private Dictionary<string, ContentItemSummary> _itemPhysicalSummaryByPath = new();
-		private Dictionary<string, ContentItemSummary> _itemLogicalSummaryByPath = new();
-		private Dictionary<string, Dictionary<string, ContentItemSummary>> _itemSummariesByParentPath = new();
-		private Dictionary<string, List<ContentItemSummary>> _physicalItemSummariesByParentPath = new();
+		private Dictionary<string, TimedCache<ContentItemSummary>> _itemPhysicalSummaryByPath = new();
+		private Dictionary<string, TimedCache<ContentItemSummary>> _itemLogicalSummaryByPath = new();
+		private Dictionary<string, TimedCache<Dictionary<string, ContentItemSummary>>> _itemSummariesByParentPath = new();
+		private Dictionary<string, TimedCache<List<ContentItemSummary>>> _physicalItemSummariesByParentPath = new();
+
+		private class TimedCache<T>
+		{
+			public TimedCache(T data, TimeSpan? validity = null)
+			{
+				Data = data;
+				ValidUntil = CreatedAt + (validity ?? new TimeSpan(0, 10, 0));
+			}
+
+			public T Data { get; set; }
+			public DateTime CreatedAt { get; set; } = DateTime.Now;
+			public DateTime ValidUntil { get; set; }
+			public bool IsValid => (ValidUntil >= DateTime.Now);
+		}
+
+		private bool TryGetTimedCacheValue<TKey, TValue>(Dictionary<TKey, TimedCache<TValue>> dict, TKey key, out TValue value)
+		{
+			if ((dict != null) && (dict.TryGetValue(key, out TimedCache<TValue> cache)))
+			{
+				if (cache.IsValid == true)
+				{
+					value = cache.Data;
+					return true;
+				}
+			}
+			value = default;
+			return false;
+		}
 
 		public void ClearCache()
 		{
@@ -132,19 +163,21 @@ namespace Docomb.ContentStorage
 		public ContentItemSummary GetItemSummary(List<string> pathParts, MatchType matchType)
 		{
 			string path = (pathParts?.Count > 0) ? string.Join('/', pathParts) : "";
-			Dictionary<string, ContentItemSummary> cacheDict = matchType switch {
+			Dictionary<string, TimedCache<ContentItemSummary>> cacheDict = matchType switch {
 				MatchType.Physical => _itemPhysicalSummaryByPath,
 				MatchType.Logical => _itemLogicalSummaryByPath,
 				_ => null
 			};
-			if ((cacheDict != null) && (cacheDict.TryGetValue(path, out ContentItemSummary cached)))
+			if ((cacheDict != null) && (TryGetTimedCacheValue(cacheDict, path, out ContentItemSummary cached)))
+			{
 				return cached;
+			}
 
 			ContentItem item = FindItem(pathParts, matchType);
 			if (item != null)
 			{
 				ContentItemSummary summary = new(item);
-				cacheDict?.Add(path, summary);
+				cacheDict?.Add(path, new(summary));
 				return summary;
 			}
 
@@ -165,7 +198,10 @@ namespace Docomb.ContentStorage
 		public Dictionary<string, ContentItemSummary> GetLogicalChildren(List<string> parentPathParts)
 		{
 			string parentPath = string.Join('/', parentPathParts);
-			if (_itemSummariesByParentPath.ContainsKey(parentPath)) return _itemSummariesByParentPath[parentPath];
+			if (TryGetTimedCacheValue(_itemSummariesByParentPath, parentPath, out Dictionary<string, ContentItemSummary> value))
+			{
+				return value;
+			}
 
 			Dictionary<string, ContentItemSummary> dict = new();
 			string path = Path.Combine(RootPath, parentPath);
@@ -183,9 +219,9 @@ namespace Docomb.ContentStorage
 					{
 						string directoryName = directory.Name;
 						string nameLower = directoryName.ToLower();
-						if (_itemLogicalSummaryByPath.ContainsKey(directoryName))
+						if (TryGetTimedCacheValue(_itemLogicalSummaryByPath, directoryName, out ContentItemSummary cache))
 						{
-							dict.Add(directoryName, _itemLogicalSummaryByPath[directoryName]);
+							dict.Add(directoryName, cache);
 							usedNames.Add(nameLower);
 						}
 
@@ -196,12 +232,12 @@ namespace Docomb.ContentStorage
 						#region Find default file
 						foreach (string fileName in DefaultFileNames)
 						{
-							string[] files = Directory.GetFiles(path, fileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
+							string[] files = Directory.GetFiles(directory.FullName, fileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
 							if (files?.Length >= 1)
 							{
 								ContentItemSummary summary = new(new ContentFile(Workspace, files[0], parentPathParts.Concat(new List<string>() { directoryName }).ToList(), true));
 								dict.Add(directoryName, summary);
-								_itemLogicalSummaryByPath.Add(directoryName, summary);
+								_itemLogicalSummaryByPath.Add(directoryName, new(summary));
 								usedNames.Add(nameLower);
 								defaultFileFound = true;
 								break;
@@ -214,7 +250,7 @@ namespace Docomb.ContentStorage
 						{
 							ContentItemSummary summary = new(new ContentDirectory(Workspace, directory.FullName, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
 							dict.Add(directoryName, summary);
-							_itemLogicalSummaryByPath.Add(directoryName, summary);
+							_itemLogicalSummaryByPath.Add(directoryName, new(summary));
 							usedNames.Add(nameLower);
 						}
 						#endregion
@@ -241,14 +277,14 @@ namespace Docomb.ContentStorage
 						if (usedNames.Contains(simplifiedLower)) continue;
 						ContentItemSummary summary = new(new ContentFile(Workspace, file.FullName, parentPathParts.Concat(new List<string>() { simplifiedName }).ToList(), false));
 						dict.Add(simplifiedName, summary);
-						_itemLogicalSummaryByPath.Add(simplifiedName, summary);
+						_itemLogicalSummaryByPath.Add(simplifiedName, new(summary));
 						usedNames.Add(simplifiedLower);
 					}
 				}
 			}
 			#endregion
 
-			_itemSummariesByParentPath.TryAdd(parentPath, dict);
+			_itemSummariesByParentPath.TryAdd(parentPath, new(dict));
 			return dict;
 		}
 
@@ -256,7 +292,7 @@ namespace Docomb.ContentStorage
 		public List<ContentItemSummary> GetPhysicalChildren(List<string> parentPathParts, bool includeFiles = true, bool includeDirectories = true)
 		{
 			string parentPath = string.Join('/', parentPathParts);
-			if (_physicalItemSummariesByParentPath.TryGetValue(parentPath, out List<ContentItemSummary> cachedList))
+			if (TryGetTimedCacheValue(_physicalItemSummariesByParentPath, parentPath, out List<ContentItemSummary> cachedList))
 				return cachedList;
 
 			List<ContentItemSummary> list = new();
@@ -296,7 +332,7 @@ namespace Docomb.ContentStorage
 			}
 			#endregion
 
-			_physicalItemSummariesByParentPath.TryAdd(parentPath, list);
+			_physicalItemSummariesByParentPath.TryAdd(parentPath, new(list));
 			return list;
 		}
 
@@ -356,6 +392,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(new ActionStatus(ActionStatus.StatusCode.Error, exception: e), null);
 			}
 		}
@@ -382,6 +419,7 @@ namespace Docomb.ContentStorage
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(new ActionStatus(ActionStatus.StatusCode.Error, exception: e), null);
 			}
 		}

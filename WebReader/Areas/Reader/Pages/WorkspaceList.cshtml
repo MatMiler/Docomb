@@ -7,7 +7,7 @@
 	<ul class="workspaceSelection">
 		@foreach (var workspace in Docomb.WebReader.SiteEnvironment.Instance?.Workspaces)
 		{
-			<li><a href="@workspace.FullUrl">@workspace.Name</a></li>
+			<li><a href="@workspace.FullUrl"><i class="icon-books"></i> @workspace.Name</a></li>
 		}
 	</ul>
 </div>

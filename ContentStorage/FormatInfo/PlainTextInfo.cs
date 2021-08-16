@@ -11,21 +11,7 @@ namespace Docomb.ContentStorage.FormatInfo
 
 		public const string MediaType = "text/plain";
 
-		//public ContentFile File { get; protected set; }
-
-		//public PlainTextInfo(ContentFile file)
-		//{
-		//	File = file;
-		//}
-
-
-		public static readonly List<string> Extensions = new() { "txt", "json", "js" };
-
-
-
-
-
-
+		public static readonly List<string> Extensions = new() { "txt" };
 
 	}
 }

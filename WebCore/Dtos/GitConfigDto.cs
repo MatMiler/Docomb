@@ -29,6 +29,14 @@ namespace Docomb.WebCore.Dtos
 		public string CommiterEmail { get; set; }
 
 
+		[JsonPropertyName("clone")]
+		public bool ShouldClone { get; set; } = false;
+
+
+		[JsonPropertyName("syncInterval")]
+		public int? AutoSyncInterval { get; set; } = null;
+
+
 		public GitManager ToGitManager()
 		{
 			GitManager manager = new()
@@ -37,7 +45,9 @@ namespace Docomb.WebCore.Dtos
 				Branch = Branch,
 				CredentialsKey = CredentialsKey,
 				CommiterName = CommiterName,
-				CommiterEmail = CommiterEmail
+				CommiterEmail = CommiterEmail,
+				ShouldClone = ShouldClone,
+				AutoSyncInterval = AutoSyncInterval
 			};
 			return manager;
 		}
@@ -51,7 +61,9 @@ namespace Docomb.WebCore.Dtos
 				Branch = manager.Branch,
 				CredentialsKey = manager.CredentialsKey,
 				CommiterName = manager.CommiterName,
-				CommiterEmail = manager.CommiterEmail
+				CommiterEmail = manager.CommiterEmail,
+				ShouldClone = manager.ShouldClone,
+				AutoSyncInterval = manager.AutoSyncInterval
 			};
 		}
 

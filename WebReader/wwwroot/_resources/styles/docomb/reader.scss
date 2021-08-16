@@ -92,7 +92,7 @@ $tabletWidth: 800px;
 		.constructor { color: map-get($codeHighlightPurple, 'dark'); }
 	}
 }
-html { @include lightPreset; }
+html { @include lightPreset; overflow-y: scroll; }
 .dark { @include darkPreset; }
 @media (prefers-color-scheme: dark) {
 	html { @include darkPreset; }
@@ -126,7 +126,7 @@ header {
 		padding: 5px 0; text-align: center; border-bottom-width: 1px; border-bottom-style: solid; @include themeMap("border-bottom-color", $menuBorderColor);
 		a { display: inline-block; font-size: 14px; font-weight: bolder; margin: 5px 5px 3px 5px; padding: 5px; text-decoration: none; }
 		a span { display: block; padding-bottom: 2px; }
-		a.selected span { padding-bottom: 0; border-bottom-width: 2px; border-bottom-style: solid; @include themeMap("border-bottom-color", $textColor); }
+		a.selected span { padding-bottom: 0; border-bottom-width: 2px; border-bottom-style: solid; @include themeMap("border-bottom-color", $accentColor); }
 		@include aboveTablet { padding: 5px 15px; font-size: 18px; }
 	}
 	.pageTitle {
@@ -145,6 +145,7 @@ header {
 			 @include aboveTablet { font-size: 30px; }
 		}
 	}
+	.workspaces a:hover, .pageTitle .breadcrumbs a:hover, .pageTitle .user a:hover { @include themeMap("color", $linkColor); }
 	@media only print
 	{
 		.workspaces { display: none !important; }
@@ -176,6 +177,8 @@ footer { flex: 0 0 auto; }
 	& > :last-child { margin-bottom: 0; }
 }
 
+.pageTitle, .pageContent { width: 100%; box-sizing: border-box; max-width: 1200px; margin: 0 auto; }
+
 .plainTextFile { white-space: pre-wrap; }
 
 
@@ -185,7 +188,7 @@ main
 
 
 	blockquote {
-		border-left: 4px solid; padding: 5px 5px 5px 15px; font-size: 18px; letter-spacing: -1px; font-style: italic;
+		border-left: 4px solid; padding: 5px 5px 5px 15px; font-size: 18px; letter-spacing: -1px;
 		@include themeMaps(("border-left-color": $menuBorderColor, "background": $menuBackgroundColor));
 	}
 
@@ -194,7 +197,7 @@ main
 		font-family: Consolas, Courier New, Courier, monospace; border: 1px solid; font-size: .9em;
 		@include themeMaps(("border-color": $menuBorderColor, "background": $menuBackgroundColor));
 	}
-	pre { padding: 10px; overflow-x: auto; }
+	pre { padding: 10px; overflow-x: auto; white-space: normal; }
 	code { padding: 0 2px; }
 	pre > pre, code > code, pre > code, code > pre { font-size: 1em; border: none; padding: 0; margin: 0; }
 
@@ -214,6 +217,9 @@ main
 	}
 
 
+	.footnote-ref { text-decoration: none; sup { display: inline-block; min-width: 1em; text-align: center; font-weight: bold; } }
+	.footnote-back-ref { text-decoration: none; }
+
 }
 
 
@@ -225,6 +231,18 @@ main
 
 
 
+.directoryChildSelection, .workspaceSelection {
+	display: block; margin: -5px; padding: 0; list-style: none;
+	li { display: block; margin: 0; padding: 0; list-style: none; }
+	a { display: inline-block; color: inherit; text-decoration: none; padding: 5px;
+		&:hover { @include themeMap("color", $linkColor); }
+		i { @include themeMap("color", $accentColor); font-size: 1.5em; }
+	}
+}
+
+
+
 
 
 @import "auth.scss";
+@import "shared/icons.scss";

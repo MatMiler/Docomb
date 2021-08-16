@@ -18,14 +18,7 @@ namespace Docomb.ContentStorage.FormatInfo
 			File = file;
 		}
 
-
 		public static readonly List<string> Extensions = new() { "html", "htm" };
-
-
-
-
-
-
 
 	}
 }

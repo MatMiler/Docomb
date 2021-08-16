@@ -47,6 +47,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 				}
 				catch (Exception e)
 				{
+					Reports.Report(e);
 					return new ActionStatus(ActionStatus.StatusCode.Error, exception: e);
 				}
 			}
@@ -112,7 +113,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 					if (parts?.Count > 0) parts[^1] = newName;
 					newUrl = CombineUrlPaths("", CombineUrlPaths(workspace.UrlPath, string.Join("/", parts)));
 				}
-				catch { }
+				catch (Exception e) { Reports.Report(e); }
 			}
 
 			return new() { ActionStatus = status, OldUrl = url, NewUrl = newUrl };
@@ -139,7 +140,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 				{
 					newUrl = CombineUrlPaths("", CombineUrlPaths(workspace.UrlPath, CombineUrlPaths(newParentPath, contentFile.FileName)));
 				}
-				catch { }
+				catch (Exception e) { Reports.Report(e); }
 			}
 
 			return new() { ActionStatus = status, OldUrl = url, NewUrl = newUrl };
@@ -174,7 +175,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 					if (parts?.Count > 0) parts[^1] = newName;
 					newUrl = CombineUrlPaths("", CombineUrlPaths(workspace.UrlPath, string.Join("/", parts)));
 				}
-				catch { }
+				catch (Exception e) { Reports.Report(e); }
 			}
 
 			return new() { ActionStatus = status, OldUrl = url, NewUrl = newUrl };
@@ -201,7 +202,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 				{
 					newUrl = CombineUrlPaths("", CombineUrlPaths(workspace.UrlPath, CombineUrlPaths(newParentPath, CombineUrlPaths(contentdirectory.UrlParts.LastOrDefault(), ""))));
 				}
-				catch { }
+				catch (Exception e) { Reports.Report(e); }
 			}
 
 			return new() { ActionStatus = status, OldUrl = url, NewUrl = newUrl };
@@ -310,7 +311,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 					parentReactLocalUrl = parent.ReactLocalUrl;
 				}
 			}
-			catch { }
+			catch (Exception e) { Reports.Report(e); }
 
 			ActionStatus status = null;
 
@@ -403,6 +404,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new PreUploadCheckResponse() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.Error, exception: e) };
 			}
 		}
@@ -443,6 +445,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new() { ActionStatus = new ActionStatus(ActionStatus.StatusCode.Error, exception: e) };
 			}
 		}
@@ -472,6 +475,7 @@ namespace Docomb.WebAdmin.Api.ContentManager
 			}
 			catch (Exception e)
 			{
+				Reports.Report(e);
 				return new(new ActionStatus(ActionStatus.StatusCode.Error, exception: e), null);
 			}
 		}

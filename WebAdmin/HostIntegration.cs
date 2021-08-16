@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Docomb.WebCore;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -60,11 +61,13 @@ namespace Docomb.WebAdmin
 				WebCore.Configurations.MainConfig.Instance?.Authentication?.AddAuthentications(services, $"/{WebCore.Configurations.UiConfig.UrlPathPrefix}/account/login");
 
 			WebCore.Configurations.UiConfig.SetHasAdmin(true);
+
+			services.AddDocombCore();
 		}
 
 		public static void UseDocombAdmin(this IApplicationBuilder app)
 		{
-			WebCore.Configurations.MainConfig.Instance?.Authentication?.UseAuthentication(app);
+			app.UseDocomb();
 		}
 	}
 

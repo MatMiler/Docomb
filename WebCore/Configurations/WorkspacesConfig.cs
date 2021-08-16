@@ -47,7 +47,6 @@ namespace Docomb.WebCore.Configurations
 						Workspace workspace = dto?.ToWorkspace();
 						if (workspace == null) continue;
 						workspace.ParentUrl = parentUrl;
-						workspace.Initialize();
 						if (!string.IsNullOrWhiteSpace(workspace.Git?.CredentialsKey))
 						{
 							Credentials.CredentialSet credentialsSet = MainConfig.Instance?.Credentials?.Get(workspace.Git.CredentialsKey);
@@ -57,6 +56,7 @@ namespace Docomb.WebCore.Configurations
 								workspace.Git.Password = credentialsSet.Password;
 							}
 						}
+						workspace.Initialize();
 						_workspaces.Add(workspace);
 					}
 				}

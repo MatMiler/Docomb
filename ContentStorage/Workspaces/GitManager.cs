@@ -1,4 +1,5 @@
-﻿using LibGit2Sharp;
+﻿using Docomb.CommonCore;
+using LibGit2Sharp;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -24,6 +25,10 @@ namespace Docomb.ContentStorage.Workspaces
 		public string CommiterName { get; set; }
 
 		public string CommiterEmail { get; set; }
+
+		public bool ShouldClone { get; set; } = false;
+
+		public int? AutoSyncInterval { get; set; } = null;
 
 
 		public Workspace Workspace { get; internal set; }
@@ -69,6 +74,46 @@ namespace Docomb.ContentStorage.Workspaces
 		private readonly object _originLock = new();
 
 
+
+		public void CloneIfEmpty()
+		{
+			string path = Workspace.ContentStoragePath;
+			#region Check path & create directory
+			{
+				if (!Directory.Exists(path))
+				{
+					try
+					{
+						Directory.CreateDirectory(path);
+					}
+					catch (Exception e)
+					{
+						Reports.Report(e);
+						return;
+					}
+				}
+			}
+			#endregion
+
+
+			#region Clone
+			if (!Repository.IsValid(path))
+			{
+				try
+				{
+					CloneOptions options = new() { CredentialsProvider = CredentialsProvider, BranchName = Branch };
+					Repository.Clone(RepositoryPath, path, options);
+				}
+				catch (Exception e)
+				{
+					Reports.Report(e);
+				}
+			}
+			#endregion
+		}
+
+
+
 		public void AddFile(string path, ActionContext context, bool push = true)
 		{
 			if (!IsValid) return;
@@ -76,7 +121,7 @@ namespace Docomb.ContentStorage.Workspaces
 			{
 				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
 				Commands.Stage(Repository, relativePath);
-				Commit($"Added '{relativePath}'", context, push);
+				Commit($"Add '{relativePath}'", context, push);
 			}
 		}
 
@@ -93,7 +138,7 @@ namespace Docomb.ContentStorage.Workspaces
 			{
 				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
 				Commands.Stage(Repository, relativePath);
-				Commit($"Updated '{relativePath}'", context, push);
+				Commit($"Update '{relativePath}'", context, push);
 			}
 		}
 
@@ -104,7 +149,7 @@ namespace Docomb.ContentStorage.Workspaces
 			{
 				string relativePath = Path.GetRelativePath(Workspace.ContentStoragePath, path);
 				Commands.Stage(Repository, relativePath);
-				Commit($"Removed '{relativePath}'", context, push);
+				Commit($"Remove '{relativePath}'", context, push);
 			}
 		}
 
@@ -126,7 +171,7 @@ namespace Docomb.ContentStorage.Workspaces
 				{
 					Commands.Stage(Repository, status.Select(x => x.FilePath));
 				}
-				Commit($"Removed '{relativePath}'", context, push);
+				Commit($"Remove '{relativePath}'", context, push);
 			}
 		}
 
@@ -140,11 +185,12 @@ namespace Docomb.ContentStorage.Workspaces
 					string relativeOldPath = Path.GetRelativePath(Workspace.ContentStoragePath, oldPath);
 					string relativeNewPath = Path.GetRelativePath(Workspace.ContentStoragePath, newPath);
 					Commands.Move(Repository, relativeOldPath, relativeNewPath);
-					Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context, push);
+					Commit($"Move '{relativeOldPath}' -> '{relativeNewPath}'", context, push);
 					return true;
 				}
-				catch
+				catch (Exception e)
 				{
+					Reports.Report(e);
 					return false;
 				}
 			}
@@ -169,7 +215,7 @@ namespace Docomb.ContentStorage.Workspaces
 				{
 					Commands.Stage(Repository, status.Select(x => x.FilePath));
 				}
-				Commit($"Moved '{relativeOldPath}' -> '{relativeNewPath}'", context, push);
+				Commit($"Move '{relativeOldPath}' -> '{relativeNewPath}'", context, push);
 			}
 		}
 
@@ -189,17 +235,28 @@ namespace Docomb.ContentStorage.Workspaces
 			if (!IsValid) return;
 			try
 			{
+				bool anyChanges = false;
+				foreach (var item in Repository.RetrieveStatus())
+				{
+					switch (item.State)
+					{
+						case FileStatus.Ignored: case FileStatus.Unaltered: case FileStatus.Unreadable: break;
+						default: { anyChanges = true; break; }
+					}
+					if (anyChanges) break;
+				}
+				if (!anyChanges) return;
+
 				Signature author = new(context?.UserName ?? CommiterName, context?.UserEmail ?? CommiterEmail, DateTime.Now);
 				Signature commiter = new(CommiterName, CommiterEmail, DateTime.Now);
 				Repository.Commit(message, author, commiter);
 
 				if (push)
 				{
-					Task.Run(Pull);
-					Task.Run(Push);
+					Task.Run(() => { Pull(); Push(); });
 				}
 			}
-			catch { }
+			catch (Exception e) { Reports.Report(e); }
 		}
 
 
@@ -214,12 +271,16 @@ namespace Docomb.ContentStorage.Workspaces
 					var options = new PullOptions();
 					Signature merger = new(CommiterName, CommiterEmail, DateTime.Now);
 
-					var credentials = new UsernamePasswordCredentials { Username = Username, Password = Password };
 					options.FetchOptions ??= new();
-					options.FetchOptions.CredentialsProvider = (url, user, cred) => credentials;
-					Commands.Pull(Repository, merger, options);
+					options.FetchOptions.CredentialsProvider = CredentialsProvider;
+					MergeResult pullResults = Commands.Pull(Repository, merger, options);
+					bool anyConflicts = ResolveConflicts();
+					if ((pullResults?.Status != MergeStatus.UpToDate) || (anyConflicts))
+					{
+						Workspace.Content.ClearCache();
+					}
 				}
-				catch { }
+				catch (Exception e) { Reports.Report(e); }
 			}
 		}
 
@@ -229,12 +290,40 @@ namespace Docomb.ContentStorage.Workspaces
 			{
 				var branch = Repository.Branches[Branch];
 				var options = new PushOptions();
-				var credentials = new UsernamePasswordCredentials { Username = Username, Password = Password };
-				options.CredentialsProvider = (url, user, cred) => credentials;
+				options.CredentialsProvider = CredentialsProvider;
+				ResolveConflicts();
 				Repository.Network.Push(branch, options);
 			}
 		}
 
+		public bool ResolveConflicts()
+		{
+			ConflictCollection conflicts = Repository.Index.Conflicts;
+			var result = false;
+			if (conflicts?.Count() > 0)
+			{
+				foreach (var conflict in Repository.Index.Conflicts)
+				{
+					IndexEntry ours = conflict.Ours;
+					Blob ourBlob = (ours != null) ? (Blob)Repository.Lookup(ours.Id) : null;
+					var ourStream = (ours != null) ? ourBlob.GetContentStream(new FilteringOptions(ours.Path)) : null;
+					var fullPath = Path.Combine(Workspace.ContentStoragePath, ours.Path);
+					using (var oursOutputStream = File.Create(fullPath))
+					{
+						ourStream.CopyTo(oursOutputStream);
+					}
+					Commands.Stage(Repository, conflict.Ours.Path);
+					result = true;
+				}
+				Repository.Commit("Merge conflicts (using local changes)", Committer, Committer);
+			}
+			return result;
+		}
+
+		private Signature Committer => new(CommiterName, CommiterEmail, DateTime.Now);
+
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "<Pending>")]
+		private UsernamePasswordCredentials CredentialsProvider(string url, string usernameFromUrl, SupportedCredentialTypes types) => new() { Username = Username, Password = Password };
 
 		public void Sync(ActionContext context)
 		{
