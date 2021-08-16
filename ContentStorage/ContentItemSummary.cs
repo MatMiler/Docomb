@@ -97,9 +97,9 @@ namespace Docomb.ContentStorage
 			return ((Type == ContentItemType.File) && (!string.IsNullOrEmpty(FilePath))) ? new(Workspace, FilePath, UrlParts, NeedsTrailingSlash) : null;
 		}
 
-		public ContentDirectory GetDirectory(Workspace workspace)
+		public ContentDirectory GetDirectory(Workspace workspace = null)
 		{
-			return ((Type == ContentItemType.Directory) && (!string.IsNullOrEmpty(FilePath))) ? new(workspace, FilePath, UrlParts) : null;
+			return ((Type == ContentItemType.Directory) && (!string.IsNullOrEmpty(FilePath))) ? new(workspace ?? this.Workspace, FilePath, UrlParts) : null;
 		}
 
 	}

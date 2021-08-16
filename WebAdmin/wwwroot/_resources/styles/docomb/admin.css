@@ -539,7 +539,6 @@ html .sideBarItem.selected a:before {
   padding: 5px 5px 5px 15px;
   font-size: 18px;
   letter-spacing: -1px;
-  font-style: italic;
   background-clip: padding-box; }
   html .articleContent blockquote {
     border-left-color: rgba(0, 0, 0, 0.2);

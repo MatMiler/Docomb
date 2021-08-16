@@ -232,7 +232,7 @@ namespace Docomb.ContentStorage
 						#region Find default file
 						foreach (string fileName in DefaultFileNames)
 						{
-							string[] files = Directory.GetFiles(path, fileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
+							string[] files = Directory.GetFiles(directory.FullName, fileName, new EnumerationOptions { MatchCasing = MatchCasing.CaseInsensitive, RecurseSubdirectories = false });
 							if (files?.Length >= 1)
 							{
 								ContentItemSummary summary = new(new ContentFile(Workspace, files[0], parentPathParts.Concat(new List<string>() { directoryName }).ToList(), true));

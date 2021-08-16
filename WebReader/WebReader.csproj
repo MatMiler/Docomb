@@ -25,6 +25,11 @@
 		<Content Remove="wwwroot\_resources\images\google-color.svg" />
 		<Content Remove="wwwroot\_resources\images\microsoft-color.svg" />
 		<Content Remove="wwwroot\_resources\styles\auth.scss" />
+		<Content Remove="wwwroot\_resources\styles\docomb\fonts\icomoon.eot" />
+		<Content Remove="wwwroot\_resources\styles\docomb\fonts\icomoon.svg" />
+		<Content Remove="wwwroot\_resources\styles\docomb\fonts\icomoon.ttf" />
+		<Content Remove="wwwroot\_resources\styles\docomb\fonts\icomoon.woff" />
+		<Content Remove="wwwroot\_resources\styles\docomb\shared\icons.scss" />
 		<Content Remove="wwwroot\_resources\styles\docomb\shared\theme.scss" />
 	</ItemGroup>
 

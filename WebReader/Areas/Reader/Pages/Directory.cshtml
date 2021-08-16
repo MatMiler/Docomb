@@ -11,7 +11,23 @@
 		<ul class="directoryChildSelection">
 			@foreach (ContentItemSummary child in children)
 			{
-				<li><a href="@child.FullUrl">@child.Title</a></li>
+				string icon = "file-empty";
+				if ((child.Type == ContentItemType.Directory) || (child.NeedsTrailingSlash))
+				{ icon = "folder"; }
+				else
+				{
+					icon = child.GetFile()?.FileType switch
+					{
+						FileType.Markdown => "file-text2",
+						FileType.PlainText => "file-text2",
+						FileType.Html => "file-text2",
+						FileType.BitmapImage => "file-picture",
+						FileType.VectorImage => "file-picture",
+						_ => "file-empty"
+					};
+				}
+				icon = $"<i class=\"icon-{icon}\"></i> ";
+				<li><a href="@child.FullUrl">@Html.Raw(icon)@child.Title</a></li>
 			}
 		</ul>
 	}
