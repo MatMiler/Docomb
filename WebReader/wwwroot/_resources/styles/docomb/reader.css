@@ -54,57 +54,43 @@ sup {
 sub {
   bottom: -0.3em; }
 
-html body {
-  background: #fff;
-  color: #000; }
-
-html a {
-  color: #03f; }
-
-html header, html footer {
-  background: #eee; }
-
-html nav a {
-  color: #000; }
-
-html .editor-colors .plainText, html .editor-colors .xmlAttributeQuotes {
-  color: #000; }
-
-html .editor-colors .htmlComment, html .editor-colors .comment, html .editor-colors .xmlDocComment, html .editor-colors .xmlComment {
-  color: #008000; }
-
-html .editor-colors .htmlTagDelimiter, html .editor-colors .htmlAttributeValue, html .editor-colors .htmlOperator, html .editor-colors .keyword, html .editor-colors .preprocessorKeyword, html .editor-colors .xmlAttributeValue, html .editor-colors .xmlDelimiter, html .editor-colors .cssPropertyValue, html .editor-colors .controlKeyword {
-  color: #00f; }
-
-html .editor-colors .htmlElementName, html .editor-colors .string, html .editor-colors .stringCSharpVerbatim, html .editor-colors .xmlName, html .editor-colors .cssSelector {
-  color: #a31515; }
-
-html .editor-colors .htmlAttributeName, html .editor-colors .htmlEntity, html .editor-colors .xmlAttribute, html .editor-colors .cssPropertyName {
-  color: #f00; }
-
-html .editor-colors .xmlDocTag, html .editor-colors .xmlCDataSection, html .editor-colors .powershellOperator, html .editor-colors .stringEscape {
-  color: #808080; }
-
-html .editor-colors .className {
-  color: #48d1cc; }
-
-html .editor-colors .sqlSystemFunction {
-  color: #f0f; }
-
-html .editor-colors .powershellAttribute {
-  color: #b0e0e6; }
-
-html .editor-colors .powershellType, html .editor-colors .type, html .editor-colors .markdownCode, html .editor-colors .typeVariable {
-  color: #008080; }
-
-html .editor-colors .powershellVariable {
-  color: #ff4500; }
-
-html .editor-colors .namespace, html .editor-colors .predefined, html .editor-colors .pseudoKeyword {
-  color: #000080; }
-
-html .editor-colors .constructor {
-  color: #800080; }
+html {
+  overflow-y: scroll; }
+  html body {
+    background: #fff;
+    color: #000; }
+  html a {
+    color: #03f; }
+  html header, html footer {
+    background: #eee; }
+  html nav a {
+    color: #000; }
+  html .editor-colors .plainText, html .editor-colors .xmlAttributeQuotes {
+    color: #000; }
+  html .editor-colors .htmlComment, html .editor-colors .comment, html .editor-colors .xmlDocComment, html .editor-colors .xmlComment {
+    color: #008000; }
+  html .editor-colors .htmlTagDelimiter, html .editor-colors .htmlAttributeValue, html .editor-colors .htmlOperator, html .editor-colors .keyword, html .editor-colors .preprocessorKeyword, html .editor-colors .xmlAttributeValue, html .editor-colors .xmlDelimiter, html .editor-colors .cssPropertyValue, html .editor-colors .controlKeyword {
+    color: #00f; }
+  html .editor-colors .htmlElementName, html .editor-colors .string, html .editor-colors .stringCSharpVerbatim, html .editor-colors .xmlName, html .editor-colors .cssSelector {
+    color: #a31515; }
+  html .editor-colors .htmlAttributeName, html .editor-colors .htmlEntity, html .editor-colors .xmlAttribute, html .editor-colors .cssPropertyName {
+    color: #f00; }
+  html .editor-colors .xmlDocTag, html .editor-colors .xmlCDataSection, html .editor-colors .powershellOperator, html .editor-colors .stringEscape {
+    color: #808080; }
+  html .editor-colors .className {
+    color: #48d1cc; }
+  html .editor-colors .sqlSystemFunction {
+    color: #f0f; }
+  html .editor-colors .powershellAttribute {
+    color: #b0e0e6; }
+  html .editor-colors .powershellType, html .editor-colors .type, html .editor-colors .markdownCode, html .editor-colors .typeVariable {
+    color: #008080; }
+  html .editor-colors .powershellVariable {
+    color: #ff4500; }
+  html .editor-colors .namespace, html .editor-colors .predefined, html .editor-colors .pseudoKeyword {
+    color: #000080; }
+  html .editor-colors .constructor {
+    color: #800080; }
 
 .dark body {
   background: #191919;
@@ -332,14 +318,14 @@ header {
       @media all and (min-width: 800px), print {
         header .pageTitle h1 {
           font-size: 30px; } }
-  html header .workspaces a:hover, html header .pageTitle .breadcrumbs a:hover, html header .pageTitle .user a {
+  html header .workspaces a:hover, html header .pageTitle .breadcrumbs a:hover, html header .pageTitle .user a:hover {
     color: #03f; }
-  .dark header .workspaces a:hover, .dark header .pageTitle .breadcrumbs a:hover, .dark header .pageTitle .user a {
+  .dark header .workspaces a:hover, .dark header .pageTitle .breadcrumbs a:hover, .dark header .pageTitle .user a:hover {
     color: #09f; }
   @media (prefers-color-scheme: dark) {
-    html header .workspaces a:hover, html header .pageTitle .breadcrumbs a:hover, html header .pageTitle .user a {
+    html header .workspaces a:hover, html header .pageTitle .breadcrumbs a:hover, html header .pageTitle .user a:hover {
       color: #09f; }
-    .light header .workspaces a:hover, .light header .pageTitle .breadcrumbs a:hover, .light header .pageTitle .user a {
+    .light header .workspaces a:hover, .light header .pageTitle .breadcrumbs a:hover, .light header .pageTitle .user a:hover {
       color: #03f; } }
   @media only print {
     header {
@@ -377,6 +363,12 @@ footer {
 
 .pageContent > :last-child, main > :last-child, blockquote > :last-child {
   margin-bottom: 0; }
+
+.pageTitle, .pageContent {
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 1200px;
+  margin: 0 auto; }
 
 .plainTextFile {
   white-space: pre-wrap; }
@@ -420,7 +412,8 @@ main pre, main code {
 
 main pre {
   padding: 10px;
-  overflow-x: auto; }
+  overflow-x: auto;
+  white-space: normal; }
 
 main code {
   padding: 0 2px; }
@@ -493,6 +486,17 @@ main table {
       background-color: #333; }
     .light main table th {
       background-color: #eee; } }
+
+main .footnote-ref {
+  text-decoration: none; }
+  main .footnote-ref sup {
+    display: inline-block;
+    min-width: 1em;
+    text-align: center;
+    font-weight: bold; }
+
+main .footnote-back-ref {
+  text-decoration: none; }
 
 .editor-colors .typeVariable, .editor-colors .italic {
   font-style: italic; }

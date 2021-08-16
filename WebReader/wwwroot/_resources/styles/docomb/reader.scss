@@ -92,7 +92,7 @@ $tabletWidth: 800px;
 		.constructor { color: map-get($codeHighlightPurple, 'dark'); }
 	}
 }
-html { @include lightPreset; }
+html { @include lightPreset; overflow-y: scroll; }
 .dark { @include darkPreset; }
 @media (prefers-color-scheme: dark) {
 	html { @include darkPreset; }
@@ -145,7 +145,7 @@ header {
 			 @include aboveTablet { font-size: 30px; }
 		}
 	}
-	.workspaces a:hover, .pageTitle .breadcrumbs a:hover, .pageTitle .user a { @include themeMap("color", $linkColor); }
+	.workspaces a:hover, .pageTitle .breadcrumbs a:hover, .pageTitle .user a:hover { @include themeMap("color", $linkColor); }
 	@media only print
 	{
 		.workspaces { display: none !important; }
@@ -177,6 +177,8 @@ footer { flex: 0 0 auto; }
 	& > :last-child { margin-bottom: 0; }
 }
 
+.pageTitle, .pageContent { width: 100%; box-sizing: border-box; max-width: 1200px; margin: 0 auto; }
+
 .plainTextFile { white-space: pre-wrap; }
 
 
@@ -195,7 +197,7 @@ main
 		font-family: Consolas, Courier New, Courier, monospace; border: 1px solid; font-size: .9em;
 		@include themeMaps(("border-color": $menuBorderColor, "background": $menuBackgroundColor));
 	}
-	pre { padding: 10px; overflow-x: auto; }
+	pre { padding: 10px; overflow-x: auto; white-space: normal; }
 	code { padding: 0 2px; }
 	pre > pre, code > code, pre > code, code > pre { font-size: 1em; border: none; padding: 0; margin: 0; }
 
@@ -214,6 +216,9 @@ main
 		th { @include themeMap("background-color", $menuBackgroundColor); }
 	}
 
+
+	.footnote-ref { text-decoration: none; sup { display: inline-block; min-width: 1em; text-align: center; font-weight: bold; } }
+	.footnote-back-ref { text-decoration: none; }
 
 }
 
