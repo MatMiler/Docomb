@@ -6,7 +6,7 @@
 		<RootNamespace>Docomb.CommonCore</RootNamespace>
 		<Product>Docomb</Product>
 		<Authors>Matjaž Miler</Authors>
-		<Version>0.1.0</Version>
+		<Version>0.2.0</Version>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Copyright>Copyright © Matjaž Miler 2021</Copyright>
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
