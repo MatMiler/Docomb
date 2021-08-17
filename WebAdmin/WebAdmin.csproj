@@ -5,7 +5,7 @@
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<AssemblyName>Docomb.WebAdmin</AssemblyName>
 		<RootNamespace>Docomb.WebAdmin</RootNamespace>
-		<Version>0.2.0</Version>
+		<Version>0.2.1</Version>
 		<Authors>Matjaž Miler</Authors>
 		<Product>Docomb</Product>
 		<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>

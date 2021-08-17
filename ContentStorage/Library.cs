@@ -177,7 +177,7 @@ namespace Docomb.ContentStorage
 			if (item != null)
 			{
 				ContentItemSummary summary = new(item);
-				cacheDict?.Add(path, new(summary));
+				cacheDict?.AddOrSet(path, new(summary));
 				return summary;
 			}
 
@@ -221,7 +221,7 @@ namespace Docomb.ContentStorage
 						string nameLower = directoryName.ToLower();
 						if (TryGetTimedCacheValue(_itemLogicalSummaryByPath, directoryName, out ContentItemSummary cache))
 						{
-							dict.Add(directoryName, cache);
+							dict.AddOrSet(directoryName, cache);
 							usedNames.Add(nameLower);
 						}
 
@@ -236,8 +236,8 @@ namespace Docomb.ContentStorage
 							if (files?.Length >= 1)
 							{
 								ContentItemSummary summary = new(new ContentFile(Workspace, files[0], parentPathParts.Concat(new List<string>() { directoryName }).ToList(), true));
-								dict.Add(directoryName, summary);
-								_itemLogicalSummaryByPath.Add(directoryName, new(summary));
+								dict.AddOrSet(directoryName, summary);
+								_itemLogicalSummaryByPath.AddOrSet(directoryName, new(summary));
 								usedNames.Add(nameLower);
 								defaultFileFound = true;
 								break;
@@ -249,8 +249,8 @@ namespace Docomb.ContentStorage
 						if (!defaultFileFound)
 						{
 							ContentItemSummary summary = new(new ContentDirectory(Workspace, directory.FullName, parentPathParts.Concat(new List<string>() { directoryName }).ToList()));
-							dict.Add(directoryName, summary);
-							_itemLogicalSummaryByPath.Add(directoryName, new(summary));
+							dict.AddOrSet(directoryName, summary);
+							_itemLogicalSummaryByPath.AddOrSet(directoryName, new(summary));
 							usedNames.Add(nameLower);
 						}
 						#endregion
@@ -276,15 +276,15 @@ namespace Docomb.ContentStorage
 						string simplifiedLower = simplifiedName.ToLower();
 						if (usedNames.Contains(simplifiedLower)) continue;
 						ContentItemSummary summary = new(new ContentFile(Workspace, file.FullName, parentPathParts.Concat(new List<string>() { simplifiedName }).ToList(), false));
-						dict.Add(simplifiedName, summary);
-						_itemLogicalSummaryByPath.Add(simplifiedName, new(summary));
+						dict.AddOrSet(simplifiedName, summary);
+						_itemLogicalSummaryByPath.AddOrSet(simplifiedName, new(summary));
 						usedNames.Add(simplifiedLower);
 					}
 				}
 			}
 			#endregion
 
-			_itemSummariesByParentPath.TryAdd(parentPath, new(dict));
+			_itemSummariesByParentPath.AddOrSet(parentPath, new(dict));
 			return dict;
 		}
 
@@ -332,7 +332,7 @@ namespace Docomb.ContentStorage
 			}
 			#endregion
 
-			_physicalItemSummariesByParentPath.TryAdd(parentPath, new(list));
+			_physicalItemSummariesByParentPath.AddOrSet(parentPath, new(list));
 			return list;
 		}
 
