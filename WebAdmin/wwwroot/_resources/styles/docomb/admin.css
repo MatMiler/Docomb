@@ -576,7 +576,7 @@ html .sideBarItem.selected a:before {
 .articleContent pre {
   padding: 10px;
   overflow-x: auto;
-  white-space: normal; }
+  white-space: pre-wrap; }
 
 .articleContent code {
   padding: 0 2px;

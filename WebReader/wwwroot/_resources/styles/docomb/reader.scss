@@ -197,7 +197,7 @@ main
 		font-family: Consolas, Courier New, Courier, monospace; border: 1px solid; font-size: .9em;
 		@include themeMaps(("border-color": $menuBorderColor, "background": $menuBackgroundColor));
 	}
-	pre { padding: 10px; overflow-x: auto; white-space: normal; }
+	pre { padding: 10px; overflow-x: auto; white-space: pre-wrap; }
 	code { padding: 0 2px; display: inline-block; }
 	pre > pre, code > code, pre > code, code > pre { font-size: 1em; border: none; padding: 0; margin: 0; }
 

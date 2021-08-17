@@ -22,7 +22,7 @@
 		background-clip: padding-box;
 		@include themeMaps(("border-color": $contentHighlightBorder, "background-color": $contentHighlightBackground));
 	}
-	pre { padding: 10px; overflow-x: auto; white-space: normal; }
+	pre { padding: 10px; overflow-x: auto; white-space: pre-wrap; }
 	code { padding: 0 2px; display: inline-block; }
 	pre > pre, code > code, pre > code, code > pre { font-size: 1em; border: none; padding: 0; margin: 0; background: none; }
 
