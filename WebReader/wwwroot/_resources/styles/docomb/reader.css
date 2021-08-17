@@ -416,7 +416,8 @@ main pre {
   white-space: normal; }
 
 main code {
-  padding: 0 2px; }
+  padding: 0 2px;
+  display: inline-block; }
 
 main pre > pre, main code > code, main pre > code, main code > pre {
   font-size: 1em;

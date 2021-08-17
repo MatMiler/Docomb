@@ -22,7 +22,7 @@
 		background-clip: padding-box;
 		@include themeMaps(("border-color": $contentHighlightBorder, "background-color": $contentHighlightBackground));
 	}
-	pre { padding: 10px; overflow-x: auto; }
+	pre { padding: 10px; overflow-x: auto; white-space: normal; }
 	code { padding: 0 2px; display: inline-block; }
 	pre > pre, code > code, pre > code, code > pre { font-size: 1em; border: none; padding: 0; margin: 0; background: none; }
 
@@ -55,6 +55,11 @@
 		thead:first-child th, tbody:first-child td, & > tr:first-child td { border-top-width: 1px; }
 		th { @include themeMap("background-color", $contentHighlightBackground); }
 	}
+
+
+	.footnote-ref { text-decoration: none; sup { display: inline-block; min-width: 1em; text-align: center; font-weight: bold; } }
+	.footnote-back-ref { text-decoration: none; }
+
 
 	.plainTextFile { white-space: pre-wrap; border: none; background: transparent; padding: 0; }
 }

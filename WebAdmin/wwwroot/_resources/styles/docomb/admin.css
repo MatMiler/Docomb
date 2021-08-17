@@ -575,7 +575,8 @@ html .sideBarItem.selected a:before {
 
 .articleContent pre {
   padding: 10px;
-  overflow-x: auto; }
+  overflow-x: auto;
+  white-space: normal; }
 
 .articleContent code {
   padding: 0 2px;
@@ -651,6 +652,17 @@ html .sideBarItem.selected a:before {
       background-color: rgba(255, 255, 255, 0.1); }
     .light .articleContent table th {
       background-color: rgba(0, 0, 0, 0.1); } }
+
+.articleContent .footnote-ref {
+  text-decoration: none; }
+  .articleContent .footnote-ref sup {
+    display: inline-block;
+    min-width: 1em;
+    text-align: center;
+    font-weight: bold; }
+
+.articleContent .footnote-back-ref {
+  text-decoration: none; }
 
 .articleContent .plainTextFile {
   white-space: pre-wrap;
