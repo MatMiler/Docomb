@@ -16,7 +16,8 @@
 				{ icon = "folder"; }
 				else
 				{
-					icon = child.GetFile()?.FileType switch
+					var file = child.GetFile();
+					icon = file?.FileType switch
 					{
 						FileType.Markdown => "file-text2",
 						FileType.PlainText => "file-text2",
@@ -25,6 +26,14 @@
 						FileType.VectorImage => "file-picture",
 						_ => "file-empty"
 					};
+					switch (Docomb.CommonCore.Utils.GetFileExtension(child.FullUrl)?.ToLower())
+					{
+						case "doc": case "docx": { icon = "file-word"; break; }
+						case "xls": case "xlsx": { icon = "file-excel"; break; }
+						case "ppt": case "pptx": { icon = "file-play"; break; }
+						case "pdf": { icon = "file-pdf"; break; }
+						case "zip": case "zipx": case "rar": case "gz": case "gzip": case "7z": case "tar": case "iso": case "lz": { icon = "file-zip"; break; }
+					}
 				}
 				icon = $"<i class=\"icon-{icon}\"></i> ";
 				<li><a href="@child.FullUrl">@Html.Raw(icon)@child.Title</a></li>

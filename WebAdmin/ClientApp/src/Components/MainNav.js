@@ -126,6 +126,37 @@ export class MainNav extends Component {
                         icon = "Photo2";
                         break;
                     }
+                    case "ppt":
+                    case "pptx": {
+                        icon = "Slideshow";
+                        break;
+                    }
+                    case "doc":
+                    case "docx": {
+                        icon = "Articles";
+                        break;
+                    }
+                    case "xls":
+                    case "xlsx": {
+                        icon = "Table";
+                        break;
+                    }
+                    case "pdf": {
+                        icon = "PDF";
+                        break;
+                    }
+                    case "zip":
+                    case "zipx":
+                    case "rar":
+                    case "gz":
+                    case "gzip":
+                    case "7z":
+                    case "tar":
+                    case "iso":
+                    case "lz": {
+                        icon = "ZipFolder";
+                        break;
+                    }
                 }
             }
         }

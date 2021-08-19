@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Docomb.ContentStorage.FormatInfo
 {
-	class BitmapImageInfo
+	public static class BitmapImageInfo
 	{
 
 		public static readonly List<string> Extensions = new() { "jpg", "jpeg", "png", "gif", "bmp", "tiff", "tif", "ico" };

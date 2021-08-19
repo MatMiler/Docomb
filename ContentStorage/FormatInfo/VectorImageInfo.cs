@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Docomb.ContentStorage.FormatInfo
 {
-	class VectorImageInfo
+	public static class VectorImageInfo
 	{
 
 		public static readonly List<string> Extensions = new() { "svg" };
