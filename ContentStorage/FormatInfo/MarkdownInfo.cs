@@ -46,13 +46,15 @@ namespace Docomb.ContentStorage.FormatInfo
 			try
 			{
 				using TextReader reader = (File?.TextContentWasLoaded == true) ? new StringReader(File?.TextContent) : new StreamReader(File?.FilePath);
+				string line = reader.ReadLine();
 				var parser = new YamlDotNet.Core.Parser(reader);
 				parser.Consume<StreamStart>();
 				parser.Consume<DocumentStart>();
 				data = FrontMatterDeserializer.Deserialize<MetaData>(parser);
 				parser.Consume<DocumentEnd>();
 			}
-			catch (Exception e) { Reports.Report(e); }
+			catch { }
+			//catch (Exception e) { Reports.Report(new ActionStatus(ActionStatus.StatusCode.DataNotSupported, message: e.Message, exception: e)); }
 			return data;
 		}
 
