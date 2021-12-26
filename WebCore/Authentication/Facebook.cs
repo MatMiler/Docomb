@@ -34,8 +34,8 @@ namespace Docomb.WebCore.Authentication
 		{
 			_code = configSource?.GetValue<string>("code")?.Trim();
 			_name = configSource?.GetValue<string>("name")?.Trim();
-			_appId = configSource?.GetValue<string>("appId");
-			_appSecret = configSource?.GetValue<string>("appSecret");
+			_appId = CommonCore.Secrets.Manager.GetValue(configSource?.GetValue<string>("appId"));
+			_appSecret = CommonCore.Secrets.Manager.GetValue(configSource?.GetValue<string>("appSecret"));
 
 			if (string.IsNullOrWhiteSpace(_code)) _code = "Facebook";
 			if (string.IsNullOrWhiteSpace(_name)) _name = "Facebook";

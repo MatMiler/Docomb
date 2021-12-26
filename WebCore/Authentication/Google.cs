@@ -30,8 +30,8 @@ namespace Docomb.WebCore.Authentication
 		{
 			_code = configSource?.GetValue<string>("code")?.Trim();
 			_name = configSource?.GetValue<string>("name")?.Trim();
-			_clientId = configSource?.GetValue<string>("clientId");
-			_clientSecret = configSource?.GetValue<string>("clientSecret");
+			_clientId = CommonCore.Secrets.Manager.GetValue(configSource?.GetValue<string>("clientId"));
+			_clientSecret = CommonCore.Secrets.Manager.GetValue(configSource?.GetValue<string>("clientSecret"));
 
 			if (string.IsNullOrWhiteSpace(_code)) _code = "Google";
 			if (string.IsNullOrWhiteSpace(_name)) _name = "Google";
