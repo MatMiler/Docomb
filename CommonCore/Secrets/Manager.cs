@@ -59,7 +59,6 @@ namespace Docomb.CommonCore.Secrets
 			{
 				string code = match.Groups[1]?.Value?.ToLowerInvariant();
 				string key = match.Groups[2]?.Value;
-				//if (code == "value") return key;
 				if ((Stores.TryGetValue(code, out Store store)) && (store != null))
 					return store.GetValue(key);
 			}
