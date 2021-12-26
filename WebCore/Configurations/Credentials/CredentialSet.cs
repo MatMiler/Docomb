@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Docomb.WebCore.Configurations.Credentials
 {
+	[Obsolete]
 	public class CredentialSet
 	{
 		[JsonPropertyName("key")]

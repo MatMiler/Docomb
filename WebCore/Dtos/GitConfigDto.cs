@@ -19,8 +19,15 @@ namespace Docomb.WebCore.Dtos
 		public string Branch { get; set; }
 
 
+		[Obsolete("Use Username & Password with secret value")]
 		[JsonPropertyName("credentialsKey")]
 		public string CredentialsKey { get; set; }
+
+		[JsonPropertyName("username")]
+		public string UsernameSecret { get; set; }
+		[JsonPropertyName("password")]
+		public string PasswordSecret { get; set; }
+
 
 		[JsonPropertyName("commiterName")]
 		public string CommiterName { get; set; }
@@ -44,6 +51,8 @@ namespace Docomb.WebCore.Dtos
 				RepositoryPath = RepositoryPath,
 				Branch = Branch,
 				CredentialsKey = CredentialsKey,
+				UsernameSecret = UsernameSecret,
+				PasswordSecret = PasswordSecret,
 				CommiterName = CommiterName,
 				CommiterEmail = CommiterEmail,
 				ShouldClone = ShouldClone,
@@ -60,6 +69,8 @@ namespace Docomb.WebCore.Dtos
 				RepositoryPath = manager.RepositoryPath,
 				Branch = manager.Branch,
 				CredentialsKey = manager.CredentialsKey,
+				UsernameSecret = manager.UsernameSecret,
+				PasswordSecret = manager.PasswordSecret,
 				CommiterName = manager.CommiterName,
 				CommiterEmail = manager.CommiterEmail,
 				ShouldClone = manager.ShouldClone,

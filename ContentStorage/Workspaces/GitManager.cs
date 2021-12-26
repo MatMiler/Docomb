@@ -19,6 +19,7 @@ namespace Docomb.ContentStorage.Workspaces
 		public string Branch { get; set; } = "main";
 
 
+		[Obsolete("Use username & password with secret value")]
 		public string CredentialsKey { get; set; } = null;
 
 
@@ -34,8 +35,36 @@ namespace Docomb.ContentStorage.Workspaces
 		public Workspace Workspace { get; internal set; }
 
 
-		public string Username { get; set; }
-		public string Password { private get; set; }
+		public string UsernameSecret { get; set; }
+		public string PasswordSecret { get; set; }
+
+		public string Username
+		{
+			get
+			{
+				if (!_accessWasRetrieved) RetrieveAccess();
+				return _username;
+			}
+			set => _username = value;
+		}
+		private string _username = null;
+		public string Password
+		{
+			private get
+			{
+				if (!_accessWasRetrieved) RetrieveAccess();
+				return _password;
+			}
+			set => _password = value;
+		}
+		private string _password = null;
+		private bool _accessWasRetrieved = false;
+		private void RetrieveAccess()
+		{
+			_username = CommonCore.Secrets.Manager.GetValue(UsernameSecret);
+			_password = CommonCore.Secrets.Manager.GetValue(PasswordSecret);
+			_accessWasRetrieved = true;
+		}
 
 
 		public bool IsValid
