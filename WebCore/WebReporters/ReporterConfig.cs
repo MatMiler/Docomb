@@ -65,10 +65,10 @@ namespace Docomb.WebCore.WebReporters
 			if (isEnabled)
 			{
 				string recipients = Utils.ParseString(configSource?.GetValue<string>("recipients"));
-				string host = Utils.ParseString(configSource?.GetValue<string>("host"));
-				int port = Utils.ParseInt(configSource?.GetValue<string>("port"));
-				string username = Utils.ParseString(configSource?.GetValue<string>("username"));
-				string password = Utils.ParseString(configSource?.GetValue<string>("password"));
+				string host = CommonCore.Secrets.Manager.GetValue(configSource?.GetValue<string>("host"));
+				int port = Utils.ParseInt(CommonCore.Secrets.Manager.GetValue(configSource?.GetValue<string>("port")));
+				string username = CommonCore.Secrets.Manager.GetValue(configSource?.GetValue<string>("username"));
+				string password = CommonCore.Secrets.Manager.GetValue(configSource?.GetValue<string>("password"));
 				_emailReporter ??= new(recipients, host, port, username, password);
 				Reports.AddReporter(_emailReporterCode, _emailReporter);
 			}
