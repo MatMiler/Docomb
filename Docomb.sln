@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31205.134
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestSite", "TestSite\TestSite.csproj", "{E6795B3C-713D-413D-84C8-6CB5DB01C5B8}"
 EndProject
@@ -15,7 +15,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonCore", "CommonCore\Co
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{DE0FB73F-5022-4722-ADB7-8CC5136E2F53}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAdmin", "WebAdmin\WebAdmin.csproj", "{687A98B9-8E1A-4242-831C-72EE7746681C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAdmin", "WebAdmin\WebAdmin.csproj", "{687A98B9-8E1A-4242-831C-72EE7746681C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonCore.Secrets.AzureKeyVault", "CommonCore.Secrets\AzureKeyVault\CommonCore.Secrets.AzureKeyVault.csproj", "{6B28CF53-1BD0-498C-928B-D5CA1E2CBD9C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonCore.Secrets.AmazonSecrets", "CommonCore.Secrets\AmazonSecrets\CommonCore.Secrets.AmazonSecrets.csproj", "{9EBCFD3B-E325-48EF-929B-9D22D4733A69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +55,14 @@ Global
 		{687A98B9-8E1A-4242-831C-72EE7746681C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{687A98B9-8E1A-4242-831C-72EE7746681C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{687A98B9-8E1A-4242-831C-72EE7746681C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B28CF53-1BD0-498C-928B-D5CA1E2CBD9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B28CF53-1BD0-498C-928B-D5CA1E2CBD9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B28CF53-1BD0-498C-928B-D5CA1E2CBD9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B28CF53-1BD0-498C-928B-D5CA1E2CBD9C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EBCFD3B-E325-48EF-929B-9D22D4733A69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EBCFD3B-E325-48EF-929B-9D22D4733A69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EBCFD3B-E325-48EF-929B-9D22D4733A69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EBCFD3B-E325-48EF-929B-9D22D4733A69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

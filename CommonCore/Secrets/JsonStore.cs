@@ -7,12 +7,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace Docomb.CommonCore.Secrets
 {
-	public class JsonStore : Store
+	public class JsonStore : IStore
 	{
 
-		public override string Code => "json";
+		public string Code => "json";
 
-		public override string GetValue(string key)
+		public string GetValue(string key)
 		{
 			if (string.IsNullOrEmpty(key)) return null;
 			string[] parts = key.Split("::", 2);

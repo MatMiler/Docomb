@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Docomb.CommonCore.Secrets
 {
-	public class ValueStore : Store
+	public class ValueStore : IStore
 	{
 
-		public override string Code => "value";
+		public string Code => "value";
 
-		public override string GetValue(string key) => key;
+		public string GetValue(string key) => key;
 
 	}
 }

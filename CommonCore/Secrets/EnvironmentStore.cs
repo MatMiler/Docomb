@@ -7,12 +7,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace Docomb.CommonCore.Secrets
 {
-	public class EnvironmentStore : Store
+	public class EnvironmentStore : IStore
 	{
 
-		public override string Code => "env";
+		public string Code => "env";
 
-		public override string GetValue(string key) => Environment.GetEnvironmentVariable(key);
+		public string GetValue(string key) => Environment.GetEnvironmentVariable(key);
 
 	}
 }

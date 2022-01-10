@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Docomb.CommonCore.Secrets
 {
-	public class AzureKeyVaultStore : Store
+	public class AzureKeyVaultStore : IStore
 	{
 		public AzureKeyVaultStore(string code, string vaultUri, Azure.Core.TokenCredential credential) : this(code, new Uri(vaultUri), credential)
 		{
@@ -27,9 +27,9 @@ namespace Docomb.CommonCore.Secrets
 
 		private SecretClient _client;
 
-		public override string Code => _code;
+		public string Code => _code;
 
-		public override string GetValue(string key) => GetValueAsync(key).Result;
+		public string GetValue(string key) => GetValueAsync(key).Result;
 
 		public async Task<string> GetValueAsync(string key)
 		{

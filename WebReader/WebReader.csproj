@@ -5,7 +5,7 @@
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<AssemblyName>Docomb.WebReader</AssemblyName>
 		<RootNamespace>Docomb.WebReader</RootNamespace>
-		<Version>0.2.2</Version>
+		<Version>0.2.3-alpha</Version>
 		<Authors>Matjaž Miler</Authors>
 		<Product>Docomb</Product>
 		<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>

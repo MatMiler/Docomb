@@ -7,17 +7,21 @@ using System.Threading.Tasks;
 
 namespace Docomb.CommonCore.Secrets
 {
+	/// <summary>
+	/// Secrets store manager.
+	/// Maintains a list of stores, which can retrieve values from their respective sources.
+	/// </summary>
 	public static class Manager
 	{
 
-
-		public static Dictionary<string, Store> Stores
+		/// <summary>Available stores</summary>
+		public static Dictionary<string, IStore> Stores
 		{
 			get
 			{
 				if (_stores == null)
 				{
-					Dictionary<string, Store> list = new();
+					Dictionary<string, IStore> list = new();
 
 					// Register built-in stores
 					list.Register(new JsonStore());
@@ -28,29 +32,40 @@ namespace Docomb.CommonCore.Secrets
 				return _stores;
 			}
 		}
-		private static Dictionary<string, Store> _stores = null;
+		private static Dictionary<string, IStore> _stores = null;
 
 
-
-		public static void Register(Store store)
+		/// <summary>Add a store.</summary>
+		/// <param name="store">Store to add</param>
+		public static void Register(IStore store)
 		{
 			Stores?.Register(store);
 		}
 
-		public static void Register(this Dictionary<string, Store> list, Store store)
+		/// <summary>Add a store if its code isn't already in use.</summary>
+		/// <param name="list"></param>
+		/// <param name="store"></param>
+		private static void Register(this Dictionary<string, IStore> list, IStore store)
 		{
 			if (string.IsNullOrWhiteSpace(store?.Code)) return; // Don't register stores without a code
 			list.TryAdd(store.Code, store);
 		}
 
-		public static void Unregister(Store store) => Unregister(store?.Code);
+		/// <summary>Remove a store, so that it can no longer be used.</summary>
+		/// <param name="store">Store to remove</param>
+		public static void Unregister(IStore store) => Unregister(store?.Code);
 
+		/// <summary>Remove a store, so that it can no longer be used.</summary>
+		/// <param name="storeCode">Code of the store to remove</param>
 		public static void Unregister(string storeCode)
 		{
 			if (storeCode == null) return;
-			_stores.Remove(storeCode);
+			_stores?.Remove(storeCode);
 		}
 
+		/// <summary>Check if <c>s</c> is a secret reference and return the value from appropriate store. Otherwise the original value is returned.</summary>
+		/// <param name="s">Secret reference. <example>Example: <c>"@store1:key1"</c></example></param>
+		/// <returns></returns>
 		public static string GetValue(string s)
 		{
 			Regex regex = new("^@([^:]*):(.*)$");
@@ -59,7 +74,7 @@ namespace Docomb.CommonCore.Secrets
 			{
 				string code = match.Groups[1]?.Value?.ToLowerInvariant();
 				string key = match.Groups[2]?.Value;
-				if ((Stores.TryGetValue(code, out Store store)) && (store != null))
+				if ((Stores.TryGetValue(code, out IStore store)) && (store != null))
 					return store.GetValue(key);
 			}
 

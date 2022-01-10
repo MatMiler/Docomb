@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
 		<AddRazorSupportForMvc>true</AddRazorSupportForMvc>
 		<AssemblyName>Docomb.WebAdmin</AssemblyName>
 		<RootNamespace>Docomb.WebAdmin</RootNamespace>
-		<Version>0.2.2</Version>
+		<Version>0.2.3-alpha</Version>
 		<Authors>Matjaž Miler</Authors>
 		<Product>Docomb</Product>
 		<GenerateEmbeddedFilesManifest>true</GenerateEmbeddedFilesManifest>
@@ -18,9 +18,9 @@
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageIconUrl />
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-  </PropertyGroup>
+	</PropertyGroup>
 
-  
+
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
@@ -38,55 +38,55 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Remove="ClientApp\package-lock.json" />
-	  <Content Remove="ClientApp\package.json" />
-	  <Content Remove="compilerconfig.json" />
-	  <Content Remove="tsconfig.json" />
+		<Content Remove="ClientApp\package-lock.json" />
+		<Content Remove="ClientApp\package.json" />
+		<Content Remove="compilerconfig.json" />
+		<Content Remove="tsconfig.json" />
 		<Content Remove="wwwroot\_resources\images\facebook-color.svg" />
 		<Content Remove="wwwroot\_resources\images\google-color.svg" />
-	  <Content Remove="wwwroot\_resources\images\microsoft-color.svg" />
-	  <Content Remove="wwwroot\_resources\styles\article.scss" />
-	  <Content Remove="wwwroot\_resources\styles\docomb\auth.scss" />
-	  <Content Remove="wwwroot\_resources\styles\docomb\shared\base.scss" />
-	  <Content Remove="wwwroot\_resources\styles\docomb\theme.scss" />
+		<Content Remove="wwwroot\_resources\images\microsoft-color.svg" />
+		<Content Remove="wwwroot\_resources\styles\article.scss" />
+		<Content Remove="wwwroot\_resources\styles\docomb\auth.scss" />
+		<Content Remove="wwwroot\_resources\styles\docomb\shared\base.scss" />
+		<Content Remove="wwwroot\_resources\styles\docomb\theme.scss" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <_ContentIncludedByDefault Remove="compilerconfig.json" />
+		<_ContentIncludedByDefault Remove="compilerconfig.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Include="..\icon.png">
-	    <Pack>True</Pack>
-	    <PackagePath></PackagePath>
-	  </None>
-	  <None Include="..\LICENSE">
-	    <Pack>True</Pack>
-	    <PackagePath></PackagePath>
-	  </None>
-	  <None Include="ClientApp\package-lock.json" />
-	  <None Include="ClientApp\package.json" />
-	  <None Include="compilerconfig.json" />
-	  <None Include="tsconfig.json" />
+		<None Include="..\icon.png">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath></PackagePath>
+		</None>
+		<None Include="ClientApp\package-lock.json" />
+		<None Include="ClientApp\package.json" />
+		<None Include="compilerconfig.json" />
+		<None Include="tsconfig.json" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="ClientApp\TypeScript\Components\Settings\SettingsBreadcrumbs.tsx">
-	    <SubType>Code</SubType>
-	  </None>
-	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentFileInfo.tsx">
-	    <SubType>Code</SubType>
-	  </None>
-	  <None Update="ClientApp\TypeScript\Components\Workspace\ContentDirectory.tsx">
-	    <SubType>Code</SubType>
-	  </None>
-	  <None Update="ClientApp\TypeScript\Components\Workspace\OptionsBreadcrumbs.tsx">
-	    <SubType>Code</SubType>
-	  </None>
+		<None Update="ClientApp\TypeScript\Components\Settings\SettingsBreadcrumbs.tsx">
+			<SubType>Code</SubType>
+		</None>
+		<None Update="ClientApp\TypeScript\Components\Workspace\ContentFileInfo.tsx">
+			<SubType>Code</SubType>
+		</None>
+		<None Update="ClientApp\TypeScript\Components\Workspace\ContentDirectory.tsx">
+			<SubType>Code</SubType>
+		</None>
+		<None Update="ClientApp\TypeScript\Components\Workspace\OptionsBreadcrumbs.tsx">
+			<SubType>Code</SubType>
+		</None>
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-	  <Exec Command="cd ClientApp&#xD;&#xA;npx webpack --config webpack.config.js&#xD;&#xA;cd .." />
+		<Exec Command="cd ClientApp&#xD;&#xA;npx webpack --config webpack.config.js&#xD;&#xA;cd .." />
 	</Target>
 
 </Project>
